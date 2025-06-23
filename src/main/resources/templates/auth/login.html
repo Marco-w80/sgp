@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Login - SGP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <form th:action="@{/login}" method="post" class="p-4 bg-white border rounded" style="min-width:300px">
+        <h2 class="mb-4 text-center">Login</h2>
+        <div class="mb-3">
+            <input type="email" name="username" class="form-control" placeholder="E-mail" required>
+        </div>
+        <div class="mb-3">
+            <input type="password" name="password" class="form-control" placeholder="Senha" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        <div th:if="${param.error}" class="text-danger mt-2 text-center">Login inválido</div>
+    </form>
+    <div class="text-center mt-3">
+        <a th:href="@{/register}">Criar conta</a>
+    </div>
+
+</body>
+
+</html>

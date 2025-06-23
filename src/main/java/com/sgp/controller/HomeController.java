@@ -8,6 +8,11 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "home"; // Vai procurar templates/home.html
+        return "site/home";
+    }
+
+    @GetMapping("/intranet")
+    public String intranet() {
+        return "intranet/dashboard"; // página a ser criada depois
     }
 }
