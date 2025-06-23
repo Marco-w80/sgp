@@ -1,0 +1,33 @@
+<!-- src/main/resources/templates/locais/cadastrar-local.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <div th:replace="~{fragments/head :: top}"></div>
+</head>
+<body>
+  <h1 class="h3 mb-4 text-gray-800">Cadastrar Local</h1>
+  <form th:action="@{/locais/cadastrar}" th:object="${local}" method="post">
+    <label>Comarca:</label>
+    <input type="text" th:field="*{comarca}" required/><br/>
+
+    <label>Especialidade:</label>
+    <input type="text" th:field="*{especialidade}" required/><br/>
+
+    <label>Número da Vara:</label>
+    <input type="text" th:field="*{numeroVara}" required/><br/>
+
+    <label>Código:</label>
+    <input type="number" th:field="*{codigo}" required/><br/>
+
+    <label>Localização:</label>
+    <input type="text" th:field="*{localizacao}" required/><br/>
+
+    <label>Observações:</label>
+    <textarea th:field="*{obs}"></textarea><br/>
+
+    <button type="submit">Salvar</button>
+  </form>
+  <a th:href="@{/locais/listar}">Voltar</a>
+  <div th:replace="~{fragments/foot :: bot}"></div>
+</body>
+</html>

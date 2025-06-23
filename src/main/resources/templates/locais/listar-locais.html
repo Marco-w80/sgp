@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <div th:replace="~{fragments/head :: top}"></div>
+</head>
+<body>
+  <h1 class="h3 mb-4 text-gray-800">Listar Locais</h1>
+  <a th:href="@{/locais/cadastrar}">Cadastrar Local</a>
+  <table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Comarca</th>
+        <th>Especialidade</th>
+        <th>Nº Vara</th>
+        <th>Código</th>
+        <th>Localização</th>
+        <th>Observações</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="loc : ${locais}">
+        <td th:text="${loc.id}"></td>
+        <td th:text="${loc.comarca}"></td>
+        <td th:text="${loc.especialidade}"></td>
+        <td th:text="${loc.numeroVara}"></td>
+        <td th:text="${loc.codigo}"></td>
+        <td th:text="${loc.localizacao}"></td>
+        <td th:text="${loc.obs}"></td>
+        <td><a th:href="@{|/locais/editar/${loc.id}|}">Editar</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <div th:replace="~{fragments/foot :: bot}"></div>
+</body>
+</html>
