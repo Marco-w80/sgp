@@ -105,6 +105,7 @@
                   <tr>
                     <th>Nome</th>
                     <th>Data de Envio</th>
+                    <th>Quantidade</th>
                     <th style="width:1%;">Remover</th>
                   </tr>
                 </thead>
@@ -118,6 +119,11 @@
                              name="produtoDatas"
                              th:value="${item.dataEnvio}" required>
                       <input type="hidden" name="produtoIds" th:value="${item.produto.id}">
+                    </td>
+                    <td>
+                      <input type="number" class="form-control form-control-sm"
+                             name="produtoQuantidades"
+                             th:value="${item.quantidade}" min="1" required>
                     </td>
                     <td>
                       <button type="button"
@@ -169,16 +175,25 @@
       var tr = document.createElement('tr');
       tr.id = key;
 
+      // Nome
       var tdNome = document.createElement('td');
       tdNome.textContent = prod.nomeItem;
       tr.appendChild(tdNome);
 
+      // Data + hidden produtoId
       var tdData = document.createElement('td');
       tdData.innerHTML =
         '<input type="date" name="produtoDatas" required class="form-control form-control-sm"/>' +
         '<input type="hidden" name="produtoIds" value="' + prod.id + '"/>';
       tr.appendChild(tdData);
 
+      // Quantidade
+      var tdQtde = document.createElement('td');
+      tdQtde.innerHTML =
+        '<input type="number" name="produtoQuantidades" min="1" required class="form-control form-control-sm"/>';
+      tr.appendChild(tdQtde);
+
+      // Remover
       var tdRm = document.createElement('td');
       tdRm.innerHTML =
         '<button type="button" class="btn btn-sm btn-danger" onclick="removeProduto(\'' + key + '\')">&times;</button>';

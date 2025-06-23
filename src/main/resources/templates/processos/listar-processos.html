@@ -47,12 +47,20 @@
                 <td th:text="${#temporals.format(proc.dataInicio, 'dd/MM/yyyy')}"></td>
                 <td th:text="${proc.status}"></td>
                 <td th:text="${proc.local.comarca + ' – ' + proc.local.localizacao}"></td>
+                
+                <!-- Aqui iteramos sobre proc.itens -->
                 <td>
-                  <span th:each="prod, iterStat : ${proc.produtos}">
-                    <span th:text="${prod.nomeItem}"></span>
-                    <span th:if="${!iterStat.last}">, </span>
-                  </span>
+                  <ul class="mb-0 pl-3">
+                    <li th:each="item : ${proc.itens}">
+                      <span th:text="${item.produto.nomeItem}">NomeProd</span>
+                      &nbsp;–
+                      Qtd: <span th:text="${item.quantidade}">0</span>
+                      &nbsp;–
+                      Env.: <span th:text="${#temporals.format(item.dataEnvio, 'dd/MM/yyyy')}">dd/mm/aaaa</span>
+                    </li>
+                  </ul>
                 </td>
+                
                 <td th:text="${proc.obs}"></td>
                 <td>
                   <a th:href="@{/processos/editar/{id}(id=${proc.id})}"

@@ -51,52 +51,60 @@ public class ProcessoController {
     }
 
     @PostMapping("/cadastrar")
-public String create(
-    @RequestParam String numeroInterno,
-    @RequestParam String numeroProcesso,
-    @RequestParam Long pacienteId,
-    @RequestParam Long advogadoId,             // ← não deixe de incluir
-    @RequestParam Long medicoId,
-    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate dataInicio,
-    @RequestParam StatusProcesso status,
-    @RequestParam Long localId,
+    public String create(
+        @RequestParam String numeroInterno,
+        @RequestParam String numeroProcesso,
+        @RequestParam Long pacienteId,
+        @RequestParam Long advogadoId,
+        @RequestParam Long medicoId,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dataInicio,
+        @RequestParam StatusProcesso status,
+        @RequestParam Long localId,
 
-    // agora sim, as listas de produtos e datas
-    @RequestParam(required = false) List<Long> produtoIds,
-    @RequestParam(required = false)
-      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-      List<LocalDate> produtoDatas,
+        // listas de produtos, datas e quantidades
+        @RequestParam(required = false) List<Long> produtoIds,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        List<LocalDate> produtoDatas,
+        @RequestParam(required = false) List<Integer> produtoQuantidades,
 
-    @RequestParam(required = false) String obs
-) {
-    Processo proc = new Processo();
-    proc.setNumeroInterno(numeroInterno);
-    proc.setNumeroProcesso(numeroProcesso);
-    // recupere e sete SEMPRE esses três:
-    proc.setPaciente((Paciente)pessoaRepository.findById(pacienteId).orElseThrow());
-    proc.setAdvogado((Advogado)pessoaRepository.findById(advogadoId).orElseThrow());
-    proc.setMedico((Medico)pessoaRepository.findById(medicoId).orElseThrow());
+        @RequestParam(required = false) String obs
+    ) {
+        Processo proc = new Processo();
+        proc.setNumeroInterno(numeroInterno);
+        proc.setNumeroProcesso(numeroProcesso);
+        proc.setPaciente((Paciente)pessoaRepository.findById(pacienteId).orElseThrow());
+        proc.setAdvogado((Advogado)pessoaRepository.findById(advogadoId).orElseThrow());
+        proc.setMedico((Medico)pessoaRepository.findById(medicoId).orElseThrow());
+        proc.setDataInicio(dataInicio);
+        proc.setStatus(status);
+        proc.setLocal(localRepository.findById(localId).orElseThrow());
+        proc.setObs(obs);
 
-    proc.setDataInicio(dataInicio);
-    proc.setStatus(status);
-    proc.setLocal(localRepository.findById(localId).orElseThrow());
-    proc.setObs(obs);
+        // adiciona cada item com data e quantidade
+        if (produtoIds != null
+            && produtoDatas != null
+            && produtoQuantidades != null
+            && produtoIds.size() == produtoDatas.size()
+            && produtoIds.size() == produtoQuantidades.size()) {
 
-    // então adicione os itens com data
-    if (produtoIds != null 
-        && produtoDatas != null 
-        && produtoIds.size() == produtoDatas.size()) {
-      for (int i = 0; i < produtoIds.size(); i++) {
-        Produto p = produtoRepository.findById(produtoIds.get(i)).orElseThrow();
-        LocalDate envio = produtoDatas.get(i);
-        proc.addItem(p, envio);
-      }
+            for (int i = 0; i < produtoIds.size(); i++) {
+                Produto p = produtoRepository.findById(produtoIds.get(i)).orElseThrow();
+                LocalDate envio = produtoDatas.get(i);
+                Integer qtde = produtoQuantidades.get(i);
+
+                // cria e configura o vínculo ProcessoProduto
+                ProcessoProduto pp = new ProcessoProduto(proc, p, envio);
+                pp.setQuantidade(qtde);  // <— você precisará adicionar este campo no model
+                proc.getItens().add(pp);
+            }
+        }
+
+        processoRepository.save(proc);
+        return "redirect:/processos/listar";
     }
 
-    processoRepository.save(proc);
-    return "redirect:/processos/listar";
-}
 
 
     @GetMapping("/listar")
@@ -105,11 +113,10 @@ public String create(
         return "processos/listar-processos";
     }
 
-    @GetMapping("/editar/{id}")
+   @GetMapping("/editar/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Processo proc = processoRepository.findById(id).orElseThrow();
         model.addAttribute("processo", proc);
-        // mesmo carregamento de listas
         model.addAttribute("pacientes", pessoaRepository.findAll().stream()
             .filter(p -> p instanceof Paciente).map(p->(Paciente)p).collect(Collectors.toList()));
         model.addAttribute("advogados", pessoaRepository.findAll().stream()
@@ -133,10 +140,19 @@ public String create(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
         @RequestParam StatusProcesso status,
         @RequestParam Long localId,
+
+        // listas paralelas vinda da view
         @RequestParam(required = false) List<Long> produtoIds,
+        @RequestParam(required = false)
+          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          List<LocalDate> produtoDatas,
+        @RequestParam(required = false) List<Integer> produtoQuantidades,
+
         @RequestParam(required = false) String obs
     ) {
         Processo proc = processoRepository.findById(id).orElseThrow();
+
+        // atualiza campos simples
         proc.setNumeroInterno(numeroInterno);
         proc.setNumeroProcesso(numeroProcesso);
         proc.setPaciente((Paciente)pessoaRepository.findById(pacienteId).orElseThrow());
@@ -145,15 +161,27 @@ public String create(
         proc.setDataInicio(dataInicio);
         proc.setStatus(status);
         proc.setLocal(localRepository.findById(localId).orElseThrow());
-        if (produtoIds != null) {
-            proc.setProdutos(produtoRepository.findAllById(produtoIds)
-                                               .stream().collect(Collectors.toSet()));
-        } else {
-            proc.getProdutos().clear();
-        }
         proc.setObs(obs);
+
+        // limpa todos os itens antigos
+        proc.clearItems();
+
+        // adiciona novamente cada item com data e quantidade
+        if (produtoIds != null 
+            && produtoDatas != null 
+            && produtoQuantidades != null
+            && produtoIds.size() == produtoDatas.size()
+            && produtoIds.size() == produtoQuantidades.size()) {
+            for (int i = 0; i < produtoIds.size(); i++) {
+                Produto p = produtoRepository.findById(produtoIds.get(i)).orElseThrow();
+                LocalDate envio = produtoDatas.get(i);
+                Integer qtde = produtoQuantidades.get(i);
+                proc.addItem(p, envio, qtde);
+            }
+        }
 
         processoRepository.save(proc);
         return "redirect:/processos/listar";
     }
+
 }

@@ -85,6 +85,7 @@
                 <tr>
                   <th>Produto</th>
                   <th>Data</th>
+                  <th>Quantidade</th>
                   <th style="width:1%;">Ações</th>
                 </tr>
               </thead>
@@ -143,6 +144,12 @@
         '<input type="hidden" name="produtoIds" value="' + prod.id + '"/>' +
         '<input type="date" name="produtoDatas" required class="form-control"/>';
       tr.appendChild(tdData);
+
+      // Coluna: quantidade
+      var tdQtd = document.createElement('td');
+      tdQtd.innerHTML =
+        '<input type="number" name="produtoQuantidades" min="1" value="1" required class="form-control"/>';
+      tr.appendChild(tdQtd);
 
       // Coluna: botão de remoção
       var tdAcao = document.createElement('td');
