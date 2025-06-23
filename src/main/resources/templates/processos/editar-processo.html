@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <div th:replace="~{fragments/head :: top}"></div>
+</head>
+<body>
+  <h1 class="h3 mb-4 text-gray-800">Editar Processo</h1>
+  <form th:action="@{|/processos/editar/${processo.id}|}" method="post">
+    <label>Número Interno:</label>
+    <input type="text" name="numeroInterno" th:value="${processo.numeroInterno}" required/><br/>
+
+    <label>Número Processo:</label>
+    <input type="text" name="numeroProcesso" th:value="${processo.numeroProcesso}" required/><br/>
+
+    <label>Paciente:</label>
+    <select name="pacienteId" required>
+      <option th:each="p : ${pacientes}"
+              th:value="${p.id}"
+              th:text="${p.nome}"
+              th:selected="${p.id == processo.paciente.id}"></option>
+    </select><br/>
+
+    <label>Advogado:</label>
+    <select name="advogadoId" required>
+      <option th:each="a : ${advogados}"
+              th:value="${a.id}"
+              th:text="${a.nome}"
+              th:selected="${a.id == processo.advogado.id}"></option>
+    </select><br/>
+
+    <label>Médico:</label>
+    <select name="medicoId" required>
+      <option th:each="m : ${medicos}"
+              th:value="${m.id}"
+              th:text="${m.nome}"
+              th:selected="${m.id == processo.medico.id}"></option>
+    </select><br/>
+
+    <label>Data Início:</label>
+    <input type="date" name="dataInicio" th:value="${processo.dataInicio}" required/><br/>
+
+    <label>Status:</label>
+    <select name="status" required>
+      <option th:each="s : ${statusValues}"
+              th:value="${s}"
+              th:text="${s}"
+              th:selected="${s == processo.status}"></option>
+    </select><br/>
+
+    <label>Local:</label>
+    <select name="localId" required>
+      <option th:each="l : ${locais}"
+              th:value="${l.id}"
+              th:text="${l.comarca + ' - ' + l.localizacao}"
+              th:selected="${l.id == processo.local.id}"></option>
+    </select><br/>
+
+    <label>Produtos:</label><br/>
+    <input list="produtosList" id="produtoBusca" placeholder="Buscar produto..." />
+    <datalist id="produtosList">
+      <option th:each="prod : ${produtos}" th:value="${prod.nomeItem}"/>
+    </datalist>
+    <button type="button" onclick="addProduto()">Adicionar Produto</button>
+    <ul id="listaProdutos">
+      <li th:each="prod : ${processo.produtos}" th:id="'prod-' + ${prod.id}">
+        <span th:text="${prod.nomeItem}"></span>
+        <input type="hidden" name="produtoIds" th:value="${prod.id}" />
+        <button type="button" th:onclick="|removeProduto('prod-${prod.id}')|">✖</button>
+      </li>
+    </ul><br/>
+
+    <label>Observações:</label><br/>
+    <textarea name="obs" th:text="${processo.obs}"></textarea><br/><br/>
+
+    <button type="submit">Atualizar</button>
+    <a th:href="@{/processos/listar}">Cancelar</a>
+  </form>
+
+  <div th:replace="~{fragments/foot :: bot}"></div>
+
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    var produtos = /*[[${produtos}]]*/ [];
+
+    function addProduto() {
+      var nome = document.getElementById('produtoBusca').value;
+      var prod = produtos.find(p => p.nomeItem === nome);
+      if (prod && !document.getElementById('prod-' + prod.id)) {
+        var ul = document.getElementById('listaProdutos');
+        var li = document.createElement('li');
+        li.id = 'prod-' + prod.id;
+        li.textContent = prod.nomeItem + ' ';
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'produtoIds';
+        input.value = prod.id;
+        li.appendChild(input);
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = '✖';
+        btn.onclick = function() { removeProduto(li.id); };
+        li.appendChild(btn);
+        ul.appendChild(li);
+        document.getElementById('produtoBusca').value = '';
+      } else {
+        alert(prod ? 'Já adicionado' : 'Produto não encontrado');
+      }
+    }
+
+    function removeProduto(liId) {
+      var li = document.getElementById(liId);
+      if (li) li.parentNode.removeChild(li);
+    }
+    /*]]>*/
+  </script>
+</body>
+</html>

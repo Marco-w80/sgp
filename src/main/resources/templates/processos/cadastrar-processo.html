@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <div th:replace="~{fragments/head :: top}"></div>
+</head>
+<body>
+  <h1 class="h3 mb-4 text-gray-800">Cadastrar Processo</h1>
+  <form th:action="@{/processos/cadastrar}" method="post">
+    <label>Número Interno:</label>
+    <input type="text" name="numeroInterno" required/><br/>
+
+    <label>Número Processo:</label>
+    <input type="text" name="numeroProcesso" required/><br/>
+
+    <label>Paciente:</label>
+    <select name="pacienteId" required>
+      <option th:each="p : ${pacientes}"
+              th:value="${p.id}"
+              th:text="${p.nome}"></option>
+    </select><br/>
+
+    <label>Advogado:</label>
+    <select name="advogadoId" required>
+      <option th:each="a : ${advogados}"
+              th:value="${a.id}"
+              th:text="${a.nome}"></option>
+    </select><br/>
+
+    <label>Médico:</label>
+    <select name="medicoId" required>
+      <option th:each="m : ${medicos}"
+              th:value="${m.id}"
+              th:text="${m.nome}"></option>
+    </select><br/>
+
+    <label>Data Início:</label>
+    <input type="date" name="dataInicio" required/><br/>
+
+    <label>Status:</label>
+    <select name="status" required>
+      <option th:each="s : ${statusValues}"
+              th:value="${s}"
+              th:text="${s}"></option>
+    </select><br/>
+
+    <label>Local:</label>
+    <select name="localId" required>
+      <option th:each="l : ${locais}"
+              th:value="${l.id}"
+              th:text="${l.comarca + ' - ' + l.localizacao}"></option>
+    </select><br/>
+
+    <label>Produtos:</label><br/>
+    <!-- dropdown pesquisável -->
+    <input list="produtosList" id="produtoBusca" placeholder="Buscar produto..." />
+    <datalist id="produtosList">
+      <option th:each="prod : ${produtos}"
+              th:value="${prod.nomeItem}"></option>
+    </datalist>
+    <button type="button" onclick="addProduto()">Adicionar Produto</button>
+    <ul id="listaProdutos"></ul><br/>
+
+    <label>Observações:</label><br/>
+    <textarea name="obs"></textarea><br/><br/>
+
+    <button type="submit">Salvar</button>
+    <a th:href="@{/processos/listar}">Cancelar</a>
+  </form>
+
+  <div th:replace="~{fragments/foot :: bot}"></div>
+
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    // variável produtos vindo do model
+    var produtos = /*[[${produtos}]]*/ [];
+
+    function addProduto() {
+      var nome = document.getElementById('produtoBusca').value;
+      var prod = produtos.find(p => p.nomeItem === nome);
+      if (prod) {
+        var ul = document.getElementById('listaProdutos');
+        var li = document.createElement('li');
+        li.textContent = prod.nomeItem + ' ';
+        // campo oculto para enviar o ID
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'produtoIds';
+        input.value = prod.id;
+        li.appendChild(input);
+        // botão de remoção
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = '✖';
+        btn.onclick = () => ul.removeChild(li);
+        li.appendChild(btn);
+        ul.appendChild(li);
+        document.getElementById('produtoBusca').value = '';
+      } else {
+        alert('Produto não encontrado');
+      }
+    }
+    /*]]>*/
+  </script>
+</body>
+</html>
