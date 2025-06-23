@@ -1,0 +1,64 @@
+<!-- src/main/resources/templates/pessoas/editar-pessoa.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+  <!-- injeta head, sidebar, topbar e abre <div class="container-fluid"> -->
+  <div th:replace="~{fragments/head :: top}"></div>
+
+  <!-- seu script de toggle de campos -->
+  <script>
+    function toggleFields() {
+      var tipo = document.getElementById('tipo').value;
+      document.getElementById('crm-field').style.display = (tipo === 'MEDICO') ? 'block' : 'none';
+      document.getElementById('oab-field').style.display = (tipo === 'ADVOGADO') ? 'block' : 'none';
+    }
+    document.addEventListener('DOMContentLoaded', toggleFields);
+  </script>
+
+  <!-- conteúdo específico da página -->
+  <h1>Editar Pessoa</h1>
+  <div th:if="${error}" style="color:red;margin-bottom:10px;" th:text="${error}"></div>
+  <form th:action="@{|/pessoas/editar/${pessoa.id}|}" method="post">
+    <label for="tipo">Tipo:</label>
+    <select id="tipo" name="tipo" onchange="toggleFields()" required>
+      <option value="MEDICO"   th:selected="${pessoa.tipo=='MEDICO'}">MÉDICO</option>
+      <option value="ADVOGADO" th:selected="${pessoa.tipo=='ADVOGADO'}">ADVOGADO</option>
+      <option value="PACIENTE" th:selected="${pessoa.tipo=='PACIENTE'}">PACIENTE</option>
+    </select><br/>
+
+    <label>Nome:</label>
+    <input type="text" name="nome" th:value="${pessoa.nome}" required/><br/>
+
+    <label>Sexo:</label>
+    <select name="sexo" required>
+      <option value="MASCULINO" th:selected="${pessoa.sexo=='MASCULINO'}">Masculino</option>
+      <option value="FEMININO"  th:selected="${pessoa.sexo=='FEMININO'}">Feminino</option>
+      <option value="OUTRO"     th:selected="${pessoa.sexo=='OUTRO'}">Outro</option>
+    </select><br/>
+
+    <label>Data de Nascimento:</label>
+    <input type="date" name="dataNascimento" th:value="${pessoa.dataNascimento}" required/><br/>
+
+    <label>CPF:</label>
+    <input type="text" name="cpf" th:value="${pessoa.cpf}" required/><br/>
+
+    <label>Identidade:</label>
+    <input type="text" name="identidade" th:value="${pessoa.identidade}" required/><br/>
+
+    <div id="crm-field" th:if="${pessoa.tipo=='MEDICO'}" style="display:none;">
+      <label>CRM:</label>
+      <input type="text" name="crm" th:value="${pessoa.crm}" />
+    </div>
+
+    <div id="oab-field" th:if="${pessoa.tipo=='ADVOGADO'}" style="display:none;">
+      <label>OAB:</label>
+      <input type="text" name="oab" th:value="${pessoa.oab}" />
+    </div>
+
+    <button type="submit">Atualizar</button>
+  </form>
+
+  <!-- injeta fechamento de container, footer e scripts -->
+  <div th:replace="~{fragments/foot :: bot}"></div>
+
+</html>

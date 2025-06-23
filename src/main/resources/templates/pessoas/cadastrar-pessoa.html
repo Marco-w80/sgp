@@ -1,28 +1,30 @@
-<!-- src/main/resources/templates/cadastrar-pessoa.html -->
+<!-- src/main/resources/templates/pessoas/cadastrar-pessoa.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Cadastrar Pessoa</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function toggleFields() {
-            const tipo = document.getElementById('tipo').value;
-            document.getElementById('crm-field').style.display = tipo === 'MEDICO' ? 'block' : 'none';
-            document.getElementById('oab-field').style.display = tipo === 'ADVOGADO' ? 'block' : 'none';
-        }
-        document.addEventListener('DOMContentLoaded', toggleFields);
-    </script>
-</head>
-<body>
-<h1>Cadastrar Pessoa</h1>
-<form th:action="@{/pessoas/cadastrar}" method="post">
+
+  <!-- importa head, sidebar, topbar e abre <div class="container-fluid"> -->
+  <div th:replace="~{fragments/head :: top}"></div>
+
+  <!-- inclui SweetAlert2 e seu script de toggle -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function toggleFields() {
+      const tipo = document.getElementById('tipo').value;
+      document.getElementById('crm-field').style.display = tipo === 'MEDICO' ? 'block' : 'none';
+      document.getElementById('oab-field').style.display = tipo === 'ADVOGADO' ? 'block' : 'none';
+    }
+    document.addEventListener('DOMContentLoaded', toggleFields);
+  </script>
+
+  <!-- conteúdo específico da página -->
+  <h1>Cadastrar Pessoa</h1>
+  <form th:action="@{/pessoas/cadastrar}" method="post">
     <label for="tipo">Tipo:</label>
     <select id="tipo" name="tipo" onchange="toggleFields()" required>
-        <option value="" disabled selected>Selecione...</option>
-        <th:block th:each="t : ${tipos}">
-            <option th:value="${t}" th:text="${t}"></option>
-        </th:block>
+      <option value="" disabled selected>Selecione...</option>
+      <th:block th:each="t : ${tipos}">
+        <option th:value="${t}" th:text="${t}"></option>
+      </th:block>
     </select><br/>
 
     <label>Nome:</label>
@@ -30,9 +32,9 @@
 
     <label>Sexo:</label>
     <select name="sexo" required>
-        <option value="MASCULINO">Masculino</option>
-        <option value="FEMININO">Feminino</option>
-        <option value="OUTRO">Outro</option>
+      <option value="MASCULINO">Masculino</option>
+      <option value="FEMININO">Feminino</option>
+      <option value="OUTRO">Outro</option>
     </select><br/>
 
     <label>Data de Nascimento:</label>
@@ -45,16 +47,19 @@
     <input type="text" name="identidade" required/><br/>
 
     <div id="crm-field" style="display:none;">
-        <label>CRM:</label>
-        <input type="text" name="crm" />
+      <label>CRM:</label>
+      <input type="text" name="crm" />
     </div>
 
     <div id="oab-field" style="display:none;">
-        <label>OAB:</label>
-        <input type="text" name="oab" />
+      <label>OAB:</label>
+      <input type="text" name="oab" />
     </div>
 
     <button type="submit">Salvar</button>
-</form>
-</body>
+  </form>
+
+  <!-- importa fechamento de container, footer e scripts -->
+  <div th:replace="~{fragments/foot :: bot}"></div>
+
 </html>

@@ -1,19 +1,24 @@
 <!-- src/main/resources/templates/pessoas/listar-pessoas.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <title>Listar Pessoas</title>
-</head>
-<body>
+  <!-- importa tudo do head até o início do container -->
+  <div th:replace="~{fragments/head :: top}"></div>
+
+  <!-- conteúdo específico da página -->
   <h1>Lista de Pessoas</h1>
   <a th:href="@{/pessoas/cadastrar}">Cadastrar nova Pessoa</a>
   <table border="1" cellpadding="5" cellspacing="0">
     <thead>
       <tr>
-        <th>ID</th><th>Nome</th><th>Tipo</th>
-        <th>Sexo</th><th>Data Nascimento</th>
-        <th>CPF</th><th>Identidade</th><th>CRM / OAB</th>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Tipo</th>
+        <th>Sexo</th>
+        <th>Data Nascimento</th>
+        <th>CPF</th>
+        <th>Identidade</th>
+        <th>CRM / OAB</th>
+        <th>Ações</th>
       </tr>
     </thead>
     <tbody>
@@ -26,8 +31,13 @@
         <td th:text="${p.cpf}"></td>
         <td th:text="${p.identidade}"></td>
         <td th:text="${p.documentoEspecial}"></td>
+        <td>
+          <a th:href="@{|/pessoas/editar/${p.id}|}">Editar</a>
+        </td>
       </tr>
     </tbody>
   </table>
-</body>
+
+  <!-- importa o fechamento do container, footer e scripts -->
+  <div th:replace="~{fragments/foot :: bot}"></div>
 </html>
