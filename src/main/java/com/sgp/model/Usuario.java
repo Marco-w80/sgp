@@ -1,4 +1,4 @@
-package com.sgp.entity;
+package com.sgp.model;
 
 import jakarta.persistence.*;
 

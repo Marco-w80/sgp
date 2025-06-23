@@ -1,6 +1,6 @@
 package com.sgp.controller;
 
-import com.sgp.entity.Usuario;
+import com.sgp.model.Usuario;
 import com.sgp.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
