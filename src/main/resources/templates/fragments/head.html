@@ -79,6 +79,23 @@
             </div>
           </li>
 
+          <!-- Nav Item – Usuários Collapse Menu -->
+          <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUsuarios"
+              aria-expanded="true" aria-controls="collapseUsuarios">
+              <i class="fas fa-fw fa-user"></i>
+              <span>Usuários</span>
+            </a>
+            <div id="collapseUsuarios" class="collapse" aria-labelledby="headingUsuarios"
+                data-parent="#accordionSidebar">
+              <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" th:href="@{/usuarios/cadastrar}">Novo Usuário</a>
+                <a class="collapse-item" th:href="@{/usuarios}">Listar Usuários</a>
+              </div>
+            </div>
+          </li>
+
+
           <!-- Nav Item - Produtos Collapse Menu -->
           <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProdutos"
