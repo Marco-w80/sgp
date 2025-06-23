@@ -2,7 +2,9 @@ package com.sgp.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -44,6 +46,17 @@ public class Processo {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusProcesso status;
+
+    @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProcessoProduto> itens = new ArrayList<>();
+
+    public void addItem(Produto produto, LocalDate dataEnvio) {
+        ProcessoProduto pp = new ProcessoProduto(this, produto, dataEnvio);
+        itens.add(pp);
+    }
+    public void clearItems() {
+        itens.clear();
+    }
 
     /** Local onde o processo tramita */
     @ManyToOne(optional = false)
@@ -102,4 +115,7 @@ public class Processo {
     public void setProdutos(Set<Produto> produtos) { this.produtos = produtos; }
     public String getObs() { return obs; }
     public void setObs(String obs) { this.obs = obs; }
+
+    public List<ProcessoProduto> getItens() { return itens; }
+    public void setItens(List<ProcessoProduto> itens) { this.itens = itens; }
 }

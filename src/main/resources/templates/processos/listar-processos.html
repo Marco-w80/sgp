@@ -1,52 +1,73 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <div th:replace="~{fragments/head :: top}"></div>
-</head>
-<body>
-  <h1 class="h3 mb-4 text-gray-800">Listar Processos</h1>
-  <a th:href="@{/processos/cadastrar}">Novo Processo</a>
-  <table border="1" cellpadding="5" cellspacing="0">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Interno</th>
-        <th>Processo</th>
-        <th>Paciente</th>
-        <th>Advogado</th>
-        <th>Médico</th>
-        <th>Início</th>
-        <th>Status</th>
-        <th>Local</th>
-        <th>Produtos</th>
-        <th>Obs</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr th:each="proc : ${processos}">
-        <td th:text="${proc.id}"></td>
-        <td th:text="${proc.numeroInterno}"></td>
-        <td th:text="${proc.numeroProcesso}"></td>
-        <td th:text="${proc.paciente.nome}"></td>
-        <td th:text="${proc.advogado.nome}"></td>
-        <td th:text="${proc.medico.nome}"></td>
-        <td th:text="${proc.dataInicio}"></td>
-        <td th:text="${proc.status}"></td>
-        <td th:text="${proc.local.comarca + ' - ' + proc.local.localizacao}"></td>
-        <td>
-          <span th:each="prod,iterStat : ${proc.produtos}">
-            <span th:text="${prod.nomeItem}"></span>
-            <span th:if="${!iterStat.last}">, </span>
-          </span>
-        </td>
-        <td th:text="${proc.obs}"></td>
-        <td>
-          <a th:href="@{|/processos/editar/${proc.id}|}">Editar</a>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head th:replace="~{fragments/head :: top}"></head>
+<body id="page-top">
+
+  <div class="container-fluid mt-4">
+    <!-- Cabeçalho com título e botão -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Listar Processos</h1>
+      <a th:href="@{/processos/cadastrar}" class="btn btn-primary">Novo Processo</a>
+    </div>
+
+    <!-- Card contendo a tabela -->
+    <div class="card shadow mb-4">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover table-sm" width="100%" cellspacing="0">
+            <thead class="thead-light">
+              <tr>
+                <th>ID</th>
+                <th>Interno</th>
+                <th>Processo</th>
+                <th>Paciente</th>
+                <th>Advogado</th>
+                <th>Médico</th>
+                <th>Início</th>
+                <th>Status</th>
+                <th>Local</th>
+                <th>Produtos</th>
+                <th>Obs</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Mostra mensagem se não houver processos -->
+              <tr th:if="${processos == null or #lists.isEmpty(processos)}">
+                <td colspan="12" class="text-center">Nenhum processo encontrado</td>
+              </tr>
+              <!-- Itera sobre cada processo -->
+              <tr th:each="proc : ${processos}">
+                <td th:text="${proc.id}"></td>
+                <td th:text="${proc.numeroInterno}"></td>
+                <td th:text="${proc.numeroProcesso}"></td>
+                <td th:text="${proc.paciente.nome}"></td>
+                <td th:text="${proc.advogado.nome}"></td>
+                <td th:text="${proc.medico.nome}"></td>
+                <td th:text="${#temporals.format(proc.dataInicio, 'dd/MM/yyyy')}"></td>
+                <td th:text="${proc.status}"></td>
+                <td th:text="${proc.local.comarca + ' – ' + proc.local.localizacao}"></td>
+                <td>
+                  <span th:each="prod, iterStat : ${proc.produtos}">
+                    <span th:text="${prod.nomeItem}"></span>
+                    <span th:if="${!iterStat.last}">, </span>
+                  </span>
+                </td>
+                <td th:text="${proc.obs}"></td>
+                <td>
+                  <a th:href="@{/processos/editar/{id}(id=${proc.id})}"
+                     class="btn btn-sm btn-secondary">Editar</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- /.container-fluid -->
+
   <div th:replace="~{fragments/foot :: bot}"></div>
 </body>
 </html>

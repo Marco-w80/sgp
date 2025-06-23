@@ -1,103 +1,162 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <div th:replace="~{fragments/head :: top}"></div>
-</head>
-<body>
-  <h1 class="h3 mb-4 text-gray-800">Cadastrar Processo</h1>
-  <form th:action="@{/processos/cadastrar}" method="post">
-    <label>Número Interno:</label>
-    <input type="text" name="numeroInterno" required/><br/>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head th:replace="~{fragments/head :: top}"></head>
+<body id="page-top">
 
-    <label>Número Processo:</label>
-    <input type="text" name="numeroProcesso" required/><br/>
+  <div class="container-fluid mt-4">
+    <h1 class="h3 mb-4 text-gray-800">Cadastrar Processo</h1>
 
-    <label>Paciente:</label>
-    <select name="pacienteId" required>
-      <option th:each="p : ${pacientes}"
-              th:value="${p.id}"
-              th:text="${p.nome}"></option>
-    </select><br/>
+    <div class="card shadow mb-4">
+      <div class="card-body">
+        <form th:action="@{/processos/cadastrar}" method="post">
+          <!-- Linha 1: números e data -->
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="numeroInterno">Número Interno</label>
+              <input type="text" class="form-control" id="numeroInterno" name="numeroInterno" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="numeroProcesso">Número Processo</label>
+              <input type="text" class="form-control" id="numeroProcesso" name="numeroProcesso" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="dataInicio">Data Início</label>
+              <input type="date" class="form-control" id="dataInicio" name="dataInicio" required>
+            </div>
+          </div>
 
-    <label>Advogado:</label>
-    <select name="advogadoId" required>
-      <option th:each="a : ${advogados}"
-              th:value="${a.id}"
-              th:text="${a.nome}"></option>
-    </select><br/>
+          <!-- Linha 2: paciente e advogado -->
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="pacienteId">Paciente</label>
+              <select class="form-control" id="pacienteId" name="pacienteId" required>
+                <option th:each="p : ${pacientes}" th:value="${p.id}" th:text="${p.nome}"></option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="advogadoId">Advogado</label>
+              <select class="form-control" id="advogadoId" name="advogadoId" required>
+                <option th:each="a : ${advogados}" th:value="${a.id}" th:text="${a.nome}"></option>
+              </select>
+            </div>
+          </div>
 
-    <label>Médico:</label>
-    <select name="medicoId" required>
-      <option th:each="m : ${medicos}"
-              th:value="${m.id}"
-              th:text="${m.nome}"></option>
-    </select><br/>
+          <!-- Linha 3: médico e status -->
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="medicoId">Médico</label>
+              <select class="form-control" id="medicoId" name="medicoId" required>
+                <option th:each="m : ${medicos}" th:value="${m.id}" th:text="${m.nome}"></option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="status">Status</label>
+              <select class="form-control" id="status" name="status" required>
+                <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"></option>
+              </select>
+            </div>
+          </div>
 
-    <label>Data Início:</label>
-    <input type="date" name="dataInicio" required/><br/>
+          <!-- Linha 4: local -->
+          <div class="form-group">
+            <label for="localId">Local</label>
+            <select class="form-control" id="localId" name="localId" required>
+              <option th:each="l : ${locais}"
+                      th:value="${l.id}"
+                      th:text="${l.comarca + ' – ' + l.localizacao}"></option>
+            </select>
+          </div>
 
-    <label>Status:</label>
-    <select name="status" required>
-      <option th:each="s : ${statusValues}"
-              th:value="${s}"
-              th:text="${s}"></option>
-    </select><br/>
+          <!-- Produtos em tabela -->
+          <div class="form-group">
+            <label for="produtoBusca">Produtos</label>
+            <div class="input-group mb-2">
+              <input list="produtosList" id="produtoBusca" class="form-control" placeholder="Buscar produto...">
+              <div class="input-group-append">
+                <button class="btn btn-outline-primary" type="button" onclick="addProduto()">Adicionar</button>
+              </div>
+            </div>
+            <datalist id="produtosList">
+              <option th:each="prod : ${produtos}" th:value="${prod.nomeItem}"></option>
+            </datalist>
 
-    <label>Local:</label>
-    <select name="localId" required>
-      <option th:each="l : ${locais}"
-              th:value="${l.id}"
-              th:text="${l.comarca + ' - ' + l.localizacao}"></option>
-    </select><br/>
+            <table class="table table-bordered" id="tabelaProdutos">
+              <thead class="thead-light">
+                <tr>
+                  <th>Produto</th>
+                  <th>Data</th>
+                  <th style="width:1%;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Linhas adicionadas via script -->
+              </tbody>
+            </table>
+          </div>
 
-    <label>Produtos:</label><br/>
-    <!-- dropdown pesquisável -->
-    <input list="produtosList" id="produtoBusca" placeholder="Buscar produto..." />
-    <datalist id="produtosList">
-      <option th:each="prod : ${produtos}"
-              th:value="${prod.nomeItem}"></option>
-    </datalist>
-    <button type="button" onclick="addProduto()">Adicionar Produto</button>
-    <ul id="listaProdutos"></ul><br/>
+          <!-- Observações -->
+          <div class="form-group">
+            <label for="obs">Observações</label>
+            <textarea class="form-control" id="obs" name="obs" rows="3"></textarea>
+          </div>
 
-    <label>Observações:</label><br/>
-    <textarea name="obs"></textarea><br/><br/>
+          <!-- Botões -->
+          <button type="submit" class="btn btn-primary">Salvar</button>
+          <a th:href="@{/processos/listar}" class="btn btn-secondary ml-2">Cancelar</a>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- /.container-fluid -->
 
-    <button type="submit">Salvar</button>
-    <a th:href="@{/processos/listar}">Cancelar</a>
-  </form>
-
+  <!-- Rodapé -->
   <div th:replace="~{fragments/foot :: bot}"></div>
 
+  <!-- Script para adicionar/remover produtos -->
   <script th:inline="javascript">
     /*<![CDATA[*/
-    // variável produtos vindo do model
+    const OK_BUTTON_CONFIG = {
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#1B9BAE'
+    };
     var produtos = /*[[${produtos}]]*/ [];
 
     function addProduto() {
       var nome = document.getElementById('produtoBusca').value;
       var prod = produtos.find(p => p.nomeItem === nome);
-      if (prod) {
-        var ul = document.getElementById('listaProdutos');
-        var li = document.createElement('li');
-        li.textContent = prod.nomeItem + ' ';
-        // campo oculto para enviar o ID
-        var input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'produtoIds';
-        input.value = prod.id;
-        li.appendChild(input);
-        // botão de remoção
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.textContent = '✖';
-        btn.onclick = () => ul.removeChild(li);
-        li.appendChild(btn);
-        ul.appendChild(li);
-        document.getElementById('produtoBusca').value = '';
-      } else {
-        alert('Produto não encontrado');
+      if (!prod) {
+        Swal.fire({ icon: 'warning', title: 'Produto não encontrado', ...OK_BUTTON_CONFIG });
+        return;
       }
+
+      var tbody = document.querySelector('#tabelaProdutos tbody');
+      var tr = document.createElement('tr');
+
+      // Coluna: nome do produto
+      var tdNome = document.createElement('td');
+      tdNome.textContent = prod.nomeItem;
+      tr.appendChild(tdNome);
+
+      // Coluna: data + hidden id
+      var tdData = document.createElement('td');
+      tdData.innerHTML =
+        '<input type="hidden" name="produtoIds" value="' + prod.id + '"/>' +
+        '<input type="date" name="produtoDatas" required class="form-control"/>';
+      tr.appendChild(tdData);
+
+      // Coluna: botão de remoção
+      var tdAcao = document.createElement('td');
+      tdAcao.innerHTML =
+        '<button type="button" class="btn btn-sm btn-danger" onclick="removeProduto(this)">&times;</button>';
+      tr.appendChild(tdAcao);
+
+      tbody.appendChild(tr);
+      document.getElementById('produtoBusca').value = '';
+    }
+
+    function removeProduto(btn) {
+      var tr = btn.closest('tr');
+      tr.parentNode.removeChild(tr);
     }
     /*]]>*/
   </script>

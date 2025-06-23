@@ -51,37 +51,53 @@ public class ProcessoController {
     }
 
     @PostMapping("/cadastrar")
-    public String create(
-        @RequestParam String numeroInterno,
-        @RequestParam String numeroProcesso,
-        @RequestParam Long pacienteId,
-        @RequestParam Long advogadoId,
-        @RequestParam Long medicoId,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
-        @RequestParam StatusProcesso status,
-        @RequestParam Long localId,
-        @RequestParam(required = false) List<Long> produtoIds,
-        @RequestParam(required = false) String obs
-    ) {
-        Processo proc = new Processo();
-        proc.setNumeroInterno(numeroInterno);
-        proc.setNumeroProcesso(numeroProcesso);
-        proc.setPaciente((Paciente)pessoaRepository.findById(pacienteId).orElseThrow());
-        proc.setAdvogado((Advogado)pessoaRepository.findById(advogadoId).orElseThrow());
-        proc.setMedico((Medico)pessoaRepository.findById(medicoId).orElseThrow());
-        proc.setDataInicio(dataInicio);
-        proc.setStatus(status);
-        proc.setLocal(localRepository.findById(localId).orElseThrow());
-        if (produtoIds != null) {
-            Set<Produto> produtos = produtoRepository.findAllById(produtoIds)
-                                                   .stream().collect(Collectors.toSet());
-            proc.setProdutos(produtos);
-        }
-        proc.setObs(obs);
+public String create(
+    @RequestParam String numeroInterno,
+    @RequestParam String numeroProcesso,
+    @RequestParam Long pacienteId,
+    @RequestParam Long advogadoId,             // ← não deixe de incluir
+    @RequestParam Long medicoId,
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        LocalDate dataInicio,
+    @RequestParam StatusProcesso status,
+    @RequestParam Long localId,
 
-        processoRepository.save(proc);
-        return "redirect:/processos/listar";
+    // agora sim, as listas de produtos e datas
+    @RequestParam(required = false) List<Long> produtoIds,
+    @RequestParam(required = false)
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+      List<LocalDate> produtoDatas,
+
+    @RequestParam(required = false) String obs
+) {
+    Processo proc = new Processo();
+    proc.setNumeroInterno(numeroInterno);
+    proc.setNumeroProcesso(numeroProcesso);
+    // recupere e sete SEMPRE esses três:
+    proc.setPaciente((Paciente)pessoaRepository.findById(pacienteId).orElseThrow());
+    proc.setAdvogado((Advogado)pessoaRepository.findById(advogadoId).orElseThrow());
+    proc.setMedico((Medico)pessoaRepository.findById(medicoId).orElseThrow());
+
+    proc.setDataInicio(dataInicio);
+    proc.setStatus(status);
+    proc.setLocal(localRepository.findById(localId).orElseThrow());
+    proc.setObs(obs);
+
+    // então adicione os itens com data
+    if (produtoIds != null 
+        && produtoDatas != null 
+        && produtoIds.size() == produtoDatas.size()) {
+      for (int i = 0; i < produtoIds.size(); i++) {
+        Produto p = produtoRepository.findById(produtoIds.get(i)).orElseThrow();
+        LocalDate envio = produtoDatas.get(i);
+        proc.addItem(p, envio);
+      }
     }
+
+    processoRepository.save(proc);
+    return "redirect:/processos/listar";
+}
+
 
     @GetMapping("/listar")
     public String list(Model model) {
