@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <div th:replace="~{fragments/head :: top}"></div>
+  </head>
+  <body>
+    <h1 class="h3 mb-4 text-gray-800">Cadastrar Produto</h1>
+    <form th:action="@{/produtos/cadastrar}" th:object="${produto}" method="post">
+      <label>Código:</label>
+      <input type="text" th:field="*{codigo}" required/><br/>
+
+      <label>Nome do Item:</label>
+      <input type="text" th:field="*{nomeItem}" required/><br/>
+
+      <label>Unidade Medida:</label>
+      <input type="text" th:field="*{unidadeMedida}" required/><br/>
+
+      <label>Sigla Unidade:</label>
+      <input type="text" th:field="*{siglaUnidade}" required/><br/>
+
+      <label>Grupo:</label>
+      <select th:field="*{grupo}" required>
+        <option th:each="g : ${grupos}" th:value="${g}" th:text="${g}"></option>
+      </select><br/>
+
+      <label>Data Cadastro:</label>
+      <input type="date" name="dataCadastro"
+             th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required/><br/>
+
+      <label>Especificações:</label>
+      <textarea th:field="*{especificacoes}"></textarea><br/>
+
+      <label>Fabricante:</label>
+      <input type="text" th:field="*{fabricante}"/><br/>
+
+      <label>Modelo:</label>
+      <input type="text" th:field="*{modelo}"/><br/>
+
+      <button type="submit">Salvar</button>
+    </form>
+    <a th:href="@{/produtos/listar}">Voltar</a>
+    <div th:replace="~{fragments/foot :: bot}"></div>
+  </body>
+</html>

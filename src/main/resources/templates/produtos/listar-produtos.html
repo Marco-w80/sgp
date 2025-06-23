@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <div th:replace="~{fragments/head :: top}"></div>
+  </head>
+  <body>
+    <h1 class="h3 mb-4 text-gray-800">Listar Produtos</h1>
+    <a th:href="@{/produtos/cadastrar}">Cadastrar Produto</a>
+    <table border="1" cellpadding="5" cellspacing="0">
+      <thead>
+        <tr>
+          <th>ID</th><th>Código</th><th>Nome Item</th><th>Unidade</th>
+          <th>Sigla</th><th>Grupo</th><th>Data Cadastro</th>
+          <th>Especificações</th><th>Fabricante</th><th>Modelo</th><th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="prod : ${produtos}">
+          <td th:text="${prod.id}"></td>
+          <td th:text="${prod.codigo}"></td>
+          <td th:text="${prod.nomeItem}"></td>
+          <td th:text="${prod.unidadeMedida}"></td>
+          <td th:text="${prod.siglaUnidade}"></td>
+          <td th:text="${prod.grupo}"></td>
+          <td th:text="${prod.dataCadastro}"></td>
+          <td th:text="${prod.especificacoes}"></td>
+          <td th:text="${prod.fabricante}"></td>
+          <td th:text="${prod.modelo}"></td>
+          <td>
+            <a th:href="@{|/produtos/editar/${prod.id}|}">Editar</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div th:replace="~{fragments/foot :: bot}"></div>
+  </body>
+</html>
