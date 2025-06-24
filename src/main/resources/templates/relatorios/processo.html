@@ -1,0 +1,141 @@
+<!-- src/main/resources/templates/relatorios/processo.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+  <head th:replace="~{fragments/head :: top}"></head>
+  <body id="page-top">
+    <div class="container-fluid mt-4">
+      <h1 class="h3 mb-4 text-gray-800">Relatório de Processos</h1>
+      
+      <!-- Filtros -->
+      <form th:action="@{/relatorios/processos}" method="get" class="card p-3 mb-4">
+        <div class="form-row">
+          <div class="form-group col-md-2">
+            <label>Data Início De</label>
+            <input type="date" name="de" class="form-control" th:value="${param.de}">
+          </div>
+          <div class="form-group col-md-2">
+            <label>Até</label>
+            <input type="date" name="ate" class="form-control" th:value="${param.ate}">
+          </div>
+          <div class="form-group col-md-2">
+            <label>Status</label>
+            <select name="status" class="form-control" th:value="${param.status}">
+              <option value="">Todos</option>
+              <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}" 
+                th:selected="${param.status} == ${s}"></option>
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label>Paciente</label>
+            <input type="text" name="paciente" class="form-control" th:value="${param.paciente}" placeholder="Nome ou CPF">
+          </div>
+          <div class="form-group col-md-3">
+            <label>Local</label>
+            <select name="localId" class="form-control" th:value="${param.localId}">
+              <option value="">Todos</option>
+              <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca}" 
+                th:selected="${param.localId} == ${l.id}"></option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-2">
+            <label><input type="checkbox" name="cpfAnexado" th:checked="${param.cpfAnexado}"> Com CPF</label>
+          </div>
+          <div class="form-group col-md-2">
+            <label><input type="checkbox" name="compResidenciaAnexado" th:checked="${param.compResidenciaAnexado}"> Comp. Residência</label>
+          </div>
+          <div class="form-group col-md-2">
+            <label><input type="checkbox" name="compRendaAnexado" th:checked="${param.compRendaAnexado}"> Comp. Renda</label>
+          </div>
+          <div class="form-group col-md-2">
+            <label><input type="checkbox" name="procuracaoAnexado" th:checked="${param.procuracaoAnexado}"> Procuração</label>
+          </div>
+          <div class="form-group col-md-2">
+            <label><input type="checkbox" name="declaracaoInsuficienciaAnexado" th:checked="${param.declaracaoInsuficienciaAnexado}"> Decl. Insuficiência</label>
+          </div>
+          <div class="form-group col-md-2 text-right align-self-end">
+            <button type="submit" class="btn btn-primary btn-block">Filtrar</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Cards Totais (opcional) -->
+      <!-- <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total de Processos</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${totalProcessos}">0</div>
+            </div>
+          </div>
+        </div> -->
+        <!-- Você pode adicionar outros cards de totalizadores aqui -->
+      <!-- </div> -->
+      
+      <!-- Tabela de Resultados -->
+      <div class="card">
+        <div class="card-body table-responsive">
+          <table class="table table-bordered table-hover table-sm">
+            <thead class="thead-light">
+              <tr>
+                <th>ID</th>
+                <th>Nº Interno</th>
+                <th>Nº Processo</th>
+                <th>Data Início</th>
+                <th>Status</th>
+                <th>Paciente</th>
+                <th>Advogado</th>
+                <th>Médico</th>
+                <th>Local</th>
+                <th>CPF</th>
+                <th>Resid.</th>
+                <th>Renda</th>
+                <th>Proc.</th>
+                <th>Decl. Insuf.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="proc : ${processos}">
+                <td th:text="${proc.id}">1</td>
+                <td th:text="${proc.numeroInterno}">XXX</td>
+                <td th:text="${proc.numeroProcesso}">XXX</td>
+                <td th:text="${proc.dataInicio}"></td>
+                <td th:text="${proc.status}"></td>
+                <td th:text="${proc.paciente.nome}"></td>
+                <td th:text="${proc.advogado.nome}"></td>
+                <td th:text="${proc.medico.nome}"></td>
+                <td th:text="${proc.local.comarca}"></td>
+                <td>
+                  <i class="fas fa-check text-success" th:if="${proc.cpfAnexado}"></i>
+                  <i class="fas fa-times text-danger" th:unless="${proc.cpfAnexado}"></i>
+                </td>
+                <td>
+                  <i class="fas fa-check text-success" th:if="${proc.compResidenciaAnexado}"></i>
+                  <i class="fas fa-times text-danger" th:unless="${proc.compResidenciaAnexado}"></i>
+                </td>
+                <td>
+                  <i class="fas fa-check text-success" th:if="${proc.compRendaAnexado}"></i>
+                  <i class="fas fa-times text-danger" th:unless="${proc.compRendaAnexado}"></i>
+                </td>
+                <td>
+                  <i class="fas fa-check text-success" th:if="${proc.procuracaoAnexado}"></i>
+                  <i class="fas fa-times text-danger" th:unless="${proc.procuracaoAnexado}"></i>
+                </td>
+                <td>
+                  <i class="fas fa-check text-success" th:if="${proc.declaracaoInsuficienciaAnexado}"></i>
+                  <i class="fas fa-times text-danger" th:unless="${proc.declaracaoInsuficienciaAnexado}"></i>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(processos)}">
+                <td colspan="14" class="text-center">Nenhum processo encontrado.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{fragments/foot :: bot}"></div>
+  </body>
+</html>
