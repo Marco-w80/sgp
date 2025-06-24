@@ -1,15 +1,200 @@
 <!-- src/main/resources/templates/blank.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+  <head th:replace="~{fragments/head :: top}"></head>
+  <body id="page-top">
+    <div class="container-fluid mt-4">
+      <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
 
-  <!-- 1) injeta head, sidebar, topbar e já abre o <div class="container-fluid"> -->
-  <div th:replace="~{fragments/head :: top}"></div>
+      <div class="row mb-4" id="cardsRow"></div>
 
-    <!-- 2) conteúdo específico desta página -->
-    <h1 class="h3 mb-4 text-gray-800">Blank Page</h1>
-    <!-- aqui você vai adicionando o que precisar nas outras páginas -->
+      <div class="row">
+        <!-- Gráfico: Processos por Status -->
+        <div class="col-xl-6 col-lg-6">
+          <div class="card mb-4">
+            <div class="card-header">Processos por Status</div>
+            <div class="card-body">
+              <canvas id="chartStatus" height="150"></canvas>
+            </div>
+          </div>
+        </div>
 
-  <!-- 3) injeta fechamento de container, footer e scripts -->
-  <div th:replace="~{fragments/foot :: bot}"></div>
+        <!-- Gráfico: Compliance de Documentos -->
+        <div class="col-xl-6 col-lg-6">
+          <div class="card mb-4">
+            <div class="card-header">Compliance de Documentos</div>
+            <div class="card-body">
+              <canvas id="chartCompliance" height="150"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <div class="card mb-4">
+      <div class="card-header">Novos Processos por Mês</div>
+      <div class="card-body">
+        <canvas id="chartMensal" height="80"></canvas>
+      </div>
+    </div>
+
+    <!-- /.container-fluid -->
+
+    <div th:replace="~{fragments/foot :: bot}"></div>
+
+    <!-- Carrega o Chart.js antes dos scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script th:inline="javascript">
+    /*<![CDATA[*/
+      // 1) Card: Total de Pacientes Cadastrados
+      fetch('/api/dashboard/total-pacientes')
+        .then(res => res.json())
+        .then(count => {
+          const col = document.createElement('div');
+          col.className = 'col-xl-3 col-md-6 mb-4';
+          col.innerHTML = `
+            <div class="card border-left-primary shadow h-100 py-2">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                      Total de Pacientes
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">${count}</div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="fas fa-user fa-2x text-gray-300"></i>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+          document.getElementById('cardsRow').appendChild(col);
+        });
+
+      // 2) Cards: Total de Processos por Status
+      fetch('/api/dashboard/processos-por-status')
+        .then(res => res.json())
+        .then(data => {
+          data.forEach(d => {
+            const col = document.createElement('div');
+            col.className = 'col-xl-3 col-md-6 mb-4';
+            col.innerHTML = `
+              <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                        ${d.status}
+                      </div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">${d.count}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>`;
+            document.getElementById('cardsRow').appendChild(col);
+          });
+        });
+
+      // 3) Gráfico de Barras: Processos por Status
+      fetch('/api/dashboard/processos-por-status')
+        .then(res => res.json())
+        .then(data => {
+          const labels = data.map(d => d.status);
+          const counts = data.map(d => d.count);
+
+          new Chart(
+            document.getElementById('chartStatus').getContext('2d'),
+            {
+              type: 'bar',
+              data: {
+                labels: labels,
+                datasets: [{
+                  label: 'Quantidade de Processos',
+                  data: counts
+                }]
+              },
+              options: {
+                responsive: true,
+                scales: {
+                  y: { beginAtZero: true },
+                  x: { ticks: { autoSkip: false } }
+                }
+              }
+            }
+          );
+        });
+
+      // 4) Gráfico de Barras Horizontal: Compliance de Documentos
+      fetch('/api/dashboard/compliance-documentos')
+        .then(res => res.json())
+        .then(data => {
+          const docs = data.map(d => d.documento);
+          const taxas = data.map(d => Math.round(d.percentual * 10) / 10);
+
+          new Chart(
+            document.getElementById('chartCompliance').getContext('2d'),
+            {
+              type: 'bar',
+              data: {
+                labels: docs,
+                datasets: [{
+                  label: '% Anexados',
+                  data: taxas
+                }]
+              },
+              options: {
+                indexAxis: 'y',
+                responsive: true,
+                scales: {
+                  x: { beginAtZero: true, max: 100 }
+                }
+              }
+            }
+          );
+        });
+
+         const monthNames = [
+    'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'
+  ];
+
+  fetch('/api/dashboard/processos-por-mes')
+    .then(r => r.json())
+    .then(data => {
+      // usa só o nome do mês (sem ano). Se quiser ano, faça `${monthNames[d.month-1]} ${d.year}`
+      const labels = data.map(d => monthNames[d.month - 1]);
+      const counts = data.map(d => d.count);
+
+      new Chart(
+        document.getElementById('chartMensal').getContext('2d'),
+        {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Novos Processos',
+              data: counts
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: { beginAtZero: true },
+              x: { ticks: { autoSkip: false } }
+            }
+          }
+        }
+      );
+    });
+
+
+    
+
+    /*]]>*/
+    </script>
+  </body>
 </html>
