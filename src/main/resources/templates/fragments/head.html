@@ -126,6 +126,24 @@
               </div>
             </div>
           </li>
+
+          <li class="nav-item">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRelatorios"
+            aria-expanded="true" aria-controls="collapseRelatorios">
+            <i class="fas fa-fw fa-file-alt"></i>
+            <span>Relatórios</span>
+          </a>
+          <div id="collapseRelatorios" class="collapse" aria-labelledby="headingRelatorios" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <h6 class="collapse-header">Relatórios</h6>
+              <a class="collapse-item" th:href="@{/relatorios/processos}">Relatório de Processos</a>
+              <!-- adicione outros relatórios aqui -->
+            </div>
+          </div>
+        </li>
+
+
+
         </ul>
 
           <hr class="sidebar-divider d-none d-md-block"/>
