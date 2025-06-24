@@ -34,6 +34,21 @@ public class Processo {
     @Column(name = "data_inicio", nullable = false)
     private LocalDate dataInicio;
 
+    @Column(name = "cpf_anexado", nullable = false)
+    private boolean cpfAnexado = false;
+
+    @Column(name = "comp_residencia_anexado", nullable = false)
+    private boolean compResidenciaAnexado = false;
+
+    @Column(name = "comp_renda_anexado", nullable = false)
+    private boolean compRendaAnexado = false;
+
+    @Column(name = "procuracao_anexado", nullable = false)
+    private boolean procuracaoAnexado = false;
+
+    @Column(name = "declaracao_insuficiencia_anexado", nullable = false)
+    private boolean declaracaoInsuficienciaAnexado = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusProcesso status;
@@ -112,4 +127,19 @@ public class Processo {
 
     public List<ProcessoProduto> getItens() { return itens; }
     public void setItens(List<ProcessoProduto> itens) { this.itens = itens; }
+
+     public boolean isCpfAnexado() { return cpfAnexado; }
+    public void setCpfAnexado(boolean cpfAnexado) { this.cpfAnexado = cpfAnexado; }
+
+    public boolean isCompResidenciaAnexado() { return compResidenciaAnexado; }
+    public void setCompResidenciaAnexado(boolean compResidenciaAnexado) { this.compResidenciaAnexado = compResidenciaAnexado; }
+
+    public boolean isCompRendaAnexado() { return compRendaAnexado; }
+    public void setCompRendaAnexado(boolean compRendaAnexado) { this.compRendaAnexado = compRendaAnexado; }
+
+    public boolean isProcuracaoAnexado() { return procuracaoAnexado; }
+    public void setProcuracaoAnexado(boolean procuracaoAnexado) { this.procuracaoAnexado = procuracaoAnexado; }
+
+    public boolean isDeclaracaoInsuficienciaAnexado() { return declaracaoInsuficienciaAnexado; }
+    public void setDeclaracaoInsuficienciaAnexado(boolean declaracaoInsuficienciaAnexado) { this.declaracaoInsuficienciaAnexado = declaracaoInsuficienciaAnexado; }
 }

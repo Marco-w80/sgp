@@ -62,12 +62,17 @@ public class ProcessoController {
         @RequestParam StatusProcesso status,
         @RequestParam Long localId,
 
-        // listas de produtos, datas e quantidades
         @RequestParam(required = false) List<Long> produtoIds,
         @RequestParam(required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         List<LocalDate> produtoDatas,
         @RequestParam(required = false) List<Integer> produtoQuantidades,
+
+        @RequestParam(defaultValue = "false") boolean cpfAnexado,
+        @RequestParam(defaultValue = "false") boolean compResidenciaAnexado,
+        @RequestParam(defaultValue = "false") boolean compRendaAnexado,
+        @RequestParam(defaultValue = "false") boolean procuracaoAnexado,
+        @RequestParam(defaultValue = "false") boolean declaracaoInsuficienciaAnexado,
 
         @RequestParam(required = false) String obs
     ) {
@@ -82,7 +87,14 @@ public class ProcessoController {
         proc.setLocal(localRepository.findById(localId).orElseThrow());
         proc.setObs(obs);
 
-        // adiciona cada item com data e quantidade
+        // seta flags dos checkboxes
+        proc.setCpfAnexado(cpfAnexado);
+        proc.setCompResidenciaAnexado(compResidenciaAnexado);
+        proc.setCompRendaAnexado(compRendaAnexado);
+        proc.setProcuracaoAnexado(procuracaoAnexado);
+        proc.setDeclaracaoInsuficienciaAnexado(declaracaoInsuficienciaAnexado);
+
+        // adiciona produtos
         if (produtoIds != null
             && produtoDatas != null
             && produtoQuantidades != null
@@ -93,11 +105,7 @@ public class ProcessoController {
                 Produto p = produtoRepository.findById(produtoIds.get(i)).orElseThrow();
                 LocalDate envio = produtoDatas.get(i);
                 Integer qtde = produtoQuantidades.get(i);
-
-                // cria e configura o vínculo ProcessoProduto
-                ProcessoProduto pp = new ProcessoProduto(proc, p, envio);
-                pp.setQuantidade(qtde);  // <— você precisará adicionar este campo no model
-                proc.getItens().add(pp);
+                proc.addItem(p, envio, qtde);
             }
         }
 
@@ -144,9 +152,16 @@ public class ProcessoController {
         // listas paralelas vinda da view
         @RequestParam(required = false) List<Long> produtoIds,
         @RequestParam(required = false)
-          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-          List<LocalDate> produtoDatas,
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            List<LocalDate> produtoDatas,
         @RequestParam(required = false) List<Integer> produtoQuantidades,
+
+        // flags de documentos
+        @RequestParam(defaultValue = "false") boolean cpfAnexado,
+        @RequestParam(defaultValue = "false") boolean compResidenciaAnexado,
+        @RequestParam(defaultValue = "false") boolean compRendaAnexado,
+        @RequestParam(defaultValue = "false") boolean procuracaoAnexado,
+        @RequestParam(defaultValue = "false") boolean declaracaoInsuficienciaAnexado,
 
         @RequestParam(required = false) String obs
     ) {
@@ -155,23 +170,31 @@ public class ProcessoController {
         // atualiza campos simples
         proc.setNumeroInterno(numeroInterno);
         proc.setNumeroProcesso(numeroProcesso);
-        proc.setPaciente((Paciente)pessoaRepository.findById(pacienteId).orElseThrow());
-        proc.setAdvogado((Advogado)pessoaRepository.findById(advogadoId).orElseThrow());
-        proc.setMedico((Medico)pessoaRepository.findById(medicoId).orElseThrow());
+        proc.setPaciente((Paciente) pessoaRepository.findById(pacienteId).orElseThrow());
+        proc.setAdvogado((Advogado) pessoaRepository.findById(advogadoId).orElseThrow());
+        proc.setMedico((Medico) pessoaRepository.findById(medicoId).orElseThrow());
         proc.setDataInicio(dataInicio);
         proc.setStatus(status);
         proc.setLocal(localRepository.findById(localId).orElseThrow());
         proc.setObs(obs);
 
+        // atualiza flags dos checkboxes
+        proc.setCpfAnexado(cpfAnexado);
+        proc.setCompResidenciaAnexado(compResidenciaAnexado);
+        proc.setCompRendaAnexado(compRendaAnexado);
+        proc.setProcuracaoAnexado(procuracaoAnexado);
+        proc.setDeclaracaoInsuficienciaAnexado(declaracaoInsuficienciaAnexado);
+
         // limpa todos os itens antigos
         proc.clearItems();
 
         // adiciona novamente cada item com data e quantidade
-        if (produtoIds != null 
-            && produtoDatas != null 
-            && produtoQuantidades != null
-            && produtoIds.size() == produtoDatas.size()
-            && produtoIds.size() == produtoQuantidades.size()) {
+        if (produtoIds != null
+                && produtoDatas != null
+                && produtoQuantidades != null
+                && produtoIds.size() == produtoDatas.size()
+                && produtoIds.size() == produtoQuantidades.size()) {
+
             for (int i = 0; i < produtoIds.size(); i++) {
                 Produto p = produtoRepository.findById(produtoIds.get(i)).orElseThrow();
                 LocalDate envio = produtoDatas.get(i);
@@ -183,5 +206,6 @@ public class ProcessoController {
         processoRepository.save(proc);
         return "redirect:/processos/listar";
     }
+
 
 }

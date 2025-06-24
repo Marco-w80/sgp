@@ -95,6 +95,58 @@
             </table>
           </div>
 
+          <!-- Documentos anexados -->
+          <div class="form-group">
+          <label>Documentos anexados</label>
+
+          <div class="form-check">
+            <!-- primeiro o checkbox -->
+            <input class="form-check-input" type="checkbox"
+                  id="cpfAnexado" name="cpfAnexado" value="true"/>
+            <!-- depois o hidden para false -->
+            <input type="hidden" name="cpfAnexado" value="false"/>
+            <label class="form-check-label" for="cpfAnexado">CPF</label>
+          </div>
+
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                  id="compResidenciaAnexado" name="compResidenciaAnexado" value="true"/>
+            <input type="hidden" name="compResidenciaAnexado" value="false"/>
+            <label class="form-check-label" for="compResidenciaAnexado">
+              Comprovante de Residência
+            </label>
+          </div>
+
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                  id="compRendaAnexado" name="compRendaAnexado" value="true"/>
+            <input type="hidden" name="compRendaAnexado" value="false"/>
+            <label class="form-check-label" for="compRendaAnexado">
+              Comprovante de Renda
+            </label>
+          </div>
+
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                  id="procuracaoAnexado" name="procuracaoAnexado" value="true"/>
+            <input type="hidden" name="procuracaoAnexado" value="false"/>
+            <label class="form-check-label" for="procuracaoAnexado">
+              Procuração
+            </label>
+          </div>
+
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                  id="declaracaoInsuficienciaAnexado"
+                  name="declaracaoInsuficienciaAnexado" value="true"/>
+            <input type="hidden" name="declaracaoInsuficienciaAnexado" value="false"/>
+            <label class="form-check-label" for="declaracaoInsuficienciaAnexado">
+              Declaração de Insuficiência
+            </label>
+          </div>
+        </div>
+
+
           <!-- Observações -->
           <div class="form-group">
             <label for="obs">Observações</label>
