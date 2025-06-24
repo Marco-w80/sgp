@@ -1,5 +1,6 @@
 <!-- src/main/resources/templates/fragments/head.html -->
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <th:block th:fragment="top">
     <head>
       <meta charset="utf-8">
@@ -48,7 +49,7 @@
           </div>
 
           <!-- Nav Item - Pessoas Collapse Menu -->
-          <li class="nav-item">
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePessoas"
                aria-expanded="true" aria-controls="collapsePessoas">
               <i class="fas fa-fw fa-user"></i>
@@ -64,7 +65,7 @@
           </li>
 
           <!-- Nav Item - Processo Collapse Menu -->
-          <li class="nav-item">
+          <li class="nav-item" sec:authorize="hasRole('ADMIN')">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProcesso"
                aria-expanded="true" aria-controls="collapseProcesso">
               <i class="fas fa-fw fa-briefcase"></i>
@@ -80,7 +81,7 @@
           </li>
 
           <!-- Nav Item – Usuários Collapse Menu -->
-          <li class="nav-item">
+          <li class="nav-item" sec:authorize="hasRole('ADMIN')">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUsuarios"
               aria-expanded="true" aria-controls="collapseUsuarios">
               <i class="fas fa-fw fa-user"></i>
@@ -97,7 +98,7 @@
 
 
           <!-- Nav Item - Produtos Collapse Menu -->
-          <li class="nav-item">
+          <li class="nav-item" sec:authorize="hasRole('ADMIN')">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProdutos"
                aria-expanded="true" aria-controls="collapseProdutos">
               <i class="fas fa-fw fa-box-open"></i>
@@ -113,7 +114,7 @@
           </li>
 
            <!-- Nav Item - Locais Collapse Menu -->
-          <li class="nav-item">
+          <li class="nav-item" sec:authorize="hasRole('ADMIN')">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLocais"
               aria-expanded="true" aria-controls="collapseLocais">
               <i class="fas fa-fw fa-map-marker-alt"></i>
@@ -127,22 +128,22 @@
             </div>
           </li>
 
-          <li class="nav-item">
-          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRelatorios"
-            aria-expanded="true" aria-controls="collapseRelatorios">
-            <i class="fas fa-fw fa-file-alt"></i>
-            <span>Relatórios</span>
-          </a>
-          <div id="collapseRelatorios" class="collapse" aria-labelledby="headingRelatorios" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-              <h6 class="collapse-header">Relatórios</h6>
-              <a class="collapse-item" th:href="@{/relatorios/processos}">Relatório de Processos</a>
-              <!-- adicione outros relatórios aqui -->
+          <li class="nav-item" sec:authorize="hasAnyRole('USUARIO','ADMIN')">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRelatorios"
+              aria-expanded="true" aria-controls="collapseRelatorios">
+              <i class="fas fa-fw fa-file-alt"></i>
+              <span>Relatórios</span>
+            </a>
+            <div id="collapseRelatorios" class="collapse" aria-labelledby="headingRelatorios" data-parent="#accordionSidebar">
+              <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Relatórios</h6>
+                <a class="collapse-item" th:href="@{/relatorios/processos}">Relatório de Processos</a>
+                <!-- adicione outros relatórios aqui -->
+              </div>
             </div>
-          </div>
-        </li>
+          </li>
 
-
+          
 
         </ul>
 

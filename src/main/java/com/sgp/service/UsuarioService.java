@@ -17,11 +17,13 @@ public class UsuarioService implements UserDetailsService {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
+        // Aqui pega o perfil real do banco
+        String role = usuario.getPerfil().name(); // ADMIN ou USUARIO
+
         return User.builder()
                 .username(usuario.getEmail())
-                .password(usuario.getSenha()) // sem criptografia
-                .roles("ADMIN")
+                .password(usuario.getSenha()) // se usar BCrypt, mantenha encode
+                .roles(role) // agora usa o perfil do banco!
                 .build();
-
     }
 }

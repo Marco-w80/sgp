@@ -13,6 +13,15 @@ public class Usuario {
     private String senha;
     private String nome;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PerfilUsuario perfil = PerfilUsuario.USUARIO; // default
+
+    public enum PerfilUsuario {
+        ADMIN,
+        USUARIO
+    }
+
     // Getters e Setters
     public Long getId() {
         return id;
@@ -45,4 +54,12 @@ public class Usuario {
     public void setNome(String nome) {
         this.nome = nome;
     }
+
+    public PerfilUsuario getPerfil() {
+        return perfil;
+    }
+    public void setPerfil(PerfilUsuario perfil) {
+        this.perfil = perfil;
+    }
+
 }
