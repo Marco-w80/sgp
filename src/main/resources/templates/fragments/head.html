@@ -1,174 +1,196 @@
 <!-- src/main/resources/templates/fragments/head.html -->
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
-  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-  <th:block th:fragment="top">
-    <head>
-      <meta charset="utf-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <meta name="description" content="">
-      <meta name="author" content="">
-      <title>SB Admin 2</title>
-      <!-- Custom fonts for this template-->
-      <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-      <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900"
-        rel="stylesheet">
-      <!-- Custom styles for this template-->
-      <link href="/css/sb-admin-2.min.css" rel="stylesheet">
-    </head>
-    <body id="page-top">
-      <div id="wrapper">
+<th:block th:fragment="top">
 
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>SB Admin 2</title>
 
-          <!-- Sidebar - Brand -->
-          <a class="sidebar-brand d-flex align-items-center justify-content-center" th:href="@{/intranet}">
-            <div class="sidebar-brand-icon rotate-n-15">
-              <i class="fas fa-laugh-wink"></i>
-            </div>
-            <div class="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
+    <!-- Fonts & Styles -->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900" rel="stylesheet">
+    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+  </head>
+
+  <body id="page-top">
+    <div id="wrapper">
+
+      <!-- Sidebar -->
+      <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <!-- Sidebar Brand -->
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" th:href="@{/intranet}">
+          <div class="sidebar-brand-icon rotate-n-15">
+            <i class="fas fa-laugh-wink"></i>
+          </div>
+          <div class="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
+        </a>
+
+        <hr class="sidebar-divider my-0" />
+
+        <!-- Dashboard -->
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/intranet}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span>
           </a>
+        </li>
 
-          <hr class="sidebar-divider my-0"/>
+        <hr class="sidebar-divider" />
 
-          <!-- Nav Item - Dashboard -->
-          <li class="nav-item">
-            <a class="nav-link" th:href="@{/intranet}">
-              <i class="fas fa-fw fa-tachometer-alt"></i>
-              <span>Dashboard</span>
-            </a>
-          </li>
+        <!-- Heading -->
+        <div class="sidebar-heading">
+          Menu
+        </div>
 
-          <hr class="sidebar-divider"/>
-
-          <!-- Heading -->
-          <div class="sidebar-heading">
-            Menu
+        <!-- Nav Item - Pessoas Collapse Menu -->
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePessoas"
+            aria-expanded="true" aria-controls="collapsePessoas">
+            <i class="fas fa-fw fa-user"></i>
+            <span>Pessoas</span>
+          </a>
+          <div id="collapsePessoas" class="collapse" aria-labelledby="headingPessoas" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/pessoas/cadastrar}">Cadastrar Pessoa</a>
+              <a class="collapse-item" th:href="@{/pessoas/listar}">Listar Pessoas</a>
+            </div>
           </div>
+        </li>
 
-          <!-- Nav Item - Pessoas Collapse Menu -->
-            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePessoas"
-               aria-expanded="true" aria-controls="collapsePessoas">
-              <i class="fas fa-fw fa-user"></i>
-              <span>Pessoas</span>
-            </a>
-            <div id="collapsePessoas" class="collapse" aria-labelledby="headingPessoas"
-                 data-parent="#accordionSidebar">
-              <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" th:href="@{/pessoas/cadastrar}">Cadastrar Pessoa</a>
-                <a class="collapse-item" th:href="@{/pessoas/listar}">Listar Pessoas</a>
-              </div>
+        <!-- Nav Item - Processo Collapse Menu -->
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProcesso"
+            aria-expanded="true" aria-controls="collapseProcesso">
+            <i class="fas fa-fw fa-briefcase"></i>
+            <span>Processo</span>
+          </a>
+          <div id="collapseProcesso" class="collapse" aria-labelledby="headingProcesso" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/processos/cadastrar}">Novo Processo</a>
+              <a class="collapse-item" th:href="@{/processos/listar}">Listar Processos</a>
             </div>
-          </li>
-
-          <!-- Nav Item - Processo Collapse Menu -->
-          <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProcesso"
-               aria-expanded="true" aria-controls="collapseProcesso">
-              <i class="fas fa-fw fa-briefcase"></i>
-              <span>Processo</span>
-            </a>
-            <div id="collapseProcesso" class="collapse" aria-labelledby="headingProcesso"
-                 data-parent="#accordionSidebar">
-              <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" th:href="@{/processos/cadastrar}">Novo Processo</a>
-                <a class="collapse-item" th:href="@{/processos/listar}">Listar Processos</a>
-              </div>
-            </div>
-          </li>
-
-          <!-- Nav Item – Usuários Collapse Menu -->
-          <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUsuarios"
-              aria-expanded="true" aria-controls="collapseUsuarios">
-              <i class="fas fa-fw fa-user"></i>
-              <span>Usuários</span>
-            </a>
-            <div id="collapseUsuarios" class="collapse" aria-labelledby="headingUsuarios"
-                data-parent="#accordionSidebar">
-              <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" th:href="@{/usuarios/cadastrar}">Novo Usuário</a>
-                <a class="collapse-item" th:href="@{/usuarios}">Listar Usuários</a>
-              </div>
-            </div>
-          </li>
-
-
-          <!-- Nav Item - Produtos Collapse Menu -->
-          <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProdutos"
-               aria-expanded="true" aria-controls="collapseProdutos">
-              <i class="fas fa-fw fa-box-open"></i>
-              <span>Produtos</span>
-            </a>
-            <div id="collapseProdutos" class="collapse" aria-labelledby="headingProdutos"
-                 data-parent="#accordionSidebar">
-              <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" th:href="@{/produtos/cadastrar}">Novo Produto</a>
-                <a class="collapse-item" th:href="@{/produtos/listar}">Listar Produtos</a>
-              </div>
-            </div>
-          </li>
-
-           <!-- Nav Item - Locais Collapse Menu -->
-          <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLocais"
-              aria-expanded="true" aria-controls="collapseLocais">
-              <i class="fas fa-fw fa-map-marker-alt"></i>
-              <span>Locais</span>
-            </a>
-            <div id="collapseLocais" class="collapse" aria-labelledby="headingLocais" data-parent="#accordionSidebar">
-              <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" th:href="@{/locais/cadastrar}">Novo Local</a>
-                <a class="collapse-item" th:href="@{/locais/listar}">Listar Locais</a>
-              </div>
-            </div>
-          </li>
-
-          <li class="nav-item" sec:authorize="hasAnyRole('USUARIO','ADMIN')">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRelatorios"
-              aria-expanded="true" aria-controls="collapseRelatorios">
-              <i class="fas fa-fw fa-file-alt"></i>
-              <span>Relatórios</span>
-            </a>
-            <div id="collapseRelatorios" class="collapse" aria-labelledby="headingRelatorios" data-parent="#accordionSidebar">
-              <div class="bg-white py-2 collapse-inner rounded">
-                <h6 class="collapse-header">Relatórios</h6>
-                <a class="collapse-item" th:href="@{/relatorios/processos}">Relatório de Processos</a>
-                <!-- adicione outros relatórios aqui -->
-              </div>
-            </div>
-          </li>
-
-          
-
-        </ul>
-
-          <hr class="sidebar-divider d-none d-md-block"/>
-
-          <!-- Sidebar Toggler (Sidebar) -->
-          <div class="text-center d-none d-md-inline">
-            <button class="rounded-circle border-0" id="sidebarToggle"></button>
           </div>
+        </li>
 
-        </ul>
-        <!-- End of Sidebar -->
+        <!-- Nav Item – Usuários Collapse Menu -->
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUsuarios"
+            aria-expanded="true" aria-controls="collapseUsuarios">
+            <i class="fas fa-fw fa-user"></i>
+            <span>Usuários</span>
+          </a>
+          <div id="collapseUsuarios" class="collapse" aria-labelledby="headingUsuarios" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/usuarios/cadastrar}">Novo Usuário</a>
+              <a class="collapse-item" th:href="@{/usuarios}">Listar Usuários</a>
+            </div>
+          </div>
+        </li>
 
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-          <div id="content">
 
-            <!-- Topbar -->
-            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-              <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                <i class="fa fa-bars"></i>
-              </button>
-              <!-- (adicione aqui search, alerts, user info etc.) -->
-            </nav>
-            <!-- End of Topbar -->
+        <!-- Nav Item - Produtos Collapse Menu -->
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProdutos"
+            aria-expanded="true" aria-controls="collapseProdutos">
+            <i class="fas fa-fw fa-box-open"></i>
+            <span>Produtos</span>
+          </a>
+          <div id="collapseProdutos" class="collapse" aria-labelledby="headingProdutos" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/produtos/cadastrar}">Novo Produto</a>
+              <a class="collapse-item" th:href="@{/produtos/listar}">Listar Produtos</a>
+            </div>
+          </div>
+        </li>
 
-            <!-- Begin Page Content -->
-            <div class="container-fluid">
+        <!-- Nav Item - Locais Collapse Menu -->
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLocais"
+            aria-expanded="true" aria-controls="collapseLocais">
+            <i class="fas fa-fw fa-map-marker-alt"></i>
+            <span>Locais</span>
+          </a>
+          <div id="collapseLocais" class="collapse" aria-labelledby="headingLocais" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/locais/cadastrar}">Novo Local</a>
+              <a class="collapse-item" th:href="@{/locais/listar}">Listar Locais</a>
+            </div>
+          </div>
+        </li>
+
+        <li class="nav-item" sec:authorize="hasAnyRole('USUARIO','ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRelatorios"
+            aria-expanded="true" aria-controls="collapseRelatorios">
+            <i class="fas fa-fw fa-file-alt"></i>
+            <span>Relatórios</span>
+          </a>
+          <div id="collapseRelatorios" class="collapse" aria-labelledby="headingRelatorios"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <h6 class="collapse-header">Relatórios</h6>
+              <a class="collapse-item" th:href="@{/relatorios/processos}">Relatório de Processos</a>
+              <!-- adicione outros relatórios aqui -->
+            </div>
+          </div>
+        </li>
+
+        <hr class="sidebar-divider d-none d-md-block" />
+
+        <!-- Sidebar Toggler -->
+        <div class="text-center d-none d-md-inline">
+          <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+      </ul>
+      <!-- End of Sidebar -->
+
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+
+          <!-- Topbar -->
+          <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <!-- Sidebar Toggle (Topbar) -->
+            <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+              <i class="fa fa-bars"></i>
+            </button>
+
+            <!-- Topbar Navbar -->
+            <ul class="navbar-nav ml-auto">
+
+              <!-- Login para anônimos -->
+              <li class="nav-item" sec:authorize="isAnonymous()">
+                <a class="nav-link" th:href="@{/login}">
+                  <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Login
+                </a>
+              </li>
+
+              <!-- Dropdown para usuários logados -->
+              <li class="nav-item dropdown no-arrow" sec:authorize="isAuthenticated()">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">
+                  <span class="mr-2 d-none d-lg-inline text-gray-600 small" sec:authentication="name"></span>
+                  <img class="img-profile rounded-circle" th:src="@{/img/undraw_profile.svg}" alt="Usuário">
+                </a>
+                <!-- Dropdown Menu -->
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                  <a class="dropdown-item" th:href="@{/profile}">
+                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Perfil
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" th:href="@{/logout}">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Logout
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </nav>
+          <!-- End of Topbar -->
+
+          <!-- Begin Page Content -->
+          <div class="container-fluid">
