@@ -3,10 +3,14 @@
 
 <head th:replace="~{fragments/head :: top}"></head>
 <!-- OBS: <body> aberto em fragments/head :: top e fechado em fragments/foot :: bot -->
-  
-<h1 class="h3 mb-4 text-gray-800">Cadastrar Processo</h1>
 
 <div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">
+      <i class="fas fa-file-alt mr-2"></i> Cadastrar Processo
+    </h6>
+  </div>
+
   <div class="card-body">
     <form th:action="@{/processos/cadastrar}" method="post">
       <!-- Linha 1: números e data -->
