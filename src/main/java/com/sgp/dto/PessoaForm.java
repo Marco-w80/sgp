@@ -9,6 +9,7 @@ import java.util.List;
 
 public class PessoaForm {
 
+    private Long id;
     private String tipo;
     private String nome;
     private Sexo sexo;
@@ -87,4 +88,7 @@ public class PessoaForm {
     public void setEnderecos(List<Endereco> enderecos) {
         this.enderecos = enderecos;
     }
+    
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 }

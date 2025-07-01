@@ -64,43 +64,68 @@ public class PessoaController {
     }
 
     @GetMapping("/editar/{id}")
-    public String showEditForm(@PathVariable Long id, @RequestParam(required = false) String error, Model model) {
-        Pessoa pessoa = pessoaRepository.findById(id).orElseThrow();
-        model.addAttribute("pessoa", pessoa);
-        model.addAttribute("tipos", List.of("MEDICO", "ADVOGADO", "PACIENTE"));
-        model.addAttribute("error", error);
-        return "pessoas/editar-pessoa";
+public String showEditForm(@PathVariable Long id, @RequestParam(required = false) String error, Model model) {
+    Pessoa pessoa = pessoaRepository.findById(id).orElseThrow();
+
+    PessoaForm form = new PessoaForm();
+    form.setTipo(pessoa.getTipo());
+    form.setNome(pessoa.getNome());
+    form.setSexo(pessoa.getSexo());
+    form.setDataNascimento(pessoa.getDataNascimento());
+    form.setCpf(pessoa.getCpf());
+    form.setIdentidade(pessoa.getIdentidade());
+    form.setEnderecos(pessoa.getEnderecos());
+
+    if (pessoa instanceof Medico) {
+        form.setCrm(((Medico) pessoa).getCrm());
+    } else if (pessoa instanceof Advogado) {
+        form.setOab(((Advogado) pessoa).getOab());
     }
 
+    form.setId(pessoa.getId()); // você deve adicionar o campo `id` ao DTO PessoaForm
+
+    model.addAttribute("pessoaForm", form);
+    model.addAttribute("tipos", List.of("MEDICO", "ADVOGADO", "PACIENTE"));
+    model.addAttribute("error", error);
+
+    return "pessoas/editar-pessoa";
+}
+
+
     @PostMapping("/editar/{id}")
-    public String update(
-            @PathVariable Long id,
-            @RequestParam String tipo,
-            @RequestParam String nome,
-            @RequestParam Sexo sexo,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataNascimento,
-            @RequestParam String cpf,
-            @RequestParam String identidade,
-            @RequestParam(required = false) String crm,
-            @RequestParam(required = false) String oab
-    ) {
-        Pessoa pessoa = pessoaRepository.findById(id).orElseThrow();
-        pessoa.setNome(nome);
-        pessoa.setSexo(sexo);
-        pessoa.setDataNascimento(dataNascimento);
-        pessoa.setCpf(cpf);
-        pessoa.setIdentidade(identidade);
-        if (pessoa instanceof Medico) {
-            ((Medico) pessoa).setCrm(crm);
-        }
-        if (pessoa instanceof Advogado) {
-            ((Advogado) pessoa).setOab(oab);
-        }
-        try {
-            pessoaRepository.save(pessoa);
-        } catch (DataIntegrityViolationException ex) {
-            return "redirect:/pessoas/editar/" + id + "?error=CPF já cadastrado";
-        }
-        return "redirect:/pessoas/listar";
+public String update(@PathVariable Long id, @ModelAttribute PessoaForm form) {
+    Pessoa pessoa = pessoaRepository.findById(id).orElseThrow();
+
+    // Atualiza campos comuns
+    pessoa.setNome(form.getNome());
+    pessoa.setSexo(form.getSexo());
+    pessoa.setDataNascimento(form.getDataNascimento());
+    pessoa.setCpf(form.getCpf());
+    pessoa.setIdentidade(form.getIdentidade());
+
+    // Atualiza campos específicos
+    if (pessoa instanceof Medico) {
+        ((Medico) pessoa).setCrm(form.getCrm());
+    } else if (pessoa instanceof Advogado) {
+        ((Advogado) pessoa).setOab(form.getOab());
     }
+
+    // Atualiza endereços
+    pessoa.getEnderecos().clear(); // remove os antigos
+    if (form.getEnderecos() != null) {
+        for (Endereco e : form.getEnderecos()) {
+            e.setPessoa(pessoa);
+            pessoa.getEnderecos().add(e);
+        }
+    }
+
+    try {
+        pessoaRepository.save(pessoa);
+    } catch (DataIntegrityViolationException ex) {
+        return "redirect:/pessoas/editar/" + id + "?error=CPF já cadastrado";
+    }
+
+    return "redirect:/pessoas/listar";
+}
+
 }
