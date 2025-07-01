@@ -2,6 +2,7 @@ package com.sgp.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "pessoas")
@@ -28,6 +29,9 @@ public abstract class Pessoa {
 
     @Column(nullable = false)
     private String identidade;
+
+    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Endereco> enderecos = new java.util.ArrayList<>();
 
     // Construtor padrão para JPA
     protected Pessoa() {}
@@ -73,5 +77,13 @@ public abstract class Pessoa {
             return ((Advogado) this).getOab();
         }
         return "-";
+    }
+    
+    public List<Endereco> getEnderecos() {
+        return enderecos;
+    }
+
+    public void setEnderecos(List<Endereco> enderecos) {
+        this.enderecos = enderecos;
     }
 }

@@ -12,7 +12,7 @@
   </div>
 
   <div class="card-body">
-    <form th:action="@{/pessoas/cadastrar}" method="post" class="needs-validation" novalidate>
+    <form th:action="@{/pessoas/cadastrar}" th:object="${pessoaForm}" method="post" class="needs-validation" novalidate>
       <!-- 1ª linha -->
       <div class="form-row">
         <div class="form-group col-md-4">
@@ -68,22 +68,153 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save mr-1"></i> Salvar
-      </button>
-    </form>
+      <hr>
+      <h6><i class="fas fa-map-marker-alt mr-2"></i> Endereço (opcional)</h6>
+
+      <div class="form-row">
+        <!-- CEP primeiro -->
+        <div class="form-group col-md-4">
+          <label>CEP</label>
+          <div class="input-group">
+            <input type="text" class="form-control" th:field="*{enderecos[0].cep}" id="cep">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" onclick="buscarCep()">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-md-4">
+          <label>Logradouro</label>
+          <input type="text" th:field="*{enderecos[0].logradouro}" class="form-control" id="logradouro" readonly>
+        </div>
+
+        <div class="form-group col-md-2">
+          <label>Número</label>
+          <input type="text" th:field="*{enderecos[0].numero}" class="form-control">
+        </div>
+
+        <div class="form-group col-md-2">
+          <label>Complemento</label>
+          <input type="text" th:field="*{enderecos[0].complemento}" class="form-control" id="complemento">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label>Bairro</label>
+          <input type="text" th:field="*{enderecos[0].bairro}" class="form-control" id="bairro" readonly>
+        </div>
+        <div class="form-group col-md-4">
+          <label>Cidade</label>
+          <input type="text" th:field="*{enderecos[0].cidade}" class="form-control" id="cidade" readonly>
+        </div>
+        <div class="form-group col-md-4">
+          <label>Estado</label>
+          <input type="text" th:field="*{enderecos[0].estado}" class="form-control" id="estado" readonly>
+        </div>
+      </div>
   </div>
+
+
 </div>
+
+<button type="submit" class="btn btn-primary">
+  <i class="fas fa-save mr-1"></i> Salvar
+</button>
+</form>
+</div>
+</div>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:inline="javascript">
+  let enderecoIndex = 1;
+
+  function adicionarEndereco() {
+    const container = document.getElementById('enderecos-container');
+
+    const novoEndereco = document.createElement('div');
+    novoEndereco.className = "endereco-row border rounded p-3 mb-3";
+    novoEndereco.innerHTML = `
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label>Logradouro</label>
+          <input type="text" name="enderecos[${enderecoIndex}].logradouro" class="form-control">
+        </div>
+        <div class="form-group col-md-2">
+          <label>Número</label>
+          <input type="text" name="enderecos[${enderecoIndex}].numero" class="form-control">
+        </div>
+        <div class="form-group col-md-3">
+          <label>Bairro</label>
+          <input type="text" name="enderecos[${enderecoIndex}].bairro" class="form-control">
+        </div>
+        <div class="form-group col-md-3">
+          <label>Complemento</label>
+          <input type="text" name="enderecos[${enderecoIndex}].complemento" class="form-control">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label>Cidade</label>
+          <input type="text" name="enderecos[${enderecoIndex}].cidade" class="form-control">
+        </div>
+        <div class="form-group col-md-4">
+          <label>Estado</label>
+          <input type="text" name="enderecos[${enderecoIndex}].estado" class="form-control">
+        </div>
+        <div class="form-group col-md-4">
+          <label>CEP</label>
+          <input type="text" name="enderecos[${enderecoIndex}].cep" class="form-control">
+        </div>
+      </div>
+    `;
+    container.appendChild(novoEndereco);
+    enderecoIndex++;
+  }
+
   function toggleFields() {
     const tipo = document.getElementById('tipo').value;
     document.getElementById('crm-field').style.display = tipo === 'MEDICO' ? 'block' : 'none';
     document.getElementById('oab-field').style.display = tipo === 'ADVOGADO' ? 'block' : 'none';
   }
+
   document.addEventListener('DOMContentLoaded', toggleFields);
 </script>
+
+<script>
+  function buscarCep() {
+    const cep = document.getElementById("cep").value.replace(/\D/g, '');
+
+    if (cep.length !== 8) {
+      Swal.fire("CEP inválido", "Digite um CEP com 8 números.", "warning");
+      return;
+    }
+
+    fetch(`/api/cep/${cep}`)
+      .then(response => {
+        if (!response.ok) throw new Error("CEP não encontrado");
+        return response.json();
+      })
+      .then(data => {
+        document.getElementById("logradouro").value = data.logradouro || '';
+        document.getElementById("bairro").value = data.bairro || '';
+        document.getElementById("cidade").value = data.localidade || '';
+        document.getElementById("estado").value = data.uf || '';
+        document.getElementById("complemento").value = data.complemento || '';
+      })
+      .catch(error => {
+        Swal.fire("Erro", "Não foi possível buscar o CEP.", "error");
+      });
+  }
+</script>
+
+
+
 
 <th:block th:replace="~{fragments/foot :: bot}"></th:block>
 
