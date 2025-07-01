@@ -118,6 +118,23 @@
           </div>
         </li>
 
+        <!-- Nav Item - Hospitais Collapse Menu -->
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseHospitais"
+            aria-expanded="false" aria-controls="collapseHospitais">
+            <i class="fas fa-fw fa-hospital"></i>
+            <span>Hospitais</span>
+          </a>
+          <div id="collapseHospitais" class="collapse" aria-labelledby="headingHospitais" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/hospitais/cadastrar}">Cadastrar Hospital</a>
+              <a class="collapse-item" th:href="@{/hospitais}">Listar Hospitais</a>
+              <!-- Futuro: <a class="collapse-item" th:href="@{/hospitais/editar/{id}}">Editar Hospital</a> -->
+            </div>
+          </div>
+        </li>
+
+
         <li class="nav-item" sec:authorize="hasAnyRole('USUARIO','ADMIN')">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRelatorios"
             aria-expanded="true" aria-controls="collapseRelatorios">
