@@ -37,6 +37,13 @@
             <option th:each="p : ${pacientes}" th:value="${p.id}" th:text="${p.nome}"></option>
           </select>
         </div>
+        <!-- CPF do Paciente -->
+        <div class="form-group col-md-6">
+          <label for="cpfPaciente">CPF do Paciente</label>
+          <input type="text" class="form-control" id="cpfPaciente" readonly>
+        </div>
+
+
         <div class="form-group col-md-6">
           <label for="advogadoId">Advogado</label>
           <select class="form-control" id="advogadoId" name="advogadoId" required>
@@ -44,6 +51,13 @@
           </select>
         </div>
       </div>
+
+      <!-- OAB do Advogado -->
+      <div class="form-group col-md-6">
+        <label for="oabAdvogado">OAB do Advogado</label>
+        <input type="text" class="form-control" id="oabAdvogado" readonly>
+      </div>
+
 
       <!-- Linha 3: médico e status -->
       <div class="form-row">
@@ -53,6 +67,13 @@
             <option th:each="m : ${medicos}" th:value="${m.id}" th:text="${m.nome}"></option>
           </select>
         </div>
+
+        <!-- CRM do Médico -->
+        <div class="form-group col-md-6">
+          <label for="crmMedico">CRM do Médico</label>
+          <input type="text" class="form-control" id="crmMedico" readonly>
+        </div>
+
         <div class="form-group col-md-6">
           <label for="status">Status</label>
           <select class="form-control" id="status" name="status" required>
@@ -60,6 +81,25 @@
           </select>
         </div>
       </div>
+
+      <div class="form-group col-md-12">
+        <label for="hospitalInput">Hospital</label>
+        <input type="text" id="hospitalInput" name="hospitalNome" class="form-control" placeholder="Digite o nome do hospital...">
+        <input type="hidden" id="hospitalId" name="hospitalId"> <!-- este vai com o form -->
+        <div id="autocompleteHospital" class="list-group"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="tipoHospital">Tipo de Hospital</label>
+        <select class="form-control" id="tipoHospital" name="tipoHospital" required>
+          <option value="">Selecione</option>
+          <option value="SUS">SUS</option>
+          <option value="CONVENIO">Convênio</option>
+          <option value="PARTICULAR">Particular</option>
+        </select>
+      </div>
+
+
 
       <!-- Linha 4: local -->
       <div class="form-group">
@@ -258,5 +298,58 @@
   document.getElementById('pacienteId').addEventListener('change', gerarNumeroInterno);
 
 </script>
+
+<script>
+  function preencherInfoPessoa(id, tipo) {
+    if (!id) return;
+
+    fetch(`/api/pessoas/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (tipo === 'paciente') {
+          document.getElementById("cpfPaciente").value = data.cpf || '';
+        } else if (tipo === 'advogado') {
+          document.getElementById("oabAdvogado").value = data.oab || '';
+        } else if (tipo === 'medico') {
+          document.getElementById("crmMedico").value = data.crm || '';
+        }
+      });
+  }
+
+  document.getElementById("pacienteId").addEventListener("change", e => preencherInfoPessoa(e.target.value, 'paciente'));
+  document.getElementById("advogadoId").addEventListener("change", e => preencherInfoPessoa(e.target.value, 'advogado'));
+  document.getElementById("medicoId").addEventListener("change", e => preencherInfoPessoa(e.target.value, 'medico'));
+</script>
+
+<script>
+document.getElementById("hospitalInput").addEventListener("input", function () {
+  const input = this.value;
+  const resultBox = document.getElementById("autocompleteHospital");
+  if (input.length < 2) {
+    resultBox.innerHTML = '';
+    return;
+  }
+
+  fetch(`/api/hospitais/buscar?nome=${encodeURIComponent(input)}`)
+    .then(res => res.json())
+    .then(hospitais => {
+      resultBox.innerHTML = '';
+      hospitais.forEach(h => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.classList.add("list-group-item", "list-group-item-action");
+        item.textContent = h.nome + (h.cidade ? ` (${h.cidade}/${h.estado})` : '');
+        item.onclick = () => {
+          document.getElementById("hospitalInput").value = h.nome;
+          document.getElementById("hospitalId").value = h.id;
+          resultBox.innerHTML = '';
+        };
+        resultBox.appendChild(item);
+      });
+    });
+});
+</script>
+
+
 
 </html>

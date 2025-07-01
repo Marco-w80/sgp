@@ -53,9 +53,15 @@ public class Processo {
     @Column(nullable = false)
     private StatusProcesso status;
 
+    @Enumerated(EnumType.STRING)
+    private TipoHospital tipoHospital;
+
     // **Somente** um-para-muitos para a tabela de junção com dados extras
     @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProcessoProduto> itens = new ArrayList<>();
+
+    @ManyToOne
+    private Hospital hospital;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "local_id")
@@ -142,4 +148,13 @@ public class Processo {
 
     public boolean isDeclaracaoInsuficienciaAnexado() { return declaracaoInsuficienciaAnexado; }
     public void setDeclaracaoInsuficienciaAnexado(boolean declaracaoInsuficienciaAnexado) { this.declaracaoInsuficienciaAnexado = declaracaoInsuficienciaAnexado; }
+
+    public TipoHospital getTipoHospital() {
+        return tipoHospital;
+    }
+
+    public void setTipoHospital(TipoHospital tipoHospital) {
+        this.tipoHospital = tipoHospital;
+    }
+    
 }

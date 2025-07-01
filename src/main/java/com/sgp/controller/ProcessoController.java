@@ -61,6 +61,8 @@ public class ProcessoController {
             LocalDate dataInicio,
         @RequestParam StatusProcesso status,
         @RequestParam Long localId,
+        @RequestParam TipoHospital tipoHospital,
+
 
         @RequestParam(required = false) List<Long> produtoIds,
         @RequestParam(required = false)
@@ -93,6 +95,9 @@ public class ProcessoController {
         proc.setCompRendaAnexado(compRendaAnexado);
         proc.setProcuracaoAnexado(procuracaoAnexado);
         proc.setDeclaracaoInsuficienciaAnexado(declaracaoInsuficienciaAnexado);
+
+        proc.setTipoHospital(tipoHospital);
+
 
         // adiciona produtos
         if (produtoIds != null
