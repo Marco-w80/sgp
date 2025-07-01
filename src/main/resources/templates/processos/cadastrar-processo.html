@@ -17,7 +17,7 @@
       <div class="form-row">
         <div class="form-group col-md-4">
           <label for="numeroInterno">Número Interno</label>
-          <input type="text" class="form-control" id="numeroInterno" name="numeroInterno" required>
+          <input type="text" class="form-control" id="numeroInterno" name="numeroInterno" readonly required>
         </div>
         <div class="form-group col-md-4">
           <label for="numeroProcesso">Número Processo</label>
@@ -215,6 +215,48 @@
     tr.parentNode.removeChild(tr);
   }
   /*]]>*/
+</script>
+
+<script>
+  function gerarNumeroInterno() {
+    const data = document.getElementById('dataInicio').value;
+    const pacienteSelect = document.getElementById('pacienteId');
+    const pacienteId = pacienteSelect.value;
+    const pacienteNome = pacienteSelect.options[pacienteSelect.selectedIndex].text;
+
+    if (!data || !pacienteId || !pacienteNome) return;
+
+    // Data formatada como DDMMAA
+    const [ano, mes, dia] = data.split("-");
+    const dataFmt = `D${dia}${mes}${ano.slice(-2)}`;
+
+    // Gerar sigla PJS (primeira letra do primeiro nome + do(s) último(s))
+    const nomes = pacienteNome.trim().split(" ");
+    const sigla = nomes.length === 1
+      ? nomes[0].substring(0, 3).toUpperCase()
+      : (nomes[0][0] + nomes[nomes.length - 1][0] + (nomes.length > 2 ? nomes[1][0] : "")).toUpperCase();
+
+    const numero = `I${pacienteId}-${dataFmt}-P${sigla}`;
+
+    const input = document.getElementById('numeroInterno');
+    input.value = numero;
+
+    fetch(`/api/processos/verifica-numero/${encodeURIComponent(numero)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.existe) {
+          Swal.fire("Número já existe", "Mude a data ou paciente.", "warning");
+          input.value = '';
+        }
+      });
+  }
+
+
+
+  // Ativar quando muda paciente ou data
+  document.getElementById('dataInicio').addEventListener('change', gerarNumeroInterno);
+  document.getElementById('pacienteId').addEventListener('change', gerarNumeroInterno);
+
 </script>
 
 </html>

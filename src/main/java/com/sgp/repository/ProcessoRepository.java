@@ -16,6 +16,9 @@ import com.sgp.model.StatusProcesso;
 @Repository
 public interface ProcessoRepository extends JpaRepository<Processo, Long> {
 
+      boolean existsByNumeroInterno(String numeroInterno);
+
+
 
     @Query("SELECT new com.sgp.dto.StatusCountDto(p.status, COUNT(p)) "
          + "FROM Processo p GROUP BY p.status")
