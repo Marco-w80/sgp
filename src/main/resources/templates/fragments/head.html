@@ -134,6 +134,22 @@
           </div>
         </li>
 
+        <!-- Nav Item - Tumores Collapse Menu -->
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTumores"
+            aria-expanded="false" aria-controls="collapseTumores">
+            <i class="fas fa-fw fa-notes-medical"></i>
+            <span>Tumores</span>
+          </a>
+          <div id="collapseTumores" class="collapse" aria-labelledby="headingTumores" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/doencas/cadastrar}">Gerenciar Tumores</a>
+              <a class="collapse-item" th:href="@{/doencas/listar}">Listar Todos</a>
+            </div>
+          </div>
+        </li>
+
+
 
         <li class="nav-item" sec:authorize="hasAnyRole('USUARIO','ADMIN')">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRelatorios"

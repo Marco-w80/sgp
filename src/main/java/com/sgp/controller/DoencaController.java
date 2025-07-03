@@ -64,10 +64,12 @@ public String cadastrar(@ModelAttribute DoencaForm form) {
 
 
     @GetMapping("/listar")
-    public String listar(Model model) {
-        model.addAttribute("doencas", doencaRepository.findAll());
+    public String listarTodos(Model model) {
+        List<GrupoDoenca> grupos = grupoRepository.findAll();
+        model.addAttribute("grupos", grupos);
         return "doencas/listar";
     }
+
 
     @PostMapping("/editar")
 public String editar(@RequestParam("id") Long id,

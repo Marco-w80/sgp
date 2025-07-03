@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/head :: top}"></div>
+
+<h1 class="h3 mb-4 text-gray-800">Todos os Tumores Cadastrados por Localização</h1>
+
+<div th:each="grupo : ${grupos}">
+  <div class="card mb-3">
+    <div class="card-header font-weight-bold">
+      <i class="fas fa-map-marker-alt text-primary"></i> 
+      <span th:text="${grupo.nome}">Localização</span>
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item" 
+          th:each="d : ${grupo.doencas}" 
+          th:text="${d.nome}">Tipo de Tumor</li>
+      <li class="list-group-item text-muted" 
+          th:if="${grupo.doencas == null or grupo.doencas.isEmpty()}">
+          Nenhum tipo de tumor cadastrado nesta localização.
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div th:replace="~{fragments/foot :: bot}"></div>
+</html>
