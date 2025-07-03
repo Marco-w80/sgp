@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/head :: top}"></div>
+
+<h1 class="h3 mb-4 text-gray-800">Gerenciar Tumores por Localização</h1>
+
+<!-- Selecionar localização -->
+<form method="get" th:action="@{/doencas/cadastrar}">
+  <div class="form-group">
+    <label for="grupoSelect">Selecione uma localização</label>
+    <select class="form-control" id="grupoSelect" name="grupoId" onchange="this.form.submit()">
+      <option value="">-- Escolha --</option>
+      <option th:each="grupo : ${grupos}"
+              th:value="${grupo.id}"
+              th:selected="${grupoSelecionado != null and grupoSelecionado.id == grupo.id}"
+              th:text="${grupo.nome}">
+      </option>
+    </select>
+  </div>
+  <!-- <button class="btn btn-primary mt-2" type="submit">Carregar</button> -->
+</form>
+
+<div th:if="${grupoSelecionado != null}">
+  <hr>
+  <h4>📍 Localização Selecionada: <span th:text="${grupoSelecionado.nome}"></span></h4>
+
+  <!-- Lista de tipos de tumor -->
+  <h5 class="mt-3">Tipos de Tumor Cadastrados:</h5>
+  <ul class="list-group mb-4">
+    <li class="list-group-item d-flex justify-content-between align-items-center"
+        th:each="d : ${doencas}">
+      <span th:text="${d.nome}"></span>
+      <button class="btn btn-sm btn-outline-secondary" data-toggle="modal" 
+              th:attr="data-target='#editModal_' + ${d.id}">Editar</button>
+
+      <!-- Modal de edição -->
+      <div class="modal fade" th:id="'editModal_' + ${d.id}" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <form th:action="@{/doencas/editar}" method="post">
+              <input type="hidden" name="id" th:value="${d.id}"/>
+              <input type="hidden" name="grupoId" th:value="${grupoSelecionado.id}"/>
+              <div class="modal-header">
+                <h5 class="modal-title">Editar Tipo de Tumor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <input type="text" class="form-control" name="nome" th:value="${d.nome}" required/>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </li>
+    <li class="list-group-item text-muted" th:if="${doencas == null or doencas.isEmpty()}">
+      Nenhum tipo de tumor cadastrado ainda.
+    </li>
+  </ul>
+
+  <!-- Botão para novo tipo de tumor -->
+  <button class="btn btn-success mb-3" data-toggle="modal" data-target="#novoModal">+ Novo Tipo de Tumor</button>
+
+  <!-- Modal de cadastro novo -->
+  <div class="modal fade" id="novoModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <form th:action="@{/doencas/cadastrar}" method="post">
+        <input type="hidden" name="grupoId" th:value="${grupoSelecionado.id}" />
+        <div class="modal-header">
+            <h5 class="modal-title">Novo Tipo de Tumor</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <input type="text" class="form-control" name="nome" placeholder="Digite o tipo de tumor" required />
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+        </div>
+        </form>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/foot :: bot}"></div>
+</html>
