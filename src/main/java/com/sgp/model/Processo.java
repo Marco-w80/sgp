@@ -31,6 +31,11 @@ public class Processo {
     @JoinColumn(name = "medico_id")
     private Medico medico;
 
+    @ManyToOne
+    @JoinColumn(name = "doenca_id")
+    private Doenca doenca;
+
+    
     @Column(name = "data_inicio", nullable = false)
     private LocalDate dataInicio;
 
@@ -156,5 +161,27 @@ public class Processo {
     public void setTipoHospital(TipoHospital tipoHospital) {
         this.tipoHospital = tipoHospital;
     }
+
+    public Doenca getDoenca() {
+        return doenca;
+    }
+
+    public Hospital getHospital() {
+        return hospital;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setDoenca(Doenca doenca) {
+        this.doenca = doenca;
+    }
+
+    public void setHospital(Hospital hospital) {
+        this.hospital = hospital;
+    }
+
+
     
 }

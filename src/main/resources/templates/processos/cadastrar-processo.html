@@ -109,6 +109,24 @@
         </select>
       </div>
 
+      <div class="form-row">
+  <div class="form-group col-md-6">
+    <label for="grupoDoenca">Localização da Doença</label>
+    <select id="grupoDoenca" name="grupoDoencaId" class="form-control" required>
+      <option value="">Selecione</option>
+      <option th:each="g : ${gruposDoenca}" th:value="${g.id}" th:text="${g.nome}"></option>
+    </select>
+  </div>
+
+  <div class="form-group col-md-6">
+    <label for="doenca">Tipo de Tumor</label>
+    <select id="doenca" name="doencaId" class="form-control" required>
+      <option value="">Selecione uma localização primeiro</option>
+    </select>
+  </div>
+</div>
+
+
       <!-- Produtos em tabela -->
       <div class="form-group">
         <label for="produtoBusca">Produtos</label>
@@ -349,6 +367,39 @@ document.getElementById("hospitalInput").addEventListener("input", function () {
     });
 });
 </script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const grupoSelect = document.getElementById("grupoDoenca");
+    const doencaSelect = document.getElementById("doenca");
+
+    grupoSelect.addEventListener("change", function () {
+      const grupoId = this.value;
+
+      if (!grupoId) {
+        doencaSelect.innerHTML = '<option value="">Selecione uma localização primeiro</option>';
+        doencaSelect.setAttribute("disabled", "disabled");
+        return;
+      }
+
+      fetch(`/api/doencas/por-grupo/${grupoId}`)
+        .then(res => res.json())
+        .then(data => {
+          doencaSelect.innerHTML = '<option value="">Selecione</option>';
+          data.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d.id;
+            opt.textContent = d.nome;
+            doencaSelect.appendChild(opt);
+          });
+          doencaSelect.removeAttribute("disabled");
+        });
+    });
+  });
+</script>
+
+
 
 
 

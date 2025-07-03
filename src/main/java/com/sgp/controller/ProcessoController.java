@@ -25,6 +25,10 @@ public class ProcessoController {
     private ProdutoRepository produtoRepository;
     @Autowired
     private LocalRepository localRepository;
+    @Autowired
+    private GrupoDoencaRepository grupoDoencaRepository;
+    @Autowired
+    private DoencaRepository doencaRepository;
 
     @GetMapping("/cadastrar")
     public String showCreateForm(Model model) {
@@ -46,7 +50,13 @@ public class ProcessoController {
         model.addAttribute("medicos", medicos);
         model.addAttribute("locais", localRepository.findAll());
         model.addAttribute("produtos", produtoRepository.findAll());
-        model.addAttribute("statusValues", StatusProcesso.values());
+        model.addAttribute("statusValues", StatusProcesso.values());      
+
+        model.addAttribute("gruposDoenca", grupoDoencaRepository.findAll());
+        model.addAttribute("doencas", doencaRepository.findAll());
+        model.addAttribute("gruposDoenca", grupoDoencaRepository.findAll());
+
+
         return "processos/cadastrar-processo";
     }
 
@@ -62,7 +72,8 @@ public class ProcessoController {
         @RequestParam StatusProcesso status,
         @RequestParam Long localId,
         @RequestParam TipoHospital tipoHospital,
-
+        @RequestParam Long doencaId,
+        @RequestParam Long grupoDoencaId,
 
         @RequestParam(required = false) List<Long> produtoIds,
         @RequestParam(required = false)
@@ -88,6 +99,7 @@ public class ProcessoController {
         proc.setStatus(status);
         proc.setLocal(localRepository.findById(localId).orElseThrow());
         proc.setObs(obs);
+        
 
         // seta flags dos checkboxes
         proc.setCpfAnexado(cpfAnexado);
@@ -97,6 +109,12 @@ public class ProcessoController {
         proc.setDeclaracaoInsuficienciaAnexado(declaracaoInsuficienciaAnexado);
 
         proc.setTipoHospital(tipoHospital);
+
+        proc.setDoenca(doencaRepository.findById(doencaId).orElse(null));
+
+
+
+        
 
 
         // adiciona produtos
