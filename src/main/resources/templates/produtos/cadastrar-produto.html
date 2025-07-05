@@ -1,44 +1,83 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <div th:replace="~{fragments/head :: top}"></div>
-  </head>
-  <body>
-    <h1 class="h3 mb-4 text-gray-800">Cadastrar Produto</h1>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+
+<head>
+  <title>Cadastrar Produto</title>
+  <div th:replace="~{fragments/head :: top}"></div>
+</head>
+
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">
+      <i class="fas fa-box-open mr-2"></i> Cadastrar Produto
+    </h6>
+  </div>
+
+  <div class="card-body">
     <form th:action="@{/produtos/cadastrar}" th:object="${produto}" method="post">
-      <label>Código:</label>
-      <input type="text" th:field="*{codigo}" required/><br/>
 
-      <label>Nome do Item:</label>
-      <input type="text" th:field="*{nomeItem}" required/><br/>
+      <fieldset class="form-group border p-3">
+        <legend class="w-auto px-2">Dados Principais</legend>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="codigo">Código:</label>
+            <input type="text" class="form-control" id="codigo" th:field="*{codigo}" required />
+          </div>
+          <div class="form-group col-md-8">
+            <label for="nomeItem">Nome do Item:</label>
+            <input type="text" class="form-control" id="nomeItem" th:field="*{nomeItem}" required />
+          </div>
+        </div>
 
-      <label>Unidade Medida:</label>
-      <input type="text" th:field="*{unidadeMedida}" required/><br/>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="unidadeMedida">Unidade Medida:</label>
+            <input type="text" class="form-control" id="unidadeMedida" th:field="*{unidadeMedida}" required />
+          </div>
+          <div class="form-group col-md-4">
+            <label for="siglaUnidade">Sigla Unidade:</label>
+            <input type="text" class="form-control" id="siglaUnidade" th:field="*{siglaUnidade}" required />
+          </div>
+          <div class="form-group col-md-4">
+            <label for="grupo">Grupo:</label>
+            <select class="form-control" id="grupo" th:field="*{grupo}" required>
+              <option value="">Selecione...</option>
+              <option th:each="g : ${grupos}" th:value="${g}" th:text="${g}"></option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
 
-      <label>Sigla Unidade:</label>
-      <input type="text" th:field="*{siglaUnidade}" required/><br/>
+      <fieldset class="form-group border p-3 mt-4">
+        <legend class="w-auto px-2">Outros Detalhes</legend>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="fabricante">Fabricante:</label>
+            <input type="text" class="form-control" id="fabricante" th:field="*{fabricante}" />
+          </div>
+          <div class="form-group col-md-6">
+            <label for="modelo">Modelo:</label>
+            <input type="text" class="form-control" id="modelo" th:field="*{modelo}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="especificacoes">Especificações:</label>
+          <textarea class="form-control" id="especificacoes" th:field="*{especificacoes}" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="dataCadastro">Data Cadastro:</label>
+          <input type="date" class="form-control" id="dataCadastro" name="dataCadastro"
+            th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required readonly />
+        </div>
+      </fieldset>
 
-      <label>Grupo:</label>
-      <select th:field="*{grupo}" required>
-        <option th:each="g : ${grupos}" th:value="${g}" th:text="${g}"></option>
-      </select><br/>
+      <hr class="mt-4 mb-4">
 
-      <label>Data Cadastro:</label>
-      <input type="date" name="dataCadastro"
-             th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required/><br/>
-
-      <label>Especificações:</label>
-      <textarea th:field="*{especificacoes}"></textarea><br/>
-
-      <label>Fabricante:</label>
-      <input type="text" th:field="*{fabricante}"/><br/>
-
-      <label>Modelo:</label>
-      <input type="text" th:field="*{modelo}"/><br/>
-
-      <button type="submit">Salvar</button>
+      <button type="submit" class="btn btn-primary">Salvar</button>
+      <a th:href="@{/produtos/listar}" class="btn btn-secondary ml-2">Cancelar</a>
     </form>
-    <a th:href="@{/produtos/listar}">Voltar</a>
-    <div th:replace="~{fragments/foot :: bot}"></div>
-  </body>
+  </div>
+</div>
+<div th:replace="~{fragments/foot :: bot}"></div>
+
 </html>
