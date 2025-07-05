@@ -13,209 +13,200 @@
 
   <div class="card-body">
     <form th:action="@{/processos/cadastrar}" method="post">
-      <!-- Linha 1: números e data -->
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label for="numeroInterno">Número Interno</label>
-          <input type="text" class="form-control" id="numeroInterno" name="numeroInterno" readonly required>
-        </div>
-        <div class="form-group col-md-4">
-          <label for="numeroProcesso">Número Processo</label>
-          <input type="text" class="form-control" id="numeroProcesso" name="numeroProcesso" required>
-        </div>
-        <div class="form-group col-md-4">
-          <label for="dataInicio">Data Início</label>
-          <input type="date" class="form-control" id="dataInicio" name="dataInicio" required>
-        </div>
-      </div>
 
-      <!-- Linha 2: paciente e advogado -->
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="pacienteId">Paciente</label>
-          <select class="form-control" id="pacienteId" name="pacienteId" required>
-            <option th:each="p : ${pacientes}" th:value="${p.id}" th:text="${p.nome}"></option>
-          </select>
-        </div>
-        <!-- CPF do Paciente -->
-        <div class="form-group col-md-6">
-          <label for="cpfPaciente">CPF do Paciente</label>
-          <input type="text" class="form-control" id="cpfPaciente" readonly>
-        </div>
-
-
-        <div class="form-group col-md-6">
-          <label for="advogadoId">Advogado</label>
-          <select class="form-control" id="advogadoId" name="advogadoId" required>
-            <option th:each="a : ${advogados}" th:value="${a.id}" th:text="${a.nome}"></option>
-          </select>
-        </div>
-      </div>
-
-      <!-- OAB do Advogado -->
-      <div class="form-group col-md-6">
-        <label for="oabAdvogado">OAB do Advogado</label>
-        <input type="text" class="form-control" id="oabAdvogado" readonly>
-      </div>
-
-
-      <!-- Linha 3: médico e status -->
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="medicoId">Médico</label>
-          <select class="form-control" id="medicoId" name="medicoId" required>
-            <option th:each="m : ${medicos}" th:value="${m.id}" th:text="${m.nome}"></option>
-          </select>
-        </div>
-
-        <!-- CRM do Médico -->
-        <div class="form-group col-md-6">
-          <label for="crmMedico">CRM do Médico</label>
-          <input type="text" class="form-control" id="crmMedico" readonly>
-        </div>
-
-        <div class="form-group col-md-6">
-          <label for="status">Status</label>
-          <select class="form-control" id="status" name="status" required>
-            <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"></option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group col-md-12">
-        <label for="hospitalInput">Hospital</label>
-        <input type="text" id="hospitalInput" name="hospitalNome" class="form-control" placeholder="Digite o nome do hospital...">
-        <input type="hidden" id="hospitalId" name="hospitalId"> <!-- este vai com o form -->
-        <div id="autocompleteHospital" class="list-group"></div>
-      </div>
-
-      <div class="form-group">
-        <label for="tipoHospital">Tipo de Hospital</label>
-        <select class="form-control" id="tipoHospital" name="tipoHospital" required>
-          <option value="">Selecione</option>
-          <option value="SUS">SUS</option>
-          <option value="CONVENIO">Convênio</option>
-          <option value="PARTICULAR">Particular</option>
-        </select>
-      </div>
-
-
-
-      <!-- Linha 4: local -->
-      <div class="form-group">
-        <label for="localId">Local</label>
-        <select class="form-control" id="localId" name="localId" required>
-          <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca + ' – ' + l.localizacao}"></option>
-        </select>
-      </div>
-
-      <div class="form-row">
-  <div class="form-group col-md-6">
-    <label for="grupoDoenca">Localização da Doença</label>
-    <select id="grupoDoenca" name="grupoDoencaId" class="form-control" required>
-      <option value="">Selecione</option>
-      <option th:each="g : ${gruposDoenca}" th:value="${g.id}" th:text="${g.nome}"></option>
-    </select>
-  </div>
-
-  <div class="form-group col-md-6">
-    <label for="doenca">Tipo de Tumor</label>
-    <select id="doenca" name="doencaId" class="form-control" required>
-      <option value="">Selecione uma localização primeiro</option>
-    </select>
-  </div>
-</div>
-
-
-      <!-- Produtos em tabela -->
-      <div class="form-group">
-        <label for="produtoBusca">Produtos</label>
-        <div class="input-group mb-2">
-          <input list="produtosList" id="produtoBusca" class="form-control" placeholder="Buscar produto...">
-          <div class="input-group-append">
-            <button class="btn btn-outline-primary" type="button" onclick="addProduto()">Adicionar</button>
+      <fieldset class="form-group border p-3">
+        <legend class="w-auto px-2">Dados do Processo</legend>
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label for="numeroInterno">Número Interno</label>
+            <input type="text" class="form-control" id="numeroInterno" name="numeroInterno" readonly required>
+          </div>
+          <div class="form-group col-md-5">
+            <label for="numeroProcesso">Número Processo</label>
+            <input type="text" class="form-control" id="numeroProcesso" name="numeroProcesso" required>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="dataInicio">Data Início</label>
+            <input type="date" class="form-control" id="dataInicio" name="dataInicio" required>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status" required>
+              <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"></option>
+            </select>
+          </div>
+          <div class="form-group col-md-12">
+            <label for="localId">Local do Processo</label>
+            <select class="form-control" id="localId" name="localId" required>
+              <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca + ' – ' + l.localizacao}">
+              </option>
+            </select>
           </div>
         </div>
-        <datalist id="produtosList">
-          <option th:each="prod : ${produtos}" th:value="${prod.nomeItem}"></option>
-        </datalist>
+      </fieldset>
 
-        <table class="table table-bordered" id="tabelaProdutos">
-          <thead class="thead-light">
-            <tr>
-              <th>Produto</th>
-              <th>Data</th>
-              <th>Quantidade</th>
-              <th style="width:1%;">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Linhas adicionadas via script -->
-          </tbody>
-        </table>
-      </div>
+      <fieldset class="form-group border p-3 mt-4">
+        <legend class="w-auto px-2">Dados do Paciente</legend>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="pacienteId">Paciente</label>
+            <select class="form-control" id="pacienteId" name="pacienteId" required>
+              <option th:each="p : ${pacientes}" th:value="${p.id}" th:text="${p.nome}"></option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="cpfPaciente">CPF do Paciente</label>
+            <input type="text" class="form-control" id="cpfPaciente" readonly>
+          </div>
+        </div>
+      </fieldset>
 
-      <!-- Documentos anexados -->
-      <div class="form-group">
-        <label>Documentos anexados</label>
+      <fieldset class="form-group border p-3 mt-4">
+        <legend class="w-auto px-2">Dados do Advogado</legend>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="advogadoId">Advogado</label>
+            <select class="form-control" id="advogadoId" name="advogadoId" required>
+              <option th:each="a : ${advogados}" th:value="${a.id}" th:text="${a.nome}"></option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="oabAdvogado">OAB do Advogado</label>
+            <input type="text" class="form-control" id="oabAdvogado" readonly>
+          </div>
+        </div>
+      </fieldset>
 
+      <fieldset class="form-group border p-3 mt-4">
+        <legend class="w-auto px-2">Dados Médicos e Hospitalares</legend>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="medicoId">Médico</label>
+            <select class="form-control" id="medicoId" name="medicoId" required>
+              <option th:each="m : ${medicos}" th:value="${m.id}" th:text="${m.nome}"></option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="crmMedico">CRM do Médico</label>
+            <input type="text" class="form-control" id="crmMedico" readonly>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="hospitalInput">Hospital</label>
+            <input type="text" id="hospitalInput" name="hospitalNome" class="form-control"
+              placeholder="Digite o nome do hospital...">
+            <input type="hidden" id="hospitalId" name="hospitalId">
+            <div id="autocompleteHospital" class="list-group"></div>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="tipoHospital">Tipo de Hospital</label>
+            <select class="form-control" id="tipoHospital" name="tipoHospital" required>
+              <option value="">Selecione</option>
+              <option value="SUS">SUS</option>
+              <option value="CONVENIO">Convênio</option>
+              <option value="PARTICULAR">Particular</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-group border p-3 mt-4">
+        <legend class="w-auto px-2">Detalhes da Doença</legend>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="grupoDoenca">Localização da Doença</label>
+            <select id="grupoDoenca" name="grupoDoencaId" class="form-control" required>
+              <option value="">Selecione</option>
+              <option th:each="g : ${gruposDoenca}" th:value="${g.id}" th:text="${g.nome}"></option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="doenca">Tipo de Tumor</label>
+            <select id="doenca" name="doencaId" class="form-control" required>
+              <option value="">Selecione uma localização primeiro</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-group border p-3 mt-4">
+        <legend class="w-auto px-2">Produtos do Processo</legend>
+        <div class="form-group">
+          <label for="produtoBusca">Produtos</label>
+          <div class="input-group mb-2">
+            <input list="produtosList" id="produtoBusca" class="form-control" placeholder="Buscar produto...">
+            <div class="input-group-append mb-3">
+              <button class="btn btn-outline-primary" type="button" onclick="addProduto()">Adicionar</button>
+            </div>
+          </div>
+          <datalist id="produtosList">
+            <option th:each="prod : ${produtos}" th:value="${prod.nomeItem}"></option>
+          </datalist>
+
+          <table class="table table-bordered" id="tabelaProdutos">
+            <thead class="thead-light">
+              <tr>
+                <th>Produto</th>
+                <th>Data</th>
+                <th>Quantidade</th>
+                <th style="width:1%;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-group border p-3 mt-4">
+        <legend class="w-auto px-2">Documentos Anexados</legend>
         <div class="form-check">
-          <!-- primeiro o checkbox -->
           <input class="form-check-input" type="checkbox" id="cpfAnexado" name="cpfAnexado" value="true" />
-          <!-- depois o hidden para false -->
           <input type="hidden" name="cpfAnexado" value="false" />
           <label class="form-check-label" for="cpfAnexado">CPF</label>
         </div>
-
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="compResidenciaAnexado" name="compResidenciaAnexado"
             value="true" />
           <input type="hidden" name="compResidenciaAnexado" value="false" />
-          <label class="form-check-label" for="compResidenciaAnexado">
-            Comprovante de Residência
-          </label>
+          <label class="form-check-label" for="compResidenciaAnexado">Comprovante de Residência</label>
         </div>
-
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="compRendaAnexado" name="compRendaAnexado" value="true" />
           <input type="hidden" name="compRendaAnexado" value="false" />
-          <label class="form-check-label" for="compRendaAnexado">
-            Comprovante de Renda
-          </label>
+          <label class="form-check-label" for="compRendaAnexado">Comprovante de Renda</label>
         </div>
-
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="procuracaoAnexado" name="procuracaoAnexado"
             value="true" />
           <input type="hidden" name="procuracaoAnexado" value="false" />
-          <label class="form-check-label" for="procuracaoAnexado">
-            Procuração
-          </label>
+          <label class="form-check-label" for="procuracaoAnexado">Procuração</label>
         </div>
-
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="declaracaoInsuficienciaAnexado"
             name="declaracaoInsuficienciaAnexado" value="true" />
           <input type="hidden" name="declaracaoInsuficienciaAnexado" value="false" />
-          <label class="form-check-label" for="declaracaoInsuficienciaAnexado">
-            Declaração de Insuficiência
-          </label>
+          <label class="form-check-label" for="declaracaoInsuficienciaAnexado">Declaração de Insuficiência</label>
         </div>
+      </fieldset>
+
+      <fieldset class="form-group border p-3 mt-4">
+        <legend class="w-auto px-2">Observações</legend>
+        <div class="form-group mb-0">
+          <label for="obs">Detalhes Adicionais</label>
+          <textarea class="form-control" id="obs" name="obs" rows="3"></textarea>
+        </div>
+      </fieldset>
+
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a th:href="@{/processos/listar}" class="btn btn-secondary ml-2">Cancelar</a>
       </div>
-
-
-      <!-- Observações -->
-      <div class="form-group">
-        <label for="obs">Observações</label>
-        <textarea class="form-control" id="obs" name="obs" rows="3"></textarea>
-      </div>
-
-      <!-- Botões -->
-      <button type="submit" class="btn btn-primary">Salvar</button>
-      <a th:href="@{/processos/listar}" class="btn btn-secondary ml-2">Cancelar</a>
     </form>
   </div>
 </div>
+
 
 <!-- Rodapé -->
 <div th:replace="~{fragments/foot :: bot}"></div>
@@ -340,32 +331,32 @@
 </script>
 
 <script>
-document.getElementById("hospitalInput").addEventListener("input", function () {
-  const input = this.value;
-  const resultBox = document.getElementById("autocompleteHospital");
-  if (input.length < 2) {
-    resultBox.innerHTML = '';
-    return;
-  }
-
-  fetch(`/api/hospitais/buscar?nome=${encodeURIComponent(input)}`)
-    .then(res => res.json())
-    .then(hospitais => {
+  document.getElementById("hospitalInput").addEventListener("input", function () {
+    const input = this.value;
+    const resultBox = document.getElementById("autocompleteHospital");
+    if (input.length < 2) {
       resultBox.innerHTML = '';
-      hospitais.forEach(h => {
-        const item = document.createElement("button");
-        item.type = "button";
-        item.classList.add("list-group-item", "list-group-item-action");
-        item.textContent = h.nome + (h.cidade ? ` (${h.cidade}/${h.estado})` : '');
-        item.onclick = () => {
-          document.getElementById("hospitalInput").value = h.nome;
-          document.getElementById("hospitalId").value = h.id;
-          resultBox.innerHTML = '';
-        };
-        resultBox.appendChild(item);
+      return;
+    }
+
+    fetch(`/api/hospitais/buscar?nome=${encodeURIComponent(input)}`)
+      .then(res => res.json())
+      .then(hospitais => {
+        resultBox.innerHTML = '';
+        hospitais.forEach(h => {
+          const item = document.createElement("button");
+          item.type = "button";
+          item.classList.add("list-group-item", "list-group-item-action");
+          item.textContent = h.nome + (h.cidade ? ` (${h.cidade}/${h.estado})` : '');
+          item.onclick = () => {
+            document.getElementById("hospitalInput").value = h.nome;
+            document.getElementById("hospitalId").value = h.id;
+            resultBox.innerHTML = '';
+          };
+          resultBox.appendChild(item);
+        });
       });
-    });
-});
+  });
 </script>
 
 
