@@ -1,26 +1,43 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<div th:replace="~{fragments/head :: top}"></div>
+<head>
+  <title>Todos os Tumores por Localização</title>
+  <div th:replace="~{fragments/head :: top}"></div>
+</head>
 
-<h1 class="h3 mb-4 text-gray-800">Todos os Tumores Cadastrados por Localização</h1>
+<div class="card shadow mb-4">
+  <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
+    <h6 class="m-0 font-weight-bold text-primary">
+      <i class="fas fa-microscope mr-2"></i> Todos os Tumores Cadastrados por Localização
+    </h6>
+    <a th:href="@{/doencas/cadastrar}" class="btn btn-info btn-sm">
+      <i class="fas fa-cogs mr-1"></i> Gerenciar Tumores
+    </a>
+  </div>
 
-<div th:each="grupo : ${grupos}">
-  <div class="card mb-3">
-    <div class="card-header font-weight-bold">
-      <i class="fas fa-map-marker-alt text-primary"></i> 
-      <span th:text="${grupo.nome}">Localização</span>
+  <div class="card-body">
+    <div th:if="${grupos == null or grupos.isEmpty()}">
+      <p class="text-muted">Nenhuma localização com tumores cadastrados encontrada.</p>
     </div>
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item" 
-          th:each="d : ${grupo.doencas}" 
-          th:text="${d.nome}">Tipo de Tumor</li>
-      <li class="list-group-item text-muted" 
-          th:if="${grupo.doencas == null or grupo.doencas.isEmpty()}">
-          Nenhum tipo de tumor cadastrado nesta localização.
-      </li>
-    </ul>
+
+    <div th:each="grupo : ${grupos}" class="mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-header py-2">
+          <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-map-marker-alt mr-2"></i> <span th:text="${grupo.nome}">Localização</span>
+          </h6>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item" th:each="d : ${grupo.doencas}" th:text="${d.nome}">Tipo de Tumor</li>
+            <li class="list-group-item text-muted" th:if="${grupo.doencas == null or grupo.doencas.isEmpty()}">
+              Nenhum tipo de tumor cadastrado nesta localização.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <div th:replace="~{fragments/foot :: bot}"></div>
+
 </html>
