@@ -43,68 +43,84 @@
         </div>
 
         <!-- Menu Principal: Cadastrar -->
-<li class="nav-item" sec:authorize="hasRole('ADMIN')">
-  <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCadastrar"
-    aria-expanded="true" aria-controls="collapseCadastrar">
-    <i class="fas fa-fw fa-plus-circle"></i>
-    <span>Cadastrar</span>
-  </a>
-  <div id="collapseCadastrar" class="collapse" aria-labelledby="headingCadastrar" data-parent="#accordionSidebar">
-    <div class="bg-white py-2 collapse-inner rounded">
-      <a class="collapse-item" th:href="@{/pessoas/cadastrar}">Pessoa</a>
-      <a class="collapse-item" th:href="@{/processos/cadastrar}">Processo</a>
-      <a class="collapse-item" th:href="@{/usuarios/cadastrar}">Usuário</a>
-      <a class="collapse-item" th:href="@{/produtos/cadastrar}">Produto</a>
-      <a class="collapse-item" th:href="@{/locais/cadastrar}">Local</a>
-      <a class="collapse-item" th:href="@{/hospitais/cadastrar}">Hospital</a>
-      <a class="collapse-item" th:href="@{/doencas/cadastrar}">Tumor</a>
-    </div>
-  </div>
-</li>
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCadastrar"
+            aria-expanded="true" aria-controls="collapseCadastrar">
+            <i class="fas fa-fw fa-plus-circle"></i>
+            <span>Cadastrar</span>
+          </a>
+          <div id="collapseCadastrar" class="collapse" aria-labelledby="headingCadastrar"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/pessoas/cadastrar}">Pessoa</a>
+              <a class="collapse-item" th:href="@{/usuarios/cadastrar}">Usuário</a>
+              <a class="collapse-item" th:href="@{/produtos/cadastrar}">Produto</a>
+              <a class="collapse-item" th:href="@{/locais/cadastrar}">Local</a>
+              <a class="collapse-item" th:href="@{/hospitais/cadastrar}">Hospital</a>
+              <a class="collapse-item" th:href="@{/doencas/cadastrar}">Tumor</a>
+            </div>
+          </div>
+        </li>
 
-<!-- Menu Principal: Editar -->
-<li class="nav-item" sec:authorize="hasRole('ADMIN')">
-  <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseEditar"
-    aria-expanded="true" aria-controls="collapseEditar">
-    <i class="fas fa-fw fa-edit"></i>
-    <span>Editar</span>
-  </a>
-  <div id="collapseEditar" class="collapse" aria-labelledby="headingEditar" data-parent="#accordionSidebar">
-    <div class="bg-white py-2 collapse-inner rounded">
-      <a class="collapse-item" th:href="@{/pessoas/listar}">Pessoas</a>
-      <a class="collapse-item" th:href="@{/processos/listar}">Processos</a>
-      <a class="collapse-item" th:href="@{/usuarios}">Usuários</a>
-      <a class="collapse-item" th:href="@{/produtos/listar}">Produtos</a>
-      <a class="collapse-item" th:href="@{/locais/listar}">Locais</a>
-      <a class="collapse-item" th:href="@{/hospitais}">Hospitais</a>
-      <a class="collapse-item" th:href="@{/doencas/listar}">Tumores</a>
-    </div>
-  </div>
-</li>
+        <!-- Menu Principal: Editar -->
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProcesso"
+            aria-expanded="true" aria-controls="collapseEditar">
+            <i class="fas fa-fw fa-edit"></i>
+            <span>Editar</span>
+          </a>
+          <div id="collapseProcesso" class="collapse" aria-labelledby="headingEditar" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/pessoas/listar}">Pessoas</a>
+              <a class="collapse-item" th:href="@{/usuarios}">Usuários</a>
+              <a class="collapse-item" th:href="@{/produtos/listar}">Produtos</a>
+              <a class="collapse-item" th:href="@{/locais/listar}">Locais</a>
+              <a class="collapse-item" th:href="@{/hospitais}">Hospitais</a>
+              <a class="collapse-item" th:href="@{/doencas/listar}">Tumores</a>
+            </div>
+          </div>
+        </li>
 
-<!-- Menu: Manutenção -->
-<li class="nav-item" sec:authorize="hasRole('ADMIN')">
-  <a class="nav-link" th:href="@{/maintenance}">
-    <i class="fas fa-fw fa-tools"></i>
-    <span>Manutenção</span>
-  </a>
-</li>
+        <!-- Menu: Processo -->
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseEditar"
+            aria-expanded="true" aria-controls="collapseEditar">
+            <i class="fas fa-fw fa-edit"></i>
+            <span>Processos</span>
+          </a>
+          <div id="collapseEditar" class="collapse" aria-labelledby="headingEditar" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/processos/cadastrar}">Criar Processo</a>
+              <a class="collapse-item" th:href="@{/processos/listar}">Editar Processo</a>
+            </div>
+          </div>
+        </li>
 
-<!-- Menu: Relatórios -->
-<li class="nav-item" sec:authorize="hasAnyRole('USUARIO','ADMIN')">
-  <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRelatorios"
-    aria-expanded="true" aria-controls="collapseRelatorios">
-    <i class="fas fa-fw fa-file-alt"></i>
-    <span>Relatórios</span>
-  </a>
-  <div id="collapseRelatorios" class="collapse" aria-labelledby="headingRelatorios" data-parent="#accordionSidebar">
-    <div class="bg-white py-2 collapse-inner rounded">
-      <h6 class="collapse-header">Relatórios</h6>
-      <a class="collapse-item" th:href="@{/relatorios/processos}">Processos</a>
-      <!-- Adicione outros relatórios aqui -->
-    </div>
-  </div>
-</li>
+
+        <!-- Menu: Manutenção -->
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link" th:href="@{/maintenance}">
+            <i class="fas fa-fw fa-tools"></i>
+            <span>Manutenção</span>
+          </a>
+        </li>
+
+        <!-- Menu: Relatórios -->
+        <li class="nav-item" sec:authorize="hasAnyRole('USUARIO','ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRelatorios"
+            aria-expanded="true" aria-controls="collapseRelatorios">
+            <i class="fas fa-fw fa-file-alt"></i>
+            <span>Relatórios</span>
+          </a>
+          <div id="collapseRelatorios" class="collapse" aria-labelledby="headingRelatorios"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <h6 class="collapse-header">Relatórios</h6>
+              <a class="collapse-item" th:href="@{/relatorios/processos}">Processos</a>
+              <!-- Adicione outros relatórios aqui -->
+            </div>
+          </div>
+        </li>
 
 
         <hr class="sidebar-divider d-none d-md-block" />
