@@ -52,7 +52,7 @@
         <div class="container">
             <div class="masthead-subheading">Seja bem-vindo ao GrupoProd</div>
             <div class="masthead-heading text-uppercase">vida, saúde, acesso e cuidado</div>
-            <a class="btn btn-primary btn-xl text-uppercase" href="#service">Saiba Mais</a>
+            <a class="btn btn-primary btn-xl text-uppercase" href="#services">Saiba Mais</a>
         </div>
 
     </header>
@@ -377,75 +377,84 @@
     <section class="page-section" id="contact">
         <div class="container">
             <div class="text-center">
-                <h2 class="section-heading text-uppercase">Contact Us</h2>
-                <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
+                <h2 class="section-heading text-uppercase">Fale Conosco</h2>
+                <h3 class="section-subheading text-muted">Entre em contato conosco para mais informações.</h3>
             </div>
+
             <!-- * * * * * * * * * * * * * * *-->
-            <!-- * * SB Forms Contact Form * *-->
+            <!-- * * Formulário de Contato SB * *-->
             <!-- * * * * * * * * * * * * * * *-->
-            <!-- This form is pre-integrated with SB Forms.-->
-            <!-- To make this form functional, sign up at-->
+            <!-- Este formulário está pré-integrado com o SB Forms.-->
+            <!-- Para torná-lo funcional, cadastre-se em-->
             <!-- https://startbootstrap.com/solution/contact-forms-->
-            <!-- to get an API token!-->
+            <!-- para obter um token de API! -->
+
             <form id="contactForm" data-sb-form-api-token="API_TOKEN">
                 <div class="row align-items-stretch mb-5">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <!-- Name input-->
-                            <input class="form-control" id="name" type="text" placeholder="Your Name *"
+                            <!-- Campo Nome -->
+                            <input class="form-control" id="name" type="text" placeholder="Seu Nome *"
                                 data-sb-validations="required" />
-                            <div class="invalid-feedback" data-sb-feedback="name:required">A name is required.</div>
+                            <div class="invalid-feedback" data-sb-feedback="name:required">O nome é obrigatório.</div>
                         </div>
                         <div class="form-group">
-                            <!-- Email address input-->
-                            <input class="form-control" id="email" type="email" placeholder="Your Email *"
+                            <!-- Campo E-mail -->
+                            <input class="form-control" id="email" type="email" placeholder="Seu E-mail *"
                                 data-sb-validations="required,email" />
-                            <div class="invalid-feedback" data-sb-feedback="email:required">An email is required.</div>
-                            <div class="invalid-feedback" data-sb-feedback="email:email">Email is not valid.</div>
+                            <div class="invalid-feedback" data-sb-feedback="email:required">O e-mail é obrigatório.
+                            </div>
+                            <div class="invalid-feedback" data-sb-feedback="email:email">O e-mail informado é inválido.
+                            </div>
                         </div>
                         <div class="form-group mb-md-0">
-                            <!-- Phone number input-->
-                            <input class="form-control" id="phone" type="tel" placeholder="Your Phone *"
+                            <!-- Campo Telefone -->
+                            <input class="form-control" id="phone" type="tel" placeholder="Seu Telefone *"
                                 data-sb-validations="required" />
-                            <div class="invalid-feedback" data-sb-feedback="phone:required">A phone number is required.
+                            <div class="invalid-feedback" data-sb-feedback="phone:required">O número de telefone é
+                                obrigatório.
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group form-group-textarea mb-md-0">
-                            <!-- Message input-->
-                            <textarea class="form-control" id="message" placeholder="Your Message *"
+                            <!-- Campo Mensagem -->
+                            <textarea class="form-control" id="message" placeholder="Sua Mensagem *"
                                 data-sb-validations="required"></textarea>
-                            <div class="invalid-feedback" data-sb-feedback="message:required">A message is required.
+                            <div class="invalid-feedback" data-sb-feedback="message:required">A mensagem é obrigatória.
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Submit success message-->
-                <!---->
-                <!-- This is what your users will see when the form-->
-                <!-- has successfully submitted-->
+
+                <!-- Mensagem de sucesso no envio -->
+                <!-- Esta é a mensagem que os usuários verão quando o formulário for enviado com sucesso -->
                 <div class="d-none" id="submitSuccessMessage">
                     <div class="text-center text-white mb-3">
-                        <div class="fw-bolder">Form submission successful!</div>
-                        To activate this form, sign up at
+                        <div class="fw-bolder">Formulário enviado com sucesso!</div>
+                        Para ativar este formulário, cadastre-se em
                         <br />
-                        <a
-                            href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
+                        <a href="https://startbootstrap.com/solution/contact-forms">
+                            https://startbootstrap.com/solution/contact-forms
+                        </a>
                     </div>
                 </div>
-                <!-- Submit error message-->
-                <!---->
-                <!-- This is what your users will see when there is-->
-                <!-- an error submitting the form-->
+
+                <!-- Mensagem de erro no envio -->
+                <!-- Esta é a mensagem que os usuários verão caso ocorra um erro ao enviar o formulário -->
                 <div class="d-none" id="submitErrorMessage">
-                    <div class="text-center text-danger mb-3">Error sending message!</div>
+                    <div class="text-center text-danger mb-3">Erro ao enviar a mensagem!</div>
                 </div>
-                <!-- Submit Button-->
-                <div class="text-center"><button class="btn btn-primary btn-xl text-uppercase disabled"
-                        id="submitButton" type="submit">Send Message</button></div>
+
+                <!-- Botão de envio -->
+                <div class="text-center">
+                    <button class="btn btn-primary btn-xl text-uppercase disabled" id="submitButton" type="submit">
+                        Enviar Mensagem
+                    </button>
+                </div>
             </form>
         </div>
+
     </section>
     <!-- Footer-->
     <footer class="footer py-4">
@@ -461,8 +470,8 @@
                             class="fab fa-linkedin-in"></i></a>
                 </div>
                 <div class="col-lg-4 text-lg-end">
-                    <a class="link-dark text-decoration-none me-3" href="#!">Privacy Policy</a>
-                    <a class="link-dark text-decoration-none" href="#!">Terms of Use</a>
+                    <a class="link-dark text-decoration-none me-3" href="#!">Política de Privacidade</a>
+                    <a class="link-dark text-decoration-none" href="#!">Termos de Uso</a>
                 </div>
             </div>
         </div>
