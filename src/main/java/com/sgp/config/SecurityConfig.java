@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 public class SecurityConfig {
@@ -43,8 +44,10 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true")
                         .permitAll())
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout=true")
-                        .permitAll());
+                    .logoutUrl("/logout")  // continua /logout
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                    .logoutSuccessUrl("/login?logout=true")
+                    .permitAll());
 
         return http.build();
     }
