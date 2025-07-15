@@ -75,80 +75,72 @@ public class ProcessoController {
     }
 
     @PostMapping("/cadastrar")
-    public String create(
-        @RequestParam String numeroInterno,
-        @RequestParam String numeroProcesso,
-        @RequestParam Long pacienteId,
-        @RequestParam Long advogadoId,
-        @RequestParam Long medicoId,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate dataInicio,
-        @RequestParam StatusProcesso status,
-        @RequestParam Long localId,
-        @RequestParam TipoHospital tipoHospital,
-        @RequestParam Long doencaId,
-        @RequestParam Long grupoDoencaId,
+public String create(
+    @RequestParam String numeroInterno,
+    @RequestParam String numeroProcesso,
+    @RequestParam Long pacienteId,
+    @RequestParam Long advogadoId,
+    @RequestParam Long medicoId,
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+    @RequestParam StatusProcesso status,
+    @RequestParam Long localId,
+    @RequestParam TipoHospital tipoHospital,
+    @RequestParam Long doencaId,
+    @RequestParam Long grupoDoencaId,
+    @RequestParam Long hospitalId, // <- ADICIONADO AQUI
 
-        @RequestParam(required = false) List<Long> produtoIds,
-        @RequestParam(required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        List<LocalDate> produtoDatas,
-        @RequestParam(required = false) List<Integer> produtoQuantidades,
+    @RequestParam(required = false) List<Long> produtoIds,
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) List<LocalDate> produtoDatas,
+    @RequestParam(required = false) List<Integer> produtoQuantidades,
 
-        @RequestParam(defaultValue = "false") boolean cpfAnexado,
-        @RequestParam(defaultValue = "false") boolean compResidenciaAnexado,
-        @RequestParam(defaultValue = "false") boolean compRendaAnexado,
-        @RequestParam(defaultValue = "false") boolean procuracaoAnexado,
-        @RequestParam(defaultValue = "false") boolean declaracaoInsuficienciaAnexado,
+    @RequestParam(defaultValue = "false") boolean cpfAnexado,
+    @RequestParam(defaultValue = "false") boolean compResidenciaAnexado,
+    @RequestParam(defaultValue = "false") boolean compRendaAnexado,
+    @RequestParam(defaultValue = "false") boolean procuracaoAnexado,
+    @RequestParam(defaultValue = "false") boolean declaracaoInsuficienciaAnexado,
 
-        @RequestParam(required = false) String obs
-    ) {
-        Processo proc = new Processo();
-        proc.setNumeroInterno(numeroInterno);
-        proc.setNumeroProcesso(numeroProcesso);
-        proc.setPaciente((Paciente)pessoaRepository.findById(pacienteId).orElseThrow());
-        proc.setAdvogado((Advogado)pessoaRepository.findById(advogadoId).orElseThrow());
-        proc.setMedico((Medico)pessoaRepository.findById(medicoId).orElseThrow());
-        proc.setDataInicio(dataInicio);
-        proc.setStatus(status);
-        proc.setLocal(localRepository.findById(localId).orElseThrow());
-        proc.setObs(obs);
-        
+    @RequestParam(required = false) String obs
+) {
+    Processo proc = new Processo();
+    proc.setNumeroInterno(numeroInterno);
+    proc.setNumeroProcesso(numeroProcesso);
+    proc.setPaciente((Paciente) pessoaRepository.findById(pacienteId).orElseThrow());
+    proc.setAdvogado((Advogado) pessoaRepository.findById(advogadoId).orElseThrow());
+    proc.setMedico((Medico) pessoaRepository.findById(medicoId).orElseThrow());
+    proc.setDataInicio(dataInicio);
+    proc.setStatus(status);
+    proc.setLocal(localRepository.findById(localId).orElseThrow());
+    proc.setObs(obs);
 
-        // seta flags dos checkboxes
-        proc.setCpfAnexado(cpfAnexado);
-        proc.setCompResidenciaAnexado(compResidenciaAnexado);
-        proc.setCompRendaAnexado(compRendaAnexado);
-        proc.setProcuracaoAnexado(procuracaoAnexado);
-        proc.setDeclaracaoInsuficienciaAnexado(declaracaoInsuficienciaAnexado);
+    // Checkbox flags
+    proc.setCpfAnexado(cpfAnexado);
+    proc.setCompResidenciaAnexado(compResidenciaAnexado);
+    proc.setCompRendaAnexado(compRendaAnexado);
+    proc.setProcuracaoAnexado(procuracaoAnexado);
+    proc.setDeclaracaoInsuficienciaAnexado(declaracaoInsuficienciaAnexado);
 
-        proc.setTipoHospital(tipoHospital);
+    proc.setTipoHospital(tipoHospital);
+    proc.setDoenca(doencaRepository.findById(doencaId).orElse(null));
 
-        proc.setDoenca(doencaRepository.findById(doencaId).orElse(null));
+    // Hospital (setado corretamente agora)
+    proc.setHospital(hospitalRepository.findById(hospitalId).orElse(null));
 
+    // Produtos
+    if (produtoIds != null && produtoDatas != null && produtoQuantidades != null
+        && produtoIds.size() == produtoDatas.size()
+        && produtoIds.size() == produtoQuantidades.size()) {
 
-
-        
-
-
-        // adiciona produtos
-        if (produtoIds != null
-            && produtoDatas != null
-            && produtoQuantidades != null
-            && produtoIds.size() == produtoDatas.size()
-            && produtoIds.size() == produtoQuantidades.size()) {
-
-            for (int i = 0; i < produtoIds.size(); i++) {
-                Produto p = produtoRepository.findById(produtoIds.get(i)).orElseThrow();
-                LocalDate envio = produtoDatas.get(i);
-                Integer qtde = produtoQuantidades.get(i);
-                proc.addItem(p, envio, qtde);
-            }
+        for (int i = 0; i < produtoIds.size(); i++) {
+            Produto p = produtoRepository.findById(produtoIds.get(i)).orElseThrow();
+            LocalDate envio = produtoDatas.get(i);
+            Integer qtde = produtoQuantidades.get(i);
+            proc.addItem(p, envio, qtde);
         }
-
-        processoRepository.save(proc);
-        return "redirect:/processos/listar";
     }
+
+    processoRepository.save(proc);
+    return "redirect:/processos/listar";
+}
 
 
 
