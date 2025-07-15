@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+  <!-- puxa <head> e abre <body> -->
+  <th:block th:replace="~{fragments/head :: top}"></th:block>
+
+  <!-- início do conteúdo específico -->
+  <div class="container-fluid p-4">
+    <h1 class="mt-0">Registro de Manutenção</h1>
+
+    <!-- formulário de lançamento -->
+    <form th:action="@{/maintenance/save}"
+          th:object="${form}"
+          method="post"
+          class="mb-4">
+      <div class="row g-3">
+        <div class="col-md-2">
+          <label for="date">Data</label>
+          <input id="date" type="date" th:field="*{date}" class="form-control"/>
+        </div>
+        <div class="col-md-2">
+          <label for="durationMinutes">Duração (min)</label>
+          <input id="durationMinutes"
+                 type="number"
+                 th:field="*{durationMinutes}"
+                 class="form-control"/>
+        </div>
+        <div class="col-md-2">
+          <label for="type">Tipo</label>
+          <select id="type" th:field="*{type}" class="form-select">
+            <option value="" disabled th:if="${form.type == null}" selected>— selecione —</option>
+            <option th:each="t : ${types}"
+                    th:value="${t}"
+                    th:text="${t}"></option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label for="performedBy">Quem</label>
+          <select id="performedBy" th:field="*{performedBy}" class="form-select">
+            <option value="" disabled th:if="${form.performedBy == null}" selected>— selecione —</option>
+            <option th:each="u : ${users}"
+                    th:value="${u}"
+                    th:text="${u}"></option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="description">Descrição</label>
+          <input id="description"
+                 type="text"
+                 th:field="*{description}"
+                 class="form-control"/>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary mt-3">Adicionar</button>
+    </form>
+
+    <!-- barra de meta mensal -->
+    <div class="mb-4">
+        <h2>Uso Mensal de manutenção</h2>
+        <p th:text="|${#numbers.formatDecimal(monthlyHours, 1, 1)}h / 20h|"></p>
+        <div class="progress" style="height: 1.5rem;">
+            <div class="progress-bar"
+                role="progressbar"
+                th:classappend="${monthlyPercent >= 100} ? ' bg-danger' : ' bg-success'"
+                th:style="'width: ' + ${monthlyPercent} + '%'"
+                th:text="|${monthlyPercent}%|">
+            </div>
+        </div>
+        </div>
+
+
+    <!-- tabela de entradas -->
+    <h2>Entradas</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Minutos</th>
+          <th>Tipo</th>
+          <th>Quem</th>
+          <th>Descrição</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="e : ${entries}">
+          <td th:text="${#temporals.format(e.date,'dd/MM/yyyy')}"></td>
+          <td th:text="${e.durationMinutes}"></td>
+          <td th:text="${e.type}"></td>
+          <td th:text="${e.performedBy}"></td>
+          <td th:text="${e.description}"></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th>Total</th>
+          <th th:text="|${totalMinutes} min (${totalMinutes/60}h ${totalMinutes % 60}m)|"
+              colspan="4"></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <!-- fim do conteúdo -->
+
+  <!-- puxa scripts e fecha </body></html> -->
+  <th:block th:replace="~{fragments/foot :: bot}"></th:block>
+</html>

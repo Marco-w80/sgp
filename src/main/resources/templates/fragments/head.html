@@ -149,6 +149,21 @@
           </div>
         </li>
 
+        <!-- Nav Item - Manutenção Collapse Menu -->
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseManutencao"
+            aria-expanded="false" aria-controls="collapseManutencao">
+            <i class="fas fa-fw fa-tools"></i>
+            <span>Manutenção</span>
+          </a>
+          <div id="collapseManutencao" class="collapse" aria-labelledby="headingManutencao" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/maintenance}">Registrar Horas</a>
+            </div>
+          </div>
+        </li>
+
+
 
 
         <li class="nav-item" sec:authorize="hasAnyRole('USUARIO','ADMIN')">
