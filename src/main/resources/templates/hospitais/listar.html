@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+  <!-- Injeção do head, sidebar, topbar e início do container -->
+  <div th:replace="~{fragments/head :: top}"></div>
+
+  <!-- Conteúdo específico da página -->
+  <h1 class="h3 mb-4 text-gray-800">Hospitais Cadastrados</h1>
+
+  <div class="mb-3">
+    <a class="btn btn-primary" th:href="@{/hospitais/cadastrar}">
+      <i class="fas fa-plus"></i> Novo Hospital
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead class="thead-light">
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Endereço</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="h : ${hospitais}">
+          <td th:text="${h.id}">1</td>
+          <td th:text="${h.nome}">Hospital Exemplo</td>
+          <td th:text="${h.endereco}">Rua X</td>
+          <td>
+            <a th:href="@{'/hospitais/editar/' + ${h.id}}" class="btn btn-sm btn-warning">
+                <i class="fas fa-edit"></i> Editar
+                </a>                
+            </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Fechamento de container, footer e scripts -->
+  <div th:replace="~{fragments/foot :: bot}"></div>
+
+</html>

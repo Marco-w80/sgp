@@ -17,9 +17,10 @@ public class ProcessoProduto {
     private Processo processo;
 
     // Relação com Produto
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "produto_id")
     private Produto produto;
+
 
     // Data de envio do medicamento
     @Column(name = "data_envio", nullable = false)

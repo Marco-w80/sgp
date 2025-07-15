@@ -54,6 +54,9 @@ public class Processo {
     @Column(name = "declaracao_insuficiencia_anexado", nullable = false)
     private boolean declaracaoInsuficienciaAnexado = false;
 
+    @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ProcessoLog> logs = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusProcesso status;
@@ -182,6 +185,12 @@ public class Processo {
         this.hospital = hospital;
     }
 
+    public List<ProcessoLog> getLogs() {
+        return logs;
+    }
 
+    public void setLogs(List<ProcessoLog> logs) {
+        this.logs = logs;
+    }
     
 }

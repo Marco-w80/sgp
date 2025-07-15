@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
 
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <head th:replace="~{fragments/head :: top}"></head>
 <!-- OBS: <body> aberto em fragments/head :: top e fechado em fragments/foot :: bot -->
 
@@ -218,7 +221,8 @@
     confirmButtonText: 'OK',
     confirmButtonColor: '#1B9BAE'
   };
-  var produtos = /*[[${produtos}]]*/[];
+var produtos = /*[[${produtos}]]*/ '[]';
+    console.log(produtos);
 
   function addProduto() {
     var nome = document.getElementById('produtoBusca').value;
