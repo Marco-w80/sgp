@@ -192,6 +192,9 @@ public String update(
     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
     @RequestParam StatusProcesso status,
     @RequestParam Long localId,
+    @RequestParam TipoHospital tipoHospital,
+    @RequestParam Long doencaId,
+
 
     @RequestParam(required = false) List<Long> produtoIds,
     @RequestParam(required = false)
@@ -237,11 +240,16 @@ public String update(
     proc.setLocal(localRepository.findById(localId).orElseThrow());
     proc.setObs(obs);
 
+    proc.setTipoHospital(tipoHospital);
+
     proc.setCpfAnexado(cpfAnexado);
     proc.setCompResidenciaAnexado(compResidenciaAnexado);
     proc.setCompRendaAnexado(compRendaAnexado);
     proc.setProcuracaoAnexado(procuracaoAnexado);
     proc.setDeclaracaoInsuficienciaAnexado(declaracaoInsuficienciaAnexado);
+
+    proc.setDoenca(doencaRepository.findById(doencaId).orElseThrow());
+
 
     // Itens
     proc.clearItems();
