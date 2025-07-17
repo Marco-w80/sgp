@@ -1,44 +1,196 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
 
-  <!-- Injeção do head, sidebar, topbar e início do container -->
-  <div th:replace="~{fragments/head :: top}"></div>
+<head>
+  <title>Lista de Hospitais</title>
+  <th:block th:replace="~{fragments/head :: top}"></th:block>
 
-  <!-- Conteúdo específico da página -->
-  <h1 class="h3 mb-4 text-gray-800">Hospitais Cadastrados</h1>
+  <style>
+    /* Estilo para arredondar as bordas da tabela */
+    .table-rounded-corners {
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: .5rem;
+      overflow: hidden;
+    }
 
-  <div class="mb-3">
-    <a class="btn btn-primary" th:href="@{/hospitais/cadastrar}">
-      <i class="fas fa-plus"></i> Novo Hospital
-    </a>
+    /* Estilo para o cabeçalho da tabela */
+    .table-rounded-corners thead {
+      background-color: #e2e6ea;
+      color: #343a40;
+    }
+
+    /* Alinhamento vertical no meio para cabeçalhos */
+    .table-rounded-corners th {
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    /* Centralizar o conteúdo das células do corpo (geral para texto) */
+    .table-rounded-corners td {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    /* Estilo para botões circulares */
+    .btn-circle {
+      width: 35px;
+      height: 35px;
+      padding: 0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Ajuste para botões pequenos circulares */
+    .btn-circle.btn-sm {
+      width: 30px;
+      height: 30px;
+      font-size: 0.8rem;
+    }
+
+    /* Garante que o TD da coluna de ações tenha altura suficiente para o flexbox e centralize seu conteúdo */
+    .table-rounded-corners td.actions-column {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Garante que os ícones dentro dos botões sejam centralizados */
+    .btn-circle i {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card shadow mb-4 rounded">
+    <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-primary">
+        <i class="fas fa-hospital mr-2"></i> Hospitais Cadastrados
+      </h6>
+      <a class="btn btn-primary shadow-sm" th:href="@{/hospitais/cadastrar}">
+        <i class="fas fa-plus mr-1"></i> Novo Hospital
+      </a>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="tabelaHospitais" class="table table-bordered table-hover w-100 table-rounded-corners"
+          cellspacing="0">
+          <thead class="thead-light">
+            <tr>
+              <th class="text-center">ID</th>
+              <th class="text-center">Nome</th>
+              <th class="text-center">CNPJ</th>
+              <th class="text-center">Endereço</th>
+              <th class="text-center">Telefone</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="h : ${hospitais}">
+              <td th:text="${h.id}"></td>
+              <td th:text="${h.nome}"></td>
+              <td th:text="${h.cnpj}"></td>
+              <td th:text="${h.endereco}"></td>
+              <td th:text="${h.telefone}"></td>
+              <td class="actions-column">
+                <a th:href="@{'/hospitais/editar/' + ${h.id}}" class="btn btn-circle btn-sm btn-secondary shadow-sm"
+                  title="Editar">
+                  <i class="fas fa-edit"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped">
-      <thead class="thead-light">
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>Endereço</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:each="h : ${hospitais}">
-          <td th:text="${h.id}">1</td>
-          <td th:text="${h.nome}">Hospital Exemplo</td>
-          <td th:text="${h.endereco}">Rua X</td>
-          <td>
-            <a th:href="@{'/hospitais/editar/' + ${h.id}}" class="btn btn-sm btn-warning">
-                <i class="fas fa-edit"></i> Editar
-                </a>                
-            </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <th:block th:replace="~{fragments/foot :: bot}"></th:block>
 
-  <!-- Fechamento de container, footer e scripts -->
-  <div th:replace="~{fragments/foot :: bot}"></div>
+  <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    $(document).ready(function () {
+      // Log para verificar se o jQuery está carregado
+      if (typeof jQuery != 'undefined') {
+        console.log('jQuery carregado com sucesso.');
+      } else {
+        console.error('jQuery NÃO está carregado. O DataTables não funcionará.');
+      }
+
+      // ATENÇÃO: Caminho atualizado para o arquivo de tradução hospedado LOCALMENTE!
+      const langUrl = '/datatables/i18n/pt-BR.json';
+      console.log('Tentando carregar tradução do DataTables de:', langUrl);
+
+      $('#tabelaHospitais').DataTable({
+        language: {
+          url: langUrl
+        },
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        columnDefs: [
+          { orderable: false, targets: -1 } // Desabilita ordenação na última coluna (Ações)
+        ],
+        scrollX: true // Adiciona rolagem horizontal se a tabela for muito larga
+      });
+
+      // Função de exemplo para confirmar exclusão com SweetAlert2 (se for usar o botão de excluir)
+      /*
+      window.confirmarExclusaoHospital = function(id) { // Tornar global para acesso do onclick
+          Swal.fire({
+              title: 'Tem certeza?',
+              text: "Você não poderá reverter isso!",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#6c757d',
+              confirmButtonText: 'Sim, excluir!',
+              cancelButtonText: 'Cancelar'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  // Requisição AJAX para excluir o hospital
+                  $.ajax({
+                      url: `/hospitais/excluir/${id}`, // Endpoint de exclusão (ajuste conforme seu controller)
+                      type: 'POST', // Ou DELETE, dependendo do seu backend (POST é mais simples em Thymeleaf)
+                      data: {
+                          _csrf: $('input[name="_csrf"]').val() // Inclui o CSRF token
+                      },
+                      success: function(response) {
+                          Swal.fire(
+                              'Excluído!',
+                              'O hospital foi removido com sucesso.',
+                              'success'
+                          ).then(() => {
+                              location.reload(); // Recarrega a página para atualizar a tabela
+                          });
+                      },
+                      error: function(xhr, status, error) {
+                          Swal.fire(
+                              'Erro!',
+                              'Ocorreu um erro ao excluir o hospital. Por favor, tente novamente.',
+                              'error'
+                          );
+                          console.error("Erro na exclusão:", xhr.responseText);
+                      }
+                  });
+              }
+          })
+      }
+      */
+    });
+  </script>
+</body>
 
 </html>

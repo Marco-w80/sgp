@@ -1,71 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+
 <head>
   <title>Lista de Locais</title>
-  <div th:replace="~{fragments/head :: top}"></div>
+  <th:block th:replace="~{fragments/head :: top}"></th:block>
+
+  <style>
+    /* Estilo para arredondar as bordas da tabela */
+    .table-rounded-corners {
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: .5rem;
+      overflow: hidden;
+    }
+
+    /* Estilo para o cabeçalho da tabela */
+    .table-rounded-corners thead {
+      background-color: #e2e6ea;
+      color: #343a40;
+    }
+
+    /* Alinhamento vertical no meio para cabeçalhos */
+    .table-rounded-corners th {
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    /* Centralizar o conteúdo das células do corpo (geral para texto) */
+    .table-rounded-corners td {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    /* Estilo para botões circulares */
+    .btn-circle {
+      width: 35px;
+      height: 35px;
+      padding: 0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Ajuste para botões pequenos circulares */
+    .btn-circle.btn-sm {
+      width: 30px;
+      height: 30px;
+      font-size: 0.8rem;
+    }
+
+    /* Garante que o TD da coluna de ações tenha altura suficiente para o flexbox e centralize seu conteúdo */
+    .table-rounded-corners td.actions-column {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Garante que os ícones dentro dos botões sejam centralizados */
+    .btn-circle i {
+      display: block;
+    }
+  </style>
 </head>
 
-<div class="card shadow mb-4">
+<body>
+  <div class="card shadow mb-4 rounded">
+    <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-primary">
+        <i class="fas fa-map-marked-alt mr-2"></i> Locais Cadastrados
+      </h6>
+      <a th:href="@{/locais/cadastrar}" class="btn btn-primary shadow-sm">
+        <i class="fas fa-map-marker-alt mr-1"></i> Cadastrar Novo Local
+      </a>
+    </div>
 
-  <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
-    <h6 class="m-0 font-weight-bold text-primary">
-      <i class="fas fa-map-marked-alt mr-2"></i> Locais Cadastrados
-    </h6>
-    <a th:href="@{/locais/cadastrar}" class="btn btn-primary">
-      <i class="fas fa-map-marker-alt mr-1"></i> Cadastrar Novo Local
-    </a>
-  </div>
-
-  <div class="card-body">
-    <div class="table-responsive">
-      <table id="tabelaLocais" class="table table-bordered table-hover" width="100%" cellspacing="0">
-        <thead class="thead-light">
-          <tr>
-            <th>ID</th>
-            <th>Comarca</th>
-            <th>Especialidade</th>
-            <th>Nº Vara</th>
-            <th>Código</th>
-            <th>Localização</th>
-            <th>Observações</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr th:each="loc : ${locais}">
-            <td th:text="${loc.id}"></td>
-            <td th:text="${loc.comarca}"></td>
-            <td th:text="${loc.especialidade}"></td>
-            <td th:text="${loc.numeroVara}"></td>
-            <td th:text="${loc.codigo}"></td>
-            <td th:text="${loc.localizacao}"></td>
-            <td th:text="${loc.obs}"></td>
-            <td>
-              <a th:href="@{|/locais/editar/${loc.id}|}" class="btn btn-sm btn-secondary">
-                <i class="fas fa-edit"></i>
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="tabelaLocais" class="table table-bordered table-hover w-100 table-rounded-corners" cellspacing="0">
+          <thead class="thead-light">
+            <tr>
+              <th class="text-center">ID</th>
+              <th class="text-center">Comarca</th>
+              <th class="text-center">Especialidade</th>
+              <th class="text-center">Nº Vara</th>
+              <th class="text-center">Código</th>
+              <th class="text-center">Localização</th>
+              <th class="text-center">Observações</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="loc : ${locais}">
+              <td th:text="${loc.id}"></td>
+              <td th:text="${loc.comarca}"></td>
+              <td th:text="${loc.especialidade}"></td>
+              <td th:text="${loc.numeroVara}"></td>
+              <td th:text="${loc.codigo}"></td>
+              <td th:text="${loc.localizacao}"></td>
+              <td th:text="${loc.obs}"></td>
+              <td class="actions-column"> <a th:href="@{|/locais/editar/${loc.id}|}"
+                  class="btn btn-circle btn-sm btn-secondary shadow-sm" title="Editar">
+                  <i class="fas fa-edit"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <div th:replace="~{fragments/foot :: bot}"></div>
-</div>
+  <th:block th:replace="~{fragments/foot :: bot}"></th:block>
 
+  <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // ATENÇÃO: Caminho para o arquivo de tradução hospedado LOCALMENTE!
+      const langUrl = '/datatables/i18n/pt-BR.json';
 
-<script>
-  $(document).ready(function () {
-    $('#tabelaLocais').DataTable({
-      language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json' },
-      pageLength: 10,
-      lengthMenu: [5, 10, 25, 50]
+      $('#tabelaLocais').DataTable({
+        language: {
+          url: langUrl
+        },
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        columnDefs: [
+          // Desabilita ordenação na última coluna (Ações)
+          { orderable: false, targets: -1 }
+        ],
+        scrollX: true // Adiciona rolagem horizontal se a tabela for muito larga
+      });
+
+      // Função de exemplo para confirmar exclusão com SweetAlert2 (se for usar o botão de excluir)
+      /*
+      window.confirmarExclusaoLocal = function(id) { // Tornar global para acesso do onclick
+          Swal.fire({
+              title: 'Tem certeza?',
+              text: "Você não poderá reverter isso!",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#6c757d',
+              confirmButtonText: 'Sim, excluir!',
+              cancelButtonText: 'Cancelar'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  // Requisição AJAX para excluir o local
+                  $.ajax({
+                      url: `/locais/excluir/${id}`, // Endpoint de exclusão (ajuste conforme seu controller)
+                      type: 'POST', // Ou DELETE, dependendo do seu backend (POST é mais simples em Thymeleaf)
+                      data: {
+                          _csrf: $('input[name="_csrf"]').val() // Inclui o CSRF token
+                      },
+                      success: function(response) {
+                          Swal.fire(
+                              'Excluído!',
+                              'O local foi removido com sucesso.',
+                              'success'
+                          ).then(() => {
+                              location.reload(); // Recarrega a página para atualizar a tabela
+                          });
+                      },
+                      error: function(xhr, status, error) {
+                          Swal.fire(
+                              'Erro!',
+                              'Ocorreu um erro ao excluir o local. Por favor, tente novamente.',
+                              'error'
+                          );
+                          console.error("Erro na exclusão:", xhr.responseText);
+                      }
+                  });
+              }
+          })
+      }
+      */
     });
-  });
-</script>
+  </script>
+</body>
 
 </html>

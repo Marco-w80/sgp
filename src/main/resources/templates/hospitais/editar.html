@@ -1,43 +1,190 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
-<head th:replace="~{fragments/head :: top}"></head>
+
+<head>
+  <title>Editar Hospital</title>
+  <th:block th:replace="~{fragments/head :: top}"></th:block>
+</head>
+
 <body>
+  <div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+        <div class="text-right mb-3">
+          <p class="text-muted small">Os campos marcados com <span class="text-danger">*</span> são obrigatórios.</p>
+        </div>
 
-<div class="card shadow mb-4">
-  <div class="card-header py-3">
-    <h6 class="m-0 font-weight-bold text-primary">
-      <i class="fas fa-hospital mr-2"></i> Editar Hospital
-    </h6>
+        <div class="card shadow mb-4 rounded">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+              <i class="fas fa-hospital mr-2"></i> Editar Hospital
+            </h6>
+          </div>
+
+          <div class="card-body">
+            <form th:action="@{|/hospitais/editar/${hospital.id}|}" method="post" th:object="${hospital}"
+              class="needs-validation" novalidate onsubmit="return validateHospitalEditForm()">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+              <input type="hidden" th:field="*{id}" />
+
+              <fieldset class="form-group border p-3 rounded">
+                <legend class="w-auto px-2">Dados do Hospital</legend>
+                <div class="form-group">
+                  <label for="nome">Nome<span class="text-danger">*</span>:</label>
+                  <input type="text" th:field="*{nome}" id="nome" class="form-control" required />
+                  <div class="invalid-feedback">
+                    Por favor, insira o nome do hospital.
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="cnpj">CNPJ:</label>
+                  <input type="text" th:field="*{cnpj}" id="cnpj" class="form-control"
+                    placeholder="XX.XXX.XXX/XXXX-XX" />
+                  <div class="invalid-feedback">
+                    Por favor, insira um CNPJ válido (ex: 00.000.000/0000-00).
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="endereco">Endereço:</label>
+                  <input type="text" th:field="*{endereco}" id="endereco" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                  <label for="telefone">Telefone:</label>
+                  <input type="text" th:field="*{telefone}" id="telefone" class="form-control"
+                    placeholder="(XX) XXXXX-XXXX" />
+                  <div class="invalid-feedback">
+                    Por favor, insira um telefone válido (ex: (DD) DDDDD-DDDD).
+                  </div>
+                </div>
+              </fieldset>
+
+              <hr class="mt-4 mb-4">
+
+              <button type="submit" class="btn btn-success shadow-sm">
+                <i class="fas fa-sync-alt mr-1"></i> Atualizar
+              </button>
+              <a th:href="@{/hospitais}" class="btn btn-secondary ml-2 shadow-sm">
+                <i class="fas fa-times-circle mr-1"></i> Cancelar
+              </a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="card-body">
-    <form th:action="@{|/hospitais/editar/${hospital.id}|}" method="post" th:object="${hospital}">
-      <div class="form-group">
-        <label for="nome">Nome</label>
-        <input type="text" th:field="*{nome}" id="nome" class="form-control" required>
-      </div>
+  <th:block th:replace="~{fragments/foot :: bot}"></th:block>
 
-      <div class="form-group">
-        <label for="cnpj">CNPJ</label>
-        <input type="text" th:field="*{cnpj}" id="cnpj" class="form-control">
-      </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
-      <div class="form-group">
-        <label for="endereco">Endereço</label>
-        <input type="text" th:field="*{endereco}" id="endereco" class="form-control">
-      </div>
+  <script th:inline="javascript">
+    // Validação do Bootstrap para exibir mensagens de erro
+    (function () {
+      'use strict';
+      window.addEventListener('load', function () {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, function (form) {
+          form.addEventListener('submit', function (event) {
+            if (form.checkValidity() === false) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+          }, false);
+        });
+      }, false);
+    })();
 
-      <div class="form-group">
-        <label for="telefone">Telefone</label>
-        <input type="text" th:field="*{telefone}" id="telefone" class="form-control">
-      </div>
+    // Função de validação personalizada para o formulário de edição de hospital
+    function validateHospitalEditForm() {
+      const form = document.querySelector('.needs-validation');
+      const nomeInput = document.getElementById('nome');
+      const cnpjInput = document.getElementById('cnpj');
+      const telefoneInput = document.getElementById('telefone');
 
-      <button type="submit" class="btn btn-success">Atualizar</button>
-      <a th:href="@{/hospitais}" class="btn btn-secondary ml-2">Cancelar</a>
-    </form>
-  </div>
-</div>
+      // Limpa validações anteriores
+      nomeInput.classList.remove('is-invalid');
+      cnpjInput.classList.remove('is-invalid');
+      telefoneInput.classList.remove('is-invalid');
 
-<div th:replace="~{fragments/foot :: bot}"></div>
+      // 1. Validação básica do Bootstrap (required, etc.)
+      if (form.checkValidity() === false) {
+        form.classList.add('was-validated');
+        return false;
+      }
+
+      // Função auxiliar para verificar se o campo está vazio ou só com espaços
+      const isEmptyOrSpaces = (str) => !str || str.trim() === '';
+
+      let isValid = true;
+      let errorMessage = '';
+
+      // 2. Validações personalizadas
+      if (isEmptyOrSpaces(nomeInput.value)) {
+        nomeInput.classList.add('is-invalid');
+        isValid = false;
+        errorMessage = 'Por favor, insira o nome do hospital.';
+      }
+
+      // Validação de CNPJ (se preenchido, deve estar no formato correto)
+      const cnpjValue = cnpjInput.value.replace(/\D/g, ''); // Remove todos os não-dígitos
+      if (cnpjValue && cnpjValue.length !== 14) {
+        cnpjInput.classList.add('is-invalid');
+        isValid = false;
+        errorMessage = 'Por favor, insira um CNPJ válido com 14 dígitos.';
+      }
+
+      // Validação de Telefone (se preenchido, deve estar no formato correto)
+      const telefoneValue = telefoneInput.value.replace(/\D/g, ''); // Remove todos os não-dígitos
+      if (telefoneValue && (telefoneValue.length < 10 || telefoneValue.length > 11)) {
+        telefoneInput.classList.add('is-invalid');
+        isValid = false;
+        errorMessage = 'Por favor, insira um telefone válido com 10 ou 11 dígitos.';
+      }
+
+      if (!isValid) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro de Validação!',
+          text: errorMessage || 'Por favor, preencha todos os campos obrigatórios e válidos.',
+          confirmButtonText: 'Ok'
+        });
+        return false; // Impede o envio do formulário se houver erros
+      }
+
+      // Se todas as validações passarem
+      Swal.fire({
+        icon: 'success',
+        title: 'Hospital Atualizado!',
+        text: 'Os dados do hospital foram salvos com sucesso.',
+        showConfirmButton: false,
+        timer: 2000 // Fecha automaticamente após 2 segundos
+      });
+
+      return true; // Permite o envio do formulário
+    }
+
+    // --- Aplicação de Máscaras e Event Listeners ---
+    $(document).ready(function () {
+      // Máscara para CNPJ: 00.000.000/0000-00
+      $('#cnpj').mask('00.000.000/0000-00', { reverse: true });
+
+      // Máscara para Telefone: (00) 00000-0000 ou (00) 0000-0000
+      $('#telefone').mask('(00) 00000-0000', {
+        onKeyPress: function (val, e, field, options) {
+          var masks = ['(00) 0000-0000', '(00) 00000-0000'];
+          var mask = (val.length > 14) ? masks[1] : masks[0]; // 14 é o comprimento para (DD) DDDD-DDDD
+          $('#telefone').mask(mask, options);
+        }
+      });
+    });
+  </script>
 </body>
+
 </html>
