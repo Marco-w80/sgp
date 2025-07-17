@@ -1,118 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+
 <head>
   <title>Gerenciar Tumores por Localização</title>
-  <div th:replace="~{fragments/head :: top}"></div>
+  <th:block th:replace="~{fragments/head :: top}"></th:block>
+
+  <style>
+    /* Estilo para garantir que o input no modal não fique grudado na borda superior */
+    .modal-body .form-group {
+      margin-bottom: 1rem;
+    }
+
+    /* Estilo para arredondar a borda da lista de grupos */
+    .list-group.rounded {
+      border-radius: .5rem;
+      overflow: hidden;
+      /* Garante que os cantos internos também sejam arredondados */
+    }
+
+    /* Ajuste para que o botão dentro do list-group-item tenha bom espaçamento e alinhamento */
+    .list-group-item .btn-group {
+      display: flex;
+      align-items: center;
+    }
+
+    .list-group-item .btn {
+      margin-left: 0.5rem;
+      /* Espaçamento para o botão de editar, se houver múltiplos */
+    }
+
+    /* Estilo para o span do nome do tumor para evitar que ele quebre a linha abruptamente com botões */
+    .list-group-item>span {
+      flex-grow: 1;
+      /* Permite que o span ocupe o espaço disponível */
+      margin-right: 1rem;
+      /* Espaço entre o nome e os botões */
+      word-break: break-word;
+      /* Quebra a palavra se for muito longa */
+    }
+  </style>
 </head>
 
-<div class="card shadow mb-4">
-  <div class="card-header py-3">
-    <h6 class="m-0 font-weight-bold text-primary">
-      <i class="fas fa-brain mr-2"></i> Gerenciar Tumores por Localização
-    </h6>
-  </div>
+<body>
 
-  <div class="card-body">
-    <form method="get" th:action="@{/doencas/cadastrar}">
-      <div class="form-group">
-        <label for="grupoSelect">Selecione uma Localização:</label>
-        <select class="form-control" id="grupoSelect" name="grupoId" onchange="this.form.submit()">
-          <option value="">-- Escolha a Localização --</option>
-          <option th:each="grupo : ${grupos}" th:value="${grupo.id}"
-            th:selected="${grupoSelecionado != null and grupoSelecionado.id == grupo.id}" th:text="${grupo.nome}">
-          </option>
-        </select>
-      </div>
-    </form>
-
-    <hr class="mt-4 mb-4" th:if="${grupoSelecionado != null}">
-
-    <div th:if="${grupoSelecionado != null}">
-      <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-          <h6 class="m-0 font-weight-bold text-primary">
-            <i class="fas fa-map-marker-alt mr-2"></i> Localização Selecionada: <span
-              th:text="${grupoSelecionado.nome}"></span>
-          </h6>
-          <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#novoModal">
-            <i class="fas fa-plus mr-1"></i> Novo Tipo de Tumor
-          </button>
-        </div>
-
-        <div class="card-body">
-          <h5 class="mb-3">Tipos de Tumor Cadastrados:</h5>
-          <ul class="list-group mb-4">
-            <li class="list-group-item d-flex justify-content-between align-items-center" th:each="d : ${doencas}">
-              <span th:text="${d.nome}"></span>
-              <button class="btn btn-sm btn-outline-secondary" data-toggle="modal"
-                th:attr="data-target='#editModal_' + ${d.id}">
-                <i class="fas fa-edit"></i> Editar
-              </button>
-
-              <div class="modal fade" th:id="'editModal_' + ${d.id}" tabindex="-1" role="dialog"
-                aria-labelledby="editModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                    <form th:action="@{/doencas/editar}" method="post">
-                      <input type="hidden" name="id" th:value="${d.id}" />
-                      <input type="hidden" name="grupoId" th:value="${grupoSelecionado.id}" />
-                      <div class="modal-header">
-                        <h5 class="modal-title" th:id="'editModalLabel_' + ${d.id}">Editar Tipo de Tumor</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        <div class="form-group">
-                          <label for="nomeEdit_[[${d.id}]]">Nome do Tipo de Tumor:</label>
-                          <input type="text" class="form-control" th:id="'nomeEdit_' + ${d.id}" name="nome"
-                            th:value="${d.nome}" required />
-                        </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item text-muted" th:if="${doencas == null or doencas.isEmpty()}">
-              Nenhum tipo de tumor cadastrado para esta localização.
-            </li>
-          </ul>
-        </div>
-      </div>
+  <div class="card shadow mb-4 rounded">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">
+        <i class="fas fa-brain mr-2"></i> Gerenciar Tumores por Localização
+      </h6>
     </div>
-  </div>
-</div>
 
-<div class="modal fade" id="novoModal" tabindex="-1" role="dialog" aria-labelledby="novoModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form th:action="@{/doencas/cadastrar}" method="post">
-        <input type="hidden" name="grupoId" th:value="${grupoSelecionado != null ? grupoSelecionado.id : ''}" />
-        <div class="modal-header">
-          <h5 class="modal-title" id="novoModalLabel">Novo Tipo de Tumor</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="nomeNovo">Nome do Tipo de Tumor:</label>
-            <input type="text" class="form-control" id="nomeNovo" name="nome" placeholder="Digite o tipo de tumor"
-              required />
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Cadastrar</button>
+    <div class="card-body">
+      <form method="get" th:action="@{/doencas/cadastrar}">
+        <div class="form-group">
+          <label for="grupoSelect" class="font-weight-bold">Selecione uma Localização:</label>
+          <select class="form-control" id="grupoSelect" name="grupoId" onchange="this.form.submit()">
+            <option value="">-- Escolha a Localização --</option>
+            <option th:each="grupo : ${grupos}" th:value="${grupo.id}"
+              th:selected="${grupoSelecionado != null and grupoSelecionado.id == grupo.id}" th:text="${grupo.nome}">
+            </option>
+          </select>
         </div>
       </form>
+
+      <hr class="mt-4 mb-4" th:if="${grupoSelecionado != null}">
+
+      <div th:if="${grupoSelecionado != null}">
+        <div class="card shadow mb-4 rounded">
+          <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+              <i class="fas fa-map-marker-alt mr-2"></i> Localização Selecionada: <span
+                th:text="${grupoSelecionado.nome}"></span>
+            </h6>
+            <button class="btn btn-primary btn-sm shadow-sm" data-toggle="modal" data-target="#novoModal">
+              <i class="fas fa-plus mr-1"></i> Novo Tipo de Tumor
+            </button>
+          </div>
+
+          <div class="card-body">
+            <h5 class="mb-3">Tipos de Tumor Cadastrados:</h5>
+            <ul class="list-group mb-4 rounded">
+              <li class="list-group-item d-flex justify-content-between align-items-center" th:each="d : ${doencas}">
+                <span th:text="${d.nome}"></span>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-secondary shadow-sm" data-toggle="modal"
+                    th:attr="data-target='#editModal_' + ${d.id}">
+                    <i class="fas fa-edit"></i> Editar
+                  </button>
+                </div>
+
+                <div class="modal fade" th:id="'editModal_' + ${d.id}" tabindex="-1" role="dialog"
+                  th:aria-labelledby="'editModalLabel_' + ${d.id}" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <form th:action="@{/doencas/editar}" method="post" class="needs-validation" novalidate>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="hidden" name="id" th:value="${d.id}" />
+                        <input type="hidden" name="grupoId" th:value="${grupoSelecionado.id}" />
+                        <div class="modal-header">
+                          <h5 class="modal-title" th:id="'editModalLabel_' + ${d.id}">Editar Tipo de Tumor</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="form-group">
+                            <label th:for="'nomeEdit_' + ${d.id}">Nome do Tipo de Tumor<span
+                                class="text-danger">*</span>:</label>
+                            <input type="text" class="form-control" th:id="'nomeEdit_' + ${d.id}" name="nome"
+                              th:value="${d.nome}" required />
+                            <div class="invalid-feedback">
+                              Por favor, insira o nome do tipo de tumor.
+                            </div>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary shadow-sm" data-dismiss="modal">
+                            <i class="fas fa-times-circle mr-1"></i> Cancelar
+                          </button>
+                          <button type="submit" class="btn btn-primary shadow-sm">
+                            <i class="fas fa-save mr-1"></i> Salvar Alterações
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item text-muted text-center" th:if="${doencas == null or doencas.isEmpty()}">
+                Nenhum tipo de tumor cadastrado para esta localização.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-<div th:replace="~{fragments/foot :: bot}"></div>
+  <div class="modal fade" id="novoModal" tabindex="-1" role="dialog" aria-labelledby="novoModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form th:action="@{/doencas/cadastrar}" method="post" class="needs-validation" novalidate>
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <input type="hidden" name="grupoId" th:value="${grupoSelecionado != null ? grupoSelecionado.id : ''}" />
+          <div class="modal-header">
+            <h5 class="modal-title" id="novoModalLabel">Novo Tipo de Tumor</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="nomeNovo">Nome do Tipo de Tumor<span class="text-danger">*</span>:</label>
+              <input type="text" class="form-control" id="nomeNovo" name="nome" placeholder="Digite o tipo de tumor"
+                required />
+              <div class="invalid-feedback">
+                Por favor, insira o nome do novo tipo de tumor.
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary shadow-sm" data-dismiss="modal">
+              <i class="fas fa-times-circle mr-1"></i> Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary shadow-sm">
+              <i class="fas fa-plus-circle mr-1"></i> Cadastrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <th:block th:replace="~{fragments/foot :: bot}"></th:block>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script th:inline="javascript">
+    // Função para feedback com SweetAlert2 após operações de CRUD
+    function showFeedback(icon, title, text) {
+      Swal.fire({
+        icon: icon,
+        title: title,
+        text: text,
+        showConfirmButton: false,
+        timer: 2000
+      });
+    }
+
+    // Exemplo de como você chamaria isso do seu Controller (via Model ou Flash Attributes)
+    /*
+    // No seu Controller Spring:
+    // Para sucesso no cadastro: model.addAttribute("successMessage", "Tipo de tumor cadastrado com sucesso!");
+    // Para sucesso na edição: model.addAttribute("successMessage", "Tipo de tumor atualizado com sucesso!");
+    // Para erro: model.addAttribute("errorMessage", "Erro ao cadastrar/atualizar tipo de tumor.");
+
+    $(document).ready(function() {
+        var successMessage = [[${successMessage}]];
+        var errorMessage = [[${errorMessage}]];
+
+        if (successMessage) {
+            showFeedback('success', 'Sucesso!', successMessage);
+        }
+        if (errorMessage) {
+            showFeedback('error', 'Erro!', errorMessage);
+        }
+    });
+    */
+
+    // Validação do Bootstrap para Modais (aplicar a todos os formulários .needs-validation)
+    (function () {
+      'use strict';
+      window.addEventListener('load', function () {
+        var forms = document.querySelectorAll('.needs-validation'); // Usa querySelectorAll
+        Array.prototype.filter.call(forms, function (form) {
+          form.addEventListener('submit', function (event) {
+            if (form.checkValidity() === false) {
+              event.preventDefault();
+              event.stopPropagation();
+              // Optional: Scroll to the first invalid field in the modal
+              setTimeout(() => {
+                const firstInvalid = form.querySelector('.is-invalid');
+                if (firstInvalid) {
+                  firstInvalid.focus();
+                }
+              }, 100);
+            }
+            form.classList.add('was-validated');
+          }, false);
+        });
+      }, false);
+    })();
+  </script>
+</body>
 
 </html>

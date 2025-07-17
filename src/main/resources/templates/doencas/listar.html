@@ -1,43 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+
 <head>
-  <title>Todos os Tumores por Localização</title>
-  <div th:replace="~{fragments/head :: top}"></div>
+    <title>Todos os Tumores por Localização</title>
+    <th:block th:replace="~{fragments/head :: top}"></th:block>
+
+    <style>
+        /* Ajuste para o campo de pesquisa com ícone */
+        .search-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-container .form-control-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        .search-container .form-control {
+            padding-left: 2.5rem; /* Espaço para o ícone */
+        }
+
+        /* --- Novas Estilizações para os Cards de Grupo --- */
+
+        /* Remover margens verticais desnecessárias entre os cards de grupo para compactar */
+        .tumor-group-card {
+            margin-bottom: 1.25rem; /* Ajustado para um espaçamento mais elegante */
+        }
+
+        /* Estilização do card de grupo principal */
+        .card.tumor-group-card .card { /* Seleciona o card interno, não o container externo */
+            border-left: .25rem solid #4e73df !important; /* Mantém a barra azul lateral */
+            border-radius: .5rem; /* Bordas arredondadas */
+            overflow: hidden; /* Garante que o conteúdo não vaze */
+            box-shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important; /* Sombra sutil */
+        }
+
+        /* Estilização do cabeçalho do card de grupo */
+        .card.tumor-group-card .card-header {
+            background-color: #f8f9fc; /* Fundo mais claro, mas não branco puro, para distinguir */
+            border-bottom: 1px solid #e3e6f0; /* Borda inferior sutil */
+            padding: .75rem 1.25rem; /* Padding ajustado para ser menos "faixa" */
+            display: flex;
+            align-items: center;
+        }
+
+        /* Estilização do título dentro do cabeçalho do card de grupo */
+        .card.tumor-group-card .card-header h6 {
+            margin: 0; /* Remover margem padrão do h6 */
+            font-size: 1rem; /* Ajustar tamanho da fonte se necessário */
+        }
+
+        /* Estilização do corpo do card de grupo */
+        .card.tumor-group-card .card-body {
+            padding: 1.25rem; /* Padding padrão do Bootstrap */
+        }
+
+        /* Estilização da lista de tumores dentro do card */
+        .card.tumor-group-card .list-group {
+            border: none; /* Remover borda redundante se list-group-flush já removeu */
+            border-radius: .35rem; /* Bordas arredondadas para a lista */
+            overflow: hidden; /* Para que as bordas do primeiro/último item se encaixem */
+        }
+
+        .card.tumor-group-card .list-group-item {
+            border-color: #eaecf4; /* Cor de borda mais suave para os itens da lista */
+            padding: .75rem 1.25rem; /* Padding para os itens da lista */
+            font-size: .95rem; /* Tamanho da fonte para os itens */
+        }
+
+        /* Mensagem quando não há tumores em um grupo (manter estilização para consistência) */
+        .no-tumors-message {
+            background-color: #fdfdfe; /* Fundo suave */
+            color: #6c757d; /* Cor do texto */
+            font-style: italic;
+        }
+    </style>
 </head>
 
-<div class="card shadow mb-4">
-  <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
-    <h6 class="m-0 font-weight-bold text-primary">
-      <i class="fas fa-microscope mr-2"></i> Todos os Tumores Cadastrados por Localização
-    </h6>
-    <a th:href="@{/doencas/cadastrar}" class="btn btn-info btn-sm">
-      <i class="fas fa-cogs mr-1"></i> Gerenciar Tumores
-    </a>
-  </div>
+<body>
+    <div class="container-fluid mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-md-12">
 
-  <div class="card-body">
-    <div th:if="${grupos == null or grupos.isEmpty()}">
-      <p class="text-muted">Nenhuma localização com tumores cadastrados encontrada.</p>
+                <div class="card shadow mb-4 rounded">
+                    <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-microscope mr-2"></i> Todos os Tumores Cadastrados por Localização
+                        </h6>
+                        <a th:href="@{/doencas/cadastrar}" class="btn btn-info btn-sm shadow-sm">
+                            <i class="fas fa-cogs mr-1"></i> Gerenciar Tumores
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="search-container mb-4">
+                            <i class="fas fa-search form-control-icon"></i>
+                            <input type="text" id="filterInput" class="form-control" placeholder="Filtrar por nome do tumor ou localização..."
+                                aria-label="Filtrar Tumores">
+                        </div>
+
+                        <div th:if="${grupos == null or grupos.isEmpty()}" class="text-center">
+                            <p class="text-muted">Nenhuma localização com tumores cadastrados encontrada.</p>
+                        </div>
+
+                        <div id="noResultsMessage" class="alert alert-warning text-center" style="display: none;">
+                            <i class="fas fa-exclamation-triangle mr-2"></i> Nenhum resultado encontrado para a sua pesquisa.
+                        </div>
+
+                        <div id="tumorsContainer">
+                            <div th:each="grupo : ${grupos}" class="tumor-group-card">
+                                <div class="card border-left-primary shadow h-100 py-2 rounded">
+                                    <div class="card-header py-2">
+                                        <h6 class="m-0 font-weight-bold text-primary group-name">
+                                            <i class="fas fa-map-marker-alt mr-2"></i> <span th:text="${grupo.nome}">Localização</span>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item tumor-item" th:each="d : ${grupo.doencas}">
+                                                <span class="tumor-name" th:text="${d.nome}">Tipo de Tumor</span>
+                                            </li>
+                                            <li class="list-group-item text-muted text-center no-tumors-message" th:if="${grupo.doencas == null or grupo.doencas.isEmpty()}">
+                                                Nenhum tipo de tumor cadastrado nesta localização.
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div th:each="grupo : ${grupos}" class="mb-4">
-      <div class="card border-left-primary shadow h-100 py-2">
-        <div class="card-header py-2">
-          <h6 class="m-0 font-weight-bold text-primary">
-            <i class="fas fa-map-marker-alt mr-2"></i> <span th:text="${grupo.nome}">Localização</span>
-          </h6>
-        </div>
-        <div class="card-body">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item" th:each="d : ${grupo.doencas}" th:text="${d.nome}">Tipo de Tumor</li>
-            <li class="list-group-item text-muted" th:if="${grupo.doencas == null or grupo.doencas.isEmpty()}">
-              Nenhum tipo de tumor cadastrado nesta localização.
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+    <th:block th:replace="~{fragments/foot :: bot}"></th:block>
 
-<div th:replace="~{fragments/foot :: bot}"></div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#filterInput').on('keyup', function () {
+                var filterValue = $(this).val().toLowerCase();
+                var totalVisibleGroups = 0;
+
+                // Itera sobre cada grupo de tumor (cada card principal de localização)
+                $('.tumor-group-card').each(function () {
+                    var $groupCardContainer = $(this); /* É o div pai do card real */
+                    var $groupCard = $groupCardContainer.find('.card'); /* O card border-left-primary */
+                    var $groupName = $groupCard.find('.group-name').text().toLowerCase();
+                    var $tumorItems = $groupCard.find('.tumor-item');
+                    var $noTumorsMessage = $groupCard.find('.no-tumors-message');
+
+                    var groupHasVisibleTumors = false;
+
+                    // Esconde a mensagem de "nenhum tumor cadastrado" por padrão durante a filtragem
+                    $noTumorsMessage.hide();
+
+                    // Itera sobre cada item de tumor dentro do grupo
+                    $tumorItems.each(function () {
+                        var $tumorItem = $(this);
+                        var tumorName = $tumorItem.find('.tumor-name').text().toLowerCase();
+
+                        // Se o nome do tumor contiver o valor do filtro, mostra o item
+                        if (tumorName.includes(filterValue)) {
+                            $tumorItem.show();
+                            groupHasVisibleTumors = true;
+                        } else {
+                            $tumorItem.hide();
+                        }
+                    });
+
+                    // Verifica se o nome do grupo (localização) contém o valor do filtro
+                    // OU se algum tumor dentro do grupo é visível
+                    if ($groupName.includes(filterValue) || groupHasVisibleTumors) {
+                        $groupCardContainer.show(); // Mostra o container do card
+                        totalVisibleGroups++;
+                    } else {
+                        $groupCardContainer.hide(); // Esconde o container do card
+                    }
+                });
+
+                // Exibe ou esconde a mensagem "Nenhum resultado encontrado"
+                if (totalVisibleGroups === 0 && filterValue !== '') {
+                    $('#noResultsMessage').show();
+                } else {
+                    $('#noResultsMessage').hide();
+                }
+
+                // Se não houver filtro e o grupo não tiver tumores, exibe a mensagem padrão
+                // Isso garante que a mensagem "Nenhum tipo de tumor cadastrado nesta localização"
+                // volte a aparecer quando o filtro é limpo e o grupo realmente não tem tumores
+                if (filterValue === '') {
+                    $('.tumor-group-card').each(function() {
+                        var $groupCardContainer = $(this);
+                        var $groupCard = $groupCardContainer.find('.card');
+                        var $noTumorsMessage = $groupCard.find('.no-tumors-message');
+                        var $tumorItems = $groupCard.find('.tumor-item');
+
+                        // Aqui precisamos verificar se o grupo TEM tumores no DOM,
+                        // não apenas os visíveis pelo filtro.
+                        // Podemos verificar se o elemento '.no-tumors-message' existe
+                        // e está th:if (que significa que a lista do backend era vazia)
+                        if ($tumorItems.length === 0 && $noTumorsMessage.length > 0) {
+                            $noTumorsMessage.show(); // Mostra a mensagem padrão
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
 
 </html>
