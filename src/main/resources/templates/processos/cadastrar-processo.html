@@ -2,10 +2,218 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
 
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.0/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="..."
+  crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<link rel="stylesheet" th:href="@{/css/custom-select2-validation.css}">
+
+<style>
+  /* Customizações básicas do Select2 (suas regras existentes) */
+  .select2-container .select2-selection--single {
+    height: calc(2.25rem + 2px);
+    /* Altura do form-control padrão do Bootstrap */
+    border-radius: .35rem;
+    /* Bordas arredondadas */
+    border-color: #ced4da;
+    /* Cor da borda padrão do Bootstrap */
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 2.25rem;
+    /* Alinhamento do texto */
+    padding-left: .75rem;
+    /* Espaçamento interno à esquerda */
+    /* Padding-right será ajustado pelo CSS de validação para o 'x' e ícones */
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: calc(2.25rem + 2px);
+    /* Alinhamento da seta */
+    right: 0px;
+    /* Garante que a seta fique bem à direita */
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: #6c757d;
+    /* Cor do placeholder */
+  }
+
+  .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #4e73df;
+    /* Cor de destaque azul para hover */
+    color: white;
+  }
+
+  .select2-container--default .select2-results__option--selected {
+    background-color: #e9ecef;
+    /* Cor de fundo para opção selecionada */
+  }
+
+  .select2-container .select2-search--dropdown .select2-search__field {
+    border-radius: .35rem;
+    /* Bordas arredondadas para o campo de busca */
+  }
+
+
+  /* --- Customizações para alinhamento Select2 com feedback de validação do Bootstrap (CSS NOVO) --- */
+
+  /* Remove ícones de background do Bootstrap dos Select2 para evitar duplicação ou desalinhamento */
+  /* Aplica bordas de validação diretamente ao Select2 */
+  .select2-container--default .select2-selection--single.is-invalid {
+    border-color: #dc3545 !important;
+    /* Borda vermelha */
+    background-image: none !important;
+    /* Remove o ícone padrão do Bootstrap */
+  }
+
+  .select2-container--default .select2-selection--single.is-valid {
+    border-color: #28a745 !important;
+    /* Borda verde */
+    background-image: none !important;
+    /* Remove o ícone padrão do Bootstrap */
+  }
+
+  /* Ajusta o padding para que o ícone de feedback não cause scroll horizontal se o Bootstrap tentasse adicioná-lo */
+  .select2-container--default .select2-selection--single.is-invalid,
+  .select2-container--default .select2-selection--single.is-valid {
+    padding-right: .75rem !important;
+  }
+
+
+  /* Ajusta a posição do botão de limpar (x) do Select2 */
+  .select2-container--default .select2-selection--single .select2-selection__clear {
+    float: none;
+    /* Remove o float para melhor controle de posicionamento */
+    position: absolute;
+    right: 25px;
+    /* Ajuste conforme necessário para o seu layout, pois o ícone da seta Select2 está em right: 0px */
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    /* Garante que esteja acima de outros elementos */
+  }
+
+  /* Ajusta o padding do texto dentro do Select2 para dar espaço ao 'x' de limpar e à seta */
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding-right: 50px;
+    /* Espaço para o 'x' e a seta. Ajuste se necessário. */
+  }
+
+
+  /* Garante que o feedback de validação do Bootstrap (a mensagem de texto) apareça abaixo do Select2 */
+  /* Isso é crucial para que as mensagens "A data é obrigatória." etc. funcionem */
+  .select2-container.is-invalid+.invalid-feedback,
+  .select2-container.is-valid+.valid-feedback {
+    display: block;
+    /* Sobrescreve o display: none padrão do Bootstrap para validação */
+    width: 100%;
+    /* Ocupa a largura total */
+    margin-top: .25rem;
+    /* Espaço entre o campo e a mensagem */
+    font-size: 80%;
+    /* Tamanho da fonte padrão do feedback */
+    color: #dc3545;
+    /* Cor vermelha para inválido */
+  }
+
+  .select2-container.is-valid+.valid-feedback {
+    color: #28a745;
+    /* Cor verde para válido, se for usar */
+  }
+
+  /* Remove a borda azul ao focar Select2 inválido, substituindo por uma sombra vermelha */
+  .select2-container--default.select2-container--focus .select2-selection--single.is-invalid {
+    box-shadow: 0 0 0 .2rem rgba(220, 53, 69, .25);
+    border-color: #dc3545 !important;
+    /* Garante a borda vermelha no foco */
+  }
+
+  /* Estilo de foco para campos válidos */
+  .select2-container--default.select2-container--focus .select2-selection--single.is-valid {
+    box-shadow: 0 0 0 .2rem rgba(40, 167, 69, .25);
+    border-color: #28a745 !important;
+    /* Garante a borda verde no foco */
+  }
+
+  /* Estilos para Select2 múltiplos (se você usar) */
+  .select2-container--default .select2-selection--multiple.is-invalid {
+    border-color: #dc3545 !important;
+    background-image: none !important;
+  }
+
+  .select2-container--default .select2-selection--multiple.is-valid {
+    border-color: #28a745 !important;
+    background-image: none !important;
+  }
+
+  /* Estilo para autocomplete do hospital */
+  #autocompleteHospital {
+    position: absolute;
+    z-index: 1000;
+    /* Garante que fique acima de outros elementos */
+    width: 100%;
+    max-height: 200px;
+    /* Limite de altura para scroll */
+    overflow-y: auto;
+    border: 1px solid #ced4da;
+    border-top: none;
+    border-radius: 0 0 .25rem .25rem;
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
+  }
+
+  #autocompleteHospital .list-group-item {
+    cursor: pointer;
+    border-left: none;
+    border-right: none;
+  }
+
+  #autocompleteHospital .list-group-item:first-child {
+    border-top: none;
+  }
+
+  #autocompleteHospital .list-group-item:hover {
+    background-color: #f8f9fa;
+  }
+
+  /* Estilo para campos obrigatórios */
+  .form-group label .text-danger {
+    margin-left: 0.25rem;
+  }
+
+  /* Ajustes para a tabela de produtos */
+  #tabelaProdutos th,
+  #tabelaProdutos td {
+    vertical-align: middle;
+  }
+
+  #tabelaProdutos input[type="date"],
+  #tabelaProdutos input[type="number"] {
+    padding: .375rem .75rem;
+    /* Padding padrão do form-control */
+    border-radius: .25rem;
+    border: 1px solid #ced4da;
+    width: 100%;
+    /* Ocupar a largura total da célula */
+    box-sizing: border-box;
+    /* Incluir padding e borda na largura */
+  }
+
+  #tabelaProdutos input:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+    /* Sombra de foco azul do Bootstrap */
+    border-color: #80bdff;
+  }
+</style>
 
 <head th:replace="~{fragments/head :: top}"></head>
 <!-- OBS: <body> aberto em fragments/head :: top e fechado em fragments/foot :: bot -->
+
+<div class="text-right m-0 p-0">
+  <p class="text-muted small">Os campos marcados com <span class="text-danger">*</span> são obrigatórios.</p>
+</div>
 
 <div class="card shadow mb-4">
   <div class="card-header py-3">
@@ -15,47 +223,69 @@
   </div>
 
   <div class="card-body">
-    <form th:action="@{/processos/cadastrar}" method="post">
+    <form th:action="@{/processos/cadastrar}" method="post" class="needs-validation" novalidate>
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-      <fieldset class="form-group border p-3">
+      <fieldset class="form-group border p-3 rounded">
         <legend class="w-auto px-2">Dados do Processo</legend>
         <div class="form-row">
           <div class="form-group col-md-3">
-            <label for="numeroInterno">Número Interno</label>
+            <label for="numeroInterno">Número Interno<span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="numeroInterno" name="numeroInterno" readonly required>
+            <div class="invalid-feedback">
+              O número interno é obrigatório e será gerado automaticamente.
+            </div>
           </div>
           <div class="form-group col-md-5">
-            <label for="numeroProcesso">Número Processo</label>
+            <label for="numeroProcesso">Número Processo<span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="numeroProcesso" name="numeroProcesso" required>
+            <div class="invalid-feedback">
+              Por favor, insira o número do processo.
+            </div>
           </div>
           <div class="form-group col-md-2">
-            <label for="dataInicio">Data Início</label>
+            <label for="dataInicio">Data Início<span class="text-danger">*</span></label>
             <input type="date" class="form-control" id="dataInicio" name="dataInicio" required>
+            <div class="invalid-feedback">
+              Por favor, selecione a data de início.
+            </div>
           </div>
           <div class="form-group col-md-2">
-            <label for="status">Status</label>
+            <label for="status">Status<span class="text-danger">*</span></label>
             <select class="form-control" id="status" name="status" required>
+              <option value="">Selecione</option>
               <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"></option>
             </select>
+            <div class="invalid-feedback">
+              Por favor, selecione um status.
+            </div>
           </div>
           <div class="form-group col-md-12">
-            <label for="localId">Local do Processo</label>
-            <select class="form-control" id="localId" name="localId" required>
+            <label for="localId">Local do Processo<span class="text-danger">*</span></label>
+            <select class="form-control select2-enabled" id="localId" name="localId" required>
+              <option value="">Selecione</option>
               <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca + ' – ' + l.localizacao}">
               </option>
             </select>
+            <div class="invalid-feedback">
+              Por favor, selecione o local do processo.
+            </div>
           </div>
         </div>
       </fieldset>
 
-      <fieldset class="form-group border p-3 mt-4">
+      <fieldset class="form-group border p-3 mt-4 rounded">
         <legend class="w-auto px-2">Dados do Paciente</legend>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="pacienteId">Paciente</label>
-            <select class="form-control" id="pacienteId" name="pacienteId" required>
+            <label for="pacienteId">Paciente<span class="text-danger">*</span></label>
+            <select class="form-control select2-enabled" id="pacienteId" name="pacienteId" required>
+              <option value="">Selecione</option>
               <option th:each="p : ${pacientes}" th:value="${p.id}" th:text="${p.nome}"></option>
             </select>
+            <div class="invalid-feedback">
+              Por favor, selecione o paciente.
+            </div>
           </div>
           <div class="form-group col-md-6">
             <label for="cpfPaciente">CPF do Paciente</label>
@@ -64,14 +294,18 @@
         </div>
       </fieldset>
 
-      <fieldset class="form-group border p-3 mt-4">
+      <fieldset class="form-group border p-3 mt-4 rounded">
         <legend class="w-auto px-2">Dados do Advogado</legend>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="advogadoId">Advogado</label>
-            <select class="form-control" id="advogadoId" name="advogadoId" required>
+            <label for="advogadoId">Advogado<span class="text-danger">*</span></label>
+            <select class="form-control select2-enabled" id="advogadoId" name="advogadoId" required>
+              <option value="">Selecione</option>
               <option th:each="a : ${advogados}" th:value="${a.id}" th:text="${a.nome}"></option>
             </select>
+            <div class="invalid-feedback">
+              Por favor, selecione o advogado.
+            </div>
           </div>
           <div class="form-group col-md-6">
             <label for="oabAdvogado">OAB do Advogado</label>
@@ -80,14 +314,18 @@
         </div>
       </fieldset>
 
-      <fieldset class="form-group border p-3 mt-4">
+      <fieldset class="form-group border p-3 mt-4 rounded">
         <legend class="w-auto px-2">Dados Médicos e Hospitalares</legend>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="medicoId">Médico</label>
-            <select class="form-control" id="medicoId" name="medicoId" required>
+            <label for="medicoId">Médico<span class="text-danger">*</span></label>
+            <select class="form-control select2-enabled" id="medicoId" name="medicoId" required>
+              <option value="">Selecione</option>
               <option th:each="m : ${medicos}" th:value="${m.id}" th:text="${m.nome}"></option>
             </select>
+            <div class="invalid-feedback">
+              Por favor, selecione o médico.
+            </div>
           </div>
           <div class="form-group col-md-6">
             <label for="crmMedico">CRM do Médico</label>
@@ -96,63 +334,75 @@
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="hospitalInput">Hospital</label>
+            <label for="hospitalInput">Hospital<span class="text-danger">*</span></label>
             <input type="text" id="hospitalInput" name="hospitalNome" class="form-control"
-              placeholder="Digite o nome do hospital...">
-            <input type="hidden" id="hospitalId" name="hospitalId">
+              placeholder="Digite o nome do hospital..." required>
+            <input type="hidden" id="hospitalId" name="hospitalId" required>
             <div id="autocompleteHospital" class="list-group"></div>
+            <div class="invalid-feedback" id="hospitalFeedback">
+              Por favor, selecione um hospital válido da lista.
+            </div>
           </div>
           <div class="form-group col-md-6">
-            <label for="tipoHospital">Tipo de Hospital</label>
+            <label for="tipoHospital">Tipo de Hospital<span class="text-danger">*</span></label>
             <select class="form-control" id="tipoHospital" name="tipoHospital" required>
               <option value="">Selecione</option>
               <option value="SUS">SUS</option>
               <option value="CONVENIO">Convênio</option>
               <option value="PARTICULAR">Particular</option>
             </select>
+            <div class="invalid-feedback">
+              Por favor, selecione o tipo de hospital.
+            </div>
           </div>
         </div>
       </fieldset>
 
-      <fieldset class="form-group border p-3 mt-4">
+      <fieldset class="form-group border p-3 mt-4 rounded">
         <legend class="w-auto px-2">Detalhes da Doença</legend>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="grupoDoenca">Localização da Doença</label>
-            <select id="grupoDoenca" name="grupoDoencaId" class="form-control" required>
+            <label for="grupoDoenca">Localização da Doença<span class="text-danger">*</span></label>
+            <select id="grupoDoenca" name="grupoDoencaId" class="form-control select2-enabled" required>
               <option value="">Selecione</option>
               <option th:each="g : ${gruposDoenca}" th:value="${g.id}" th:text="${g.nome}"></option>
             </select>
+            <div class="invalid-feedback">
+              Por favor, selecione a localização da doença.
+            </div>
           </div>
           <div class="form-group col-md-6">
-            <label for="doenca">Tipo de Tumor</label>
-            <select id="doenca" name="doencaId" class="form-control" required>
+            <label for="doenca">Tipo de Tumor<span class="text-danger">*</span></label>
+            <select id="doenca" name="doencaId" class="form-control select2-enabled" required disabled>
               <option value="">Selecione uma localização primeiro</option>
             </select>
+            <div class="invalid-feedback">
+              Por favor, selecione o tipo de tumor.
+            </div>
           </div>
         </div>
       </fieldset>
 
-      <fieldset class="form-group border p-3 mt-4">
+      <fieldset class="form-group border p-3 mt-4 rounded">
         <legend class="w-auto px-2">Produtos do Processo</legend>
         <div class="form-group">
           <label for="produtoBusca">Produtos</label>
           <div class="input-group mb-2">
-            <input list="produtosList" id="produtoBusca" class="form-control" placeholder="Buscar produto...">
-            <div class="input-group-append mb-3">
-              <button class="btn btn-outline-primary" type="button" onclick="addProduto()">Adicionar</button>
+            <input type="text" id="produtoBusca" class="form-control" placeholder="Buscar produto...">
+            <div class="input-group-append">
+              <button class="btn btn-outline-primary shadow-sm" type="button" id="addProdutoBtn">
+                <i class="fas fa-plus mr-1"></i> Adicionar
+              </button>
             </div>
           </div>
-          <datalist id="produtosList">
-            <option th:each="prod : ${produtos}" th:value="${prod.nomeItem}"></option>
-          </datalist>
+          <div id="autocompleteProdutos" class="list-group"></div>
 
-          <table class="table table-bordered" id="tabelaProdutos">
+          <table class="table table-bordered mt-3 rounded" id="tabelaProdutos">
             <thead class="thead-light">
               <tr>
                 <th>Produto</th>
-                <th>Data</th>
-                <th>Quantidade</th>
+                <th>Data<span class="text-danger">*</span></th>
+                <th>Quantidade<span class="text-danger">*</span></th>
                 <th style="width:1%;">Ações</th>
               </tr>
             </thead>
@@ -162,7 +412,7 @@
         </div>
       </fieldset>
 
-      <fieldset class="form-group border p-3 mt-4">
+      <fieldset class="form-group border p-3 mt-4 rounded">
         <legend class="w-auto px-2">Documentos Anexados</legend>
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="cpfAnexado" name="cpfAnexado" value="true" />
@@ -194,7 +444,7 @@
         </div>
       </fieldset>
 
-      <fieldset class="form-group border p-3 mt-4">
+      <fieldset class="form-group border p-3 mt-4 rounded">
         <legend class="w-auto px-2">Observações</legend>
         <div class="form-group mb-0">
           <label for="obs">Detalhes Adicionais</label>
@@ -203,8 +453,10 @@
       </fieldset>
 
       <div class="mt-4">
-        <button type="submit" class="btn btn-primary">Salvar</button>
-        <a th:href="@{/processos/listar}" class="btn btn-secondary ml-2">Cancelar</a>
+        <button type="submit" class="btn btn-primary shadow-sm"><i class="fas fa-save mr-1"></i> Salvar</button>
+        <a th:href="@{/processos/listar}" class="btn btn-secondary ml-2 shadow-sm">
+          <i class="fas fa-times-circle mr-1"></i> Cancelar
+        </a>
       </div>
     </form>
   </div>
@@ -214,53 +466,164 @@
 <!-- Rodapé -->
 <div th:replace="~{fragments/foot :: bot}"></div>
 
-<!-- Script para adicionar/remover produtos -->
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt-BR.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.0/dist/sweetalert2.all.min.js"></script>
+
+
+
 <script th:inline="javascript">
   /*<![CDATA[*/
   const OK_BUTTON_CONFIG = {
     confirmButtonText: 'OK',
-    confirmButtonColor: '#1B9BAE'
+    confirmButtonColor: '#4e73df'
   };
-var produtos = /*[[${produtos}]]*/ '[]';
-    console.log(produtos);
 
-  function addProduto() {
-    var nome = document.getElementById('produtoBusca').value;
-    var prod = produtos.find(p => p.nomeItem === nome);
-    if (!prod) {
-      Swal.fire({ icon: 'warning', title: 'Produto não encontrado', ...OK_BUTTON_CONFIG });
+  // Adicione um console.log aqui para inspecionar produtosBackend na inicialização
+  var produtosBackend = /*[[${produtos}]]*/ '[]';
+  console.log('Produtos carregados no frontend (produtosBackend):', produtosBackend);
+  console.log('Tipo de produtosBackend:', typeof produtosBackend);
+  if (Array.isArray(produtosBackend)) {
+    console.log('Número de produtos carregados:', produtosBackend.length);
+    if (produtosBackend.length > 0) {
+      console.log('Primeiro produto:', produtosBackend[0]);
+    }
+  }
+
+
+  // --- Autocomplete de Produtos ---
+  const produtoBuscaInput = document.getElementById('produtoBusca');
+  const autocompleteProdutosDiv = document.getElementById('autocompleteProdutos');
+  let selectedProductId = null;
+
+  produtoBuscaInput.addEventListener('input', function () {
+    const inputVal = this.value.toLowerCase();
+    autocompleteProdutosDiv.innerHTML = '';
+    selectedProductId = null; // Reseta o ID selecionado ao digitar
+
+    if (inputVal.length < 2) {
       return;
     }
 
+    // Adicione um console.log aqui para verificar a entrada e os produtos filtrados
+    console.log('Input de busca:', inputVal);
+    const filteredProducts = produtosBackend.filter(p =>
+      p.nomeItem.toLowerCase().includes(inputVal)
+    ).slice(0, 10);
+    console.log('Produtos filtrados:', filteredProducts);
+
+
+    if (filteredProducts.length === 0) {
+      const noResultItem = document.createElement("div");
+      noResultItem.classList.add("list-group-item", "text-muted");
+      noResultItem.textContent = "Nenhum produto encontrado.";
+      autocompleteProdutosDiv.appendChild(noResultItem);
+    } else {
+      filteredProducts.forEach(p => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.classList.add("list-group-item", "list-group-item-action");
+        item.textContent = p.nomeItem;
+        item.onclick = () => {
+          produtoBuscaInput.value = p.nomeItem;
+          selectedProductId = p.id; // Armazena o ID do produto selecionado
+          autocompleteProdutosDiv.innerHTML = '';
+          produtoBuscaInput.focus();
+          // Adicione um console.log aqui para confirmar a seleção
+          console.log('Produto selecionado via autocomplete:', p.nomeItem, 'ID:', p.id);
+          console.log('selectedProductId após seleção:', selectedProductId);
+        };
+        autocompleteProdutosDiv.appendChild(item);
+      });
+    }
+  });
+
+  document.addEventListener('click', function (event) {
+    if (!produtoBuscaInput.contains(event.target) && !autocompleteProdutosDiv.contains(event.target)) {
+      autocompleteProdutosDiv.innerHTML = '';
+    }
+  });
+
+  function addProduto() {
+    var nomeBusca = produtoBuscaInput.value;
+    let prodToAdd = null;
+
+    // Logs para depuração dentro de addProduto
+    console.log('--- Início da função addProduto ---');
+    console.log('Valor atual do campo produtoBuscaInput:', nomeBusca);
+    console.log('Valor atual de selectedProductId:', selectedProductId);
+    console.log('Estado de produtosBackend:', produtosBackend); // Verifique se ainda é um array de objetos
+
+    if (selectedProductId) {
+      prodToAdd = produtosBackend.find(p => p.id === selectedProductId);
+      console.log('Tentando encontrar produto por selectedProductId. Resultado:', prodToAdd);
+    }
+
+    if (!prodToAdd && nomeBusca.trim() !== '') {
+      console.log('Produto não encontrado por ID ou ID é nulo, tentando encontrar por nome de busca:', nomeBusca.trim().toLowerCase());
+      prodToAdd = produtosBackend.find(p => p.nomeItem.toLowerCase() === nomeBusca.trim().toLowerCase());
+      console.log('Resultado da busca por nome:', prodToAdd);
+    }
+
+    if (!prodToAdd) {
+      console.log('!!! Produto NÃO ENCONTRADO para adição. Exibindo SweetAlert.');
+      Swal.fire({ icon: 'warning', title: 'Produto não encontrado', text: 'Por favor, selecione um produto da lista de sugestões ou digite o nome completo de um produto válido.', ...OK_BUTTON_CONFIG });
+      return;
+    }
+    console.log('Produto encontrado para adição (prodToAdd):', prodToAdd);
+
+
+    // Verifica se o produto já foi adicionado
+    const existingProductIds = Array.from(document.querySelectorAll('input[name="produtoIds"]')).map(input => input.value);
+    if (existingProductIds.includes(String(prodToAdd.id))) {
+      console.log('Produto já adicionado. Exibindo SweetAlert.');
+      Swal.fire({ icon: 'info', title: 'Produto já adicionado', text: `O produto "${prodToAdd.nomeItem}" já está na lista.`, ...OK_BUTTON_CONFIG });
+      produtoBuscaInput.value = '';
+      selectedProductId = null;
+      return;
+    }
+
+    // Restante da lógica (criar TR, TD, etc.)
+    console.log('Adicionando produto na tabela:', prodToAdd.nomeItem);
     var tbody = document.querySelector('#tabelaProdutos tbody');
     var tr = document.createElement('tr');
+    tr.setAttribute('data-product-id', prodToAdd.id);
 
-    // Coluna: nome do produto
     var tdNome = document.createElement('td');
-    tdNome.textContent = prod.nomeItem;
+    tdNome.textContent = prodToAdd.nomeItem;
     tr.appendChild(tdNome);
 
-    // Coluna: data + hidden id
     var tdData = document.createElement('td');
     tdData.innerHTML =
-      '<input type="hidden" name="produtoIds" value="' + prod.id + '"/>' +
-      '<input type="date" name="produtoDatas" required class="form-control"/>';
+      `<input type="hidden" name="produtoIds" value="${prodToAdd.id}"/>` +
+      `<input type="date" name="produtoDatas" class="form-control" required/>` +
+      `<div class="invalid-feedback">A data é obrigatória.</div>`;
     tr.appendChild(tdData);
 
-    // Coluna: quantidade
     var tdQtd = document.createElement('td');
     tdQtd.innerHTML =
-      '<input type="number" name="produtoQuantidades" min="1" value="1" required class="form-control"/>';
+      `<input type="number" name="produtoQuantidades" min="1" value="1" class="form-control" required/>` +
+      `<div class="invalid-feedback">A quantidade é obrigatória e deve ser no mínimo 1.</div>`;
     tr.appendChild(tdQtd);
 
-    // Coluna: botão de remoção
     var tdAcao = document.createElement('td');
     tdAcao.innerHTML =
-      '<button type="button" class="btn btn-sm btn-danger" onclick="removeProduto(this)">&times;</button>';
+      '<button type="button" class="btn btn-sm btn-danger shadow-sm" onclick="removeProduto(this)">' +
+      '<i class="fas fa-trash-alt"></i></button>';
     tr.appendChild(tdAcao);
 
     tbody.appendChild(tr);
-    document.getElementById('produtoBusca').value = '';
+    produtoBuscaInput.value = '';
+    selectedProductId = null;
+    produtoBuscaInput.focus();
+    console.log('--- Fim da função addProduto (sucesso) ---');
   }
 
   function removeProduto(btn) {
@@ -268,53 +631,82 @@ var produtos = /*[[${produtos}]]*/ '[]';
     tr.parentNode.removeChild(tr);
   }
   /*]]>*/
-</script>
+  // --- Fim Funções da Tabela de Produtos ---
 
-<script>
+
+  // --- Geração de Número Interno ---
   function gerarNumeroInterno() {
-    const data = document.getElementById('dataInicio').value;
+    const dataInput = document.getElementById('dataInicio');
     const pacienteSelect = document.getElementById('pacienteId');
+
+    const data = dataInput.value;
     const pacienteId = pacienteSelect.value;
-    const pacienteNome = pacienteSelect.options[pacienteSelect.selectedIndex].text;
+    const pacienteNome = pacienteSelect.options[pacienteSelect.selectedIndex] ? pacienteSelect.options[pacienteSelect.selectedIndex].text : '';
 
-    if (!data || !pacienteId || !pacienteNome) return;
+    const numeroInternoInput = document.getElementById('numeroInterno');
 
-    // Data formatada como DDMMAA
+    if (!data || !pacienteId || !pacienteNome) {
+      numeroInternoInput.value = '';
+      if (!data) dataInput.classList.add('is-invalid');
+      return;
+    } else {
+      dataInput.classList.remove('is-invalid');
+    }
+
     const [ano, mes, dia] = data.split("-");
     const dataFmt = `D${dia}${mes}${ano.slice(-2)}`;
 
-    // Gerar sigla PJS (primeira letra do primeiro nome + do(s) último(s))
     const nomes = pacienteNome.trim().split(" ");
-    const sigla = nomes.length === 1
-      ? nomes[0].substring(0, 3).toUpperCase()
-      : (nomes[0][0] + nomes[nomes.length - 1][0] + (nomes.length > 2 ? nomes[1][0] : "")).toUpperCase();
+    let sigla;
+    if (nomes.length === 1) {
+      sigla = nomes[0].substring(0, 3).toUpperCase();
+    } else {
+      sigla = (nomes[0][0] + nomes[nomes.length - 1][0]).toUpperCase();
+      if (nomes.length > 2) {
+        sigla += nomes[1][0].toUpperCase();
+      }
+    }
+    if (sigla.length < 3 && nomes.length > 1) {
+      sigla = (nomes[0][0] + nomes[1][0] + (nomes[2] ? nomes[2][0] : '')).toUpperCase().substring(0, 3);
+      if (sigla.length < 3 && nomes[0].length > 1) {
+        sigla = (nomes[0].substring(0, 2) + (nomes[1] ? nomes[1][0] : '')).toUpperCase().substring(0, 3);
+      }
+    }
 
     const numero = `I${pacienteId}-${dataFmt}-P${sigla}`;
-
-    const input = document.getElementById('numeroInterno');
-    input.value = numero;
+    numeroInternoInput.value = numero;
 
     fetch(`/api/processos/verifica-numero/${encodeURIComponent(numero)}`)
       .then(res => res.json())
       .then(data => {
         if (data.existe) {
-          Swal.fire("Número já existe", "Mude a data ou paciente.", "warning");
-          input.value = '';
+          Swal.fire({
+            icon: 'warning',
+            title: 'Número Interno Existente',
+            text: 'Este número interno já existe. Por favor, ajuste a data ou o paciente para gerar um número único.',
+            ...OK_BUTTON_CONFIG
+          });
+          numeroInternoInput.value = '';
+          numeroInternoInput.classList.add('is-invalid');
+        } else {
+          numeroInternoInput.classList.remove('is-invalid');
         }
+      })
+      .catch(error => {
+        console.error('Erro ao verificar número interno:', error);
       });
   }
+  // --- Fim Geração de Número Interno ---
 
 
-
-  // Ativar quando muda paciente ou data
-  document.getElementById('dataInicio').addEventListener('change', gerarNumeroInterno);
-  document.getElementById('pacienteId').addEventListener('change', gerarNumeroInterno);
-
-</script>
-
-<script>
+  // --- Preenchimento de Info de Pessoa (CPF, OAB, CRM) ---
   function preencherInfoPessoa(id, tipo) {
-    if (!id) return;
+    if (!id) {
+      if (tipo === 'paciente') document.getElementById("cpfPaciente").value = '';
+      else if (tipo === 'advogado') document.getElementById("oabAdvogado").value = '';
+      else if (tipo === 'medico') document.getElementById("crmMedico").value = '';
+      return;
+    }
 
     fetch(`/api/pessoas/${id}`)
       .then(res => res.json())
@@ -326,18 +718,27 @@ var produtos = /*[[${produtos}]]*/ '[]';
         } else if (tipo === 'medico') {
           document.getElementById("crmMedico").value = data.crm || '';
         }
+      })
+      .catch(error => {
+        console.error(`Erro ao buscar dados de ${tipo}:`, error);
       });
   }
+  // --- Fim Preenchimento de Info de Pessoa ---
 
-  document.getElementById("pacienteId").addEventListener("change", e => preencherInfoPessoa(e.target.value, 'paciente'));
-  document.getElementById("advogadoId").addEventListener("change", e => preencherInfoPessoa(e.target.value, 'advogado'));
-  document.getElementById("medicoId").addEventListener("change", e => preencherInfoPessoa(e.target.value, 'medico'));
-</script>
 
-<script>
+  // --- Lógica para Autocomplete de Hospital ---
+  let selectedHospitalId = '';
+
   document.getElementById("hospitalInput").addEventListener("input", function () {
-    const input = this.value;
+    const inputElement = this;
+    const input = inputElement.value;
     const resultBox = document.getElementById("autocompleteHospital");
+    const hospitalIdInput = document.getElementById("hospitalId");
+
+    hospitalIdInput.value = '';
+    inputElement.classList.remove('is-valid', 'is-invalid');
+    hospitalIdInput.classList.remove('is-valid', 'is-invalid');
+
     if (input.length < 2) {
       resultBox.innerHTML = '';
       return;
@@ -347,51 +748,279 @@ var produtos = /*[[${produtos}]]*/ '[]';
       .then(res => res.json())
       .then(hospitais => {
         resultBox.innerHTML = '';
-        hospitais.forEach(h => {
-          const item = document.createElement("button");
-          item.type = "button";
-          item.classList.add("list-group-item", "list-group-item-action");
-          item.textContent = h.nome + (h.cidade ? ` (${h.cidade}/${h.estado})` : '');
-          item.onclick = () => {
-            document.getElementById("hospitalInput").value = h.nome;
-            document.getElementById("hospitalId").value = h.id;
-            resultBox.innerHTML = '';
-          };
-          resultBox.appendChild(item);
-        });
+        if (hospitais.length === 0) {
+          const noResultItem = document.createElement("div");
+          noResultItem.classList.add("list-group-item", "text-muted");
+          noResultItem.textContent = "Nenhum hospital encontrado.";
+          resultBox.appendChild(noResultItem);
+        } else {
+          hospitais.forEach(h => {
+            const item = document.createElement("button");
+            item.type = "button";
+            item.classList.add("list-group-item", "list-group-item-action");
+            item.textContent = h.nome + (h.cidade ? ` (${h.cidade}/${h.estado})` : '');
+            item.onclick = () => {
+              inputElement.value = h.nome;
+              hospitalIdInput.value = h.id;
+              selectedHospitalId = h.id;
+              resultBox.innerHTML = '';
+              inputElement.classList.add('is-valid');
+              hospitalIdInput.classList.add('is-valid');
+              inputElement.classList.remove('is-invalid');
+              hospitalIdInput.classList.remove('is-invalid');
+            };
+            resultBox.appendChild(item);
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Erro na busca de hospitais:', error);
+        resultBox.innerHTML = '<div class="list-group-item text-danger">Erro ao buscar hospitais.</div>';
       });
   });
-</script>
+
+  document.addEventListener('click', function (event) {
+    const hospitalInput = document.getElementById('hospitalInput');
+    const autocompleteHospital = document.getElementById('autocompleteHospital');
+    if (!hospitalInput.contains(event.target) && !autocompleteHospital.contains(event.target)) {
+      autocompleteHospital.innerHTML = '';
+    }
+  });
+  // --- Fim Autocomplete de Hospital ---
 
 
-<script>
+  // --- Lógica para Tipo de Tumor (Dependente de Localização) ---
   document.addEventListener("DOMContentLoaded", function () {
     const grupoSelect = document.getElementById("grupoDoenca");
     const doencaSelect = document.getElementById("doenca");
 
-    grupoSelect.addEventListener("change", function () {
+    // Usar o evento 'change' do jQuery, que é compatível com Select2
+    $(grupoSelect).on("change", function () {
       const grupoId = this.value;
+
+      doencaSelect.innerHTML = '<option value="">Selecione</option>';
+      doencaSelect.value = '';
+      doencaSelect.classList.remove('is-valid', 'is-invalid');
+      $(doencaSelect).next('.select2-container').find('.select2-selection').removeClass('is-valid is-invalid');
 
       if (!grupoId) {
         doencaSelect.innerHTML = '<option value="">Selecione uma localização primeiro</option>';
         doencaSelect.setAttribute("disabled", "disabled");
+        $(doencaSelect).val(null).trigger('change');
         return;
       }
 
+      doencaSelect.setAttribute("disabled", "disabled");
+      doencaSelect.innerHTML = '<option value="">Carregando...</option>';
+      $(doencaSelect).val(null).trigger('change');
+
       fetch(`/api/doencas/por-grupo/${grupoId}`)
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Erro ao carregar tipos de tumor.');
+          }
+          return res.json();
+        })
         .then(data => {
           doencaSelect.innerHTML = '<option value="">Selecione</option>';
-          data.forEach(d => {
-            const opt = document.createElement("option");
-            opt.value = d.id;
-            opt.textContent = d.nome;
-            doencaSelect.appendChild(opt);
-          });
+          if (data.length === 0) {
+            doencaSelect.innerHTML = '<option value="">Nenhum tipo de tumor encontrado para esta localização</option>';
+          } else {
+            data.forEach(d => {
+              const opt = document.createElement("option");
+              opt.value = d.id;
+              opt.textContent = d.nome;
+              doencaSelect.appendChild(opt);
+            });
+          }
           doencaSelect.removeAttribute("disabled");
+          $(doencaSelect).val(null).trigger('change');
+        })
+        .catch(error => {
+          console.error('Erro ao carregar doenças:', error);
+          doencaSelect.innerHTML = '<option value="">Erro ao carregar tipos de tumor</option>';
+          doencaSelect.removeAttribute("disabled");
+          $(doencaSelect).val(null).trigger('change');
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro de Carregamento',
+            text: 'Não foi possível carregar os tipos de tumor para a localização selecionada.',
+            ...OK_BUTTON_CONFIG
+          });
         });
     });
   });
+  // --- Fim Lógica para Tipo de Tumor ---
+
+
+  // --- Event Listeners Iniciais e Inicialização do Select2 ---
+  $(document).ready(function () {
+    // Inicializar Select2 em todos os elementos com a classe 'select2-enabled'
+    $('.select2-enabled').select2({
+      theme: "default",
+      width: '100%',
+      placeholder: function () {
+        return $(this).find('option[value=""]').text() || 'Selecione uma opção';
+      },
+      allowClear: true
+    });
+
+    // Adiciona um listener para quando um select2 é aberto, para focar no campo de busca
+    $('.select2-enabled').on('select2:open', function () {
+      setTimeout(function () {
+        document.querySelector('.select2-search__field').focus();
+      }, 100);
+    });
+
+    // Event listeners para o preenchimento de CPF/OAB/CRM
+    // Usar $(element).on('change', ...) para Select2
+    $('#pacienteId').on('change', function () {
+      preencherInfoPessoa($(this).val(), 'paciente');
+      gerarNumeroInterno(); // Chamar gerarNumeroInterno também ao mudar o paciente
+    });
+    $('#advogadoId').on('change', function () {
+      preencherInfoPessoa($(this).val(), 'advogado');
+    });
+    $('#medicoId').on('change', function () {
+      preencherInfoPessoa($(this).val(), 'medico');
+    });
+
+    // Ativar quando muda apenas a data de início (paciente já tem listener do Select2)
+    document.getElementById('dataInicio').addEventListener('change', gerarNumeroInterno);
+
+    // Preenche o CPF/OAB/CRM inicial caso o formulário já venha com valores (ex: edição)
+    const initialPacienteId = $('#pacienteId').val();
+    const initialAdvogadoId = $('#advogadoId').val();
+    const initialMedicoId = $('#medicoId').val();
+    if (initialPacienteId) preencherInfoPessoa(initialPacienteId, 'paciente');
+    if (initialAdvogadoId) preencherInfoPessoa(initialAdvogadoId, 'advogado');
+    // Fix: Changed 'preencherInfoPeloId' to 'preencherInfoPessoa' for consistency
+    if (initialMedicoId) preencherInfoPessoa(initialMedicoId, 'medico');
+
+    // Disparar o change no grupoDoenca se já houver um selecionado na carga inicial
+    if ($('#grupoDoenca').val()) {
+      $('#grupoDoenca').trigger('change');
+    }
+
+    // Ativar a geração do número interno ao carregar a página
+    gerarNumeroInterno();
+
+    // Botão de adicionar produtos
+    $('#addProdutoBtn').on('click', function () {
+      addProduto();
+    });
+  });
+
+
+  // --- Validação Bootstrap e Feedback com SweetAlert2 ---
+  // --- Validação Bootstrap e Feedback com SweetAlert2 ---
+  (function () {
+    'use strict';
+    window.addEventListener('load', function () {
+      var form = document.querySelector('.needs-validation');
+      form.addEventListener('submit', function (event) {
+        form.classList.remove('was-validated'); // Sempre remova antes de revalidar
+
+        let formIsValid = true;
+
+        // Validação Select2
+        $('.select2-enabled').each(function () {
+          const selectElement = $(this); // O <select> original
+          const select2Container = selectElement.next('.select2-container').find('.select2-selection');
+
+          // Remova ambas as classes de validação antes de reavaliar
+          select2Container.removeClass('is-invalid is-valid');
+
+          if (selectElement.prop('required') && !selectElement.val()) {
+            select2Container.addClass('is-invalid');
+            formIsValid = false;
+          } else if (selectElement.val()) { // Apenas adiciona is-valid se tiver um valor (e não for required e vazio)
+            select2Container.addClass('is-valid');
+          }
+        });
+
+        // Resto do seu código de validação...
+        // ... (Validação Hospital, Produtos na Tabela, etc.) ...
+
+        // Ao final da validação principal
+        const bootstrapValidationPassed = form.checkValidity();
+        if (bootstrapValidationPassed === false) {
+          formIsValid = false;
+        }
+
+        if (!formIsValid) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro de Validação',
+            text: 'Por favor, preencha todos os campos obrigatórios corretamente ou selecione uma opção válida.',
+            ...OK_BUTTON_CONFIG
+          });
+
+          form.classList.add('was-validated'); // Aplica was-validated para mostrar feedbacks
+
+          // Foca no primeiro campo inválido
+          setTimeout(() => {
+            // Seleciona o primeiro campo inválido visível (incluindo Select2)
+            const firstInvalid = form.querySelector('.is-invalid:not(input[type="hidden"]):not(.select2-container), .select2-container .select2-selection.is-invalid');
+            if (firstInvalid) {
+              if ($(firstInvalid).hasClass('select2-selection')) {
+                // Se for um Select2, abre-o
+                $(firstInvalid).closest('.select2-container').prev('select').select2('open');
+              } else {
+                // Se for um campo normal, foca nele
+                firstInvalid.focus();
+              }
+            }
+          }, 100);
+        } else {
+          // Se tudo validou, você pode decidir se quer a classe 'was-validated'
+          // para mostrar feedbacks verdes em campos não Select2.
+          form.classList.add('was-validated');
+        }
+      }, false);
+    });
+  })();
+
+  function showFeedback(icon, title, text) {
+    Swal.fire({
+      icon: icon,
+      title: title,
+      text: text,
+      showConfirmButton: false,
+      timer: 2000
+    });
+  }
+
+  $(document).ready(function () {
+    var successMessage = /*[[${successMessage}]]*/ null;
+    var errorMessage = /*[[${errorMessage}]]*/ null;
+
+    if (successMessage) {
+      // Alerta de sucesso com botão OK para redirecionar
+      Swal.fire({
+        icon: 'success',
+        title: 'Sucesso!',
+        text: successMessage,
+        confirmButtonText: 'OK', // Texto do botão
+        confirmButtonColor: '#4e73df' // Cor do botão (sua cor OK_BUTTON_CONFIG)
+      }).then((result) => {
+        // Se o usuário clicou em OK (ou fora, se allowOutsideClick não for false)
+        if (result.isConfirmed || result.dismiss === Swal.DismissReason.backdrop) {
+          // Redireciona para a página de listagem de processos
+          window.location.href = /*[[@{/processos/listar}]]*/ '/processos/listar';
+        }
+      });
+    }
+    if (errorMessage) {
+      // Alerta de erro (mantém o comportamento showFeedback existente)
+      showFeedback('error', 'Erro!', errorMessage);
+    }
+  });
+
+  /*]]>*/
 </script>
 
 
