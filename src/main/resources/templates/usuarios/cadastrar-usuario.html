@@ -1,13 +1,20 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+
 <head>
   <title>Cadastrar Usuário</title>
-  <div th:replace="~{fragments/head :: top}"></div>
+  <th:block th:replace="~{fragments/head :: top}"></th:block>
 </head>
+
 <body>
   <div class="container-fluid mt-4">
     <div class="row justify-content-center">
-      <div class="col-lg-6 col-md-8"> <div class="card shadow mb-4">
+      <div class="col-lg-6 col-md-8">
+        <div class="text-right mb-3">
+          <p class="text-muted small">Os campos marcados com <span class="text-danger">*</span> são obrigatórios.
+          </p>
+        </div>
+        <div class="card shadow mb-4 rounded">
           <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">
               <i class="fas fa-user-plus mr-2"></i> Cadastrar Novo Usuário
@@ -15,31 +22,123 @@
           </div>
 
           <div class="card-body">
-            <form th:action="@{/usuarios/cadastrar}" th:object="${usuario}" method="post">
+
+            <form th:action="@{/usuarios/cadastrar}" th:object="${usuario}" method="post" class="needs-validation"
+              novalidate onsubmit="return validateUserForm()">
 
               <div class="form-group">
-                <label for="nome">Nome:</label>
-                <input type="text" class="form-control" id="nome" th:field="*{nome}" required/>
+                <label for="nome">Nome<span class="text-danger">*</span>:</label>
+                <input type="text" class="form-control" id="nome" th:field="*{nome}" required minlength="3" />
+                <div class="invalid-feedback">
+                  Por favor, insira um nome com no mínimo 3 caracteres.
+                </div>
               </div>
 
               <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" class="form-control" id="email" th:field="*{email}" required/>
+                <label for="email">Email<span class="text-danger">*</span>:</label>
+                <input type="email" class="form-control" id="email" th:field="*{email}" required />
+                <div class="invalid-feedback">
+                  Por favor, insira um e-mail válido.
+                </div>
               </div>
 
               <div class="form-group">
-                <label for="senha">Senha:</label>
-                <input type="password" class="form-control" id="senha" th:field="*{senha}" required/>
+                <label for="senha">Senha<span class="text-danger">*</span>:</label>
+                <input type="password" class="form-control" id="senha" th:field="*{senha}" required minlength="6" />
+                <div class="invalid-feedback">
+                  A senha deve ter no mínimo 6 caracteres.
+                </div>
               </div>
 
-              <hr class="mt-4 mb-4"> <button type="submit" class="btn btn-primary">Salvar</button>
-              <a th:href="@{/usuarios/listar}" class="btn btn-secondary ml-2">Cancelar</a> </form>
+              <div class="form-group">
+                <label for="confirmarSenha">Confirmar Senha<span class="text-danger">*</span>:</label>
+                <input type="password" class="form-control" id="confirmarSenha" required minlength="6" />
+                <div class="invalid-feedback">
+                  As senhas não coincidem ou não possuem no mínimo 6 caracteres.
+                </div>
+              </div>
+
+              <hr class="mt-4 mb-4">
+              <button type="submit" class="btn btn-primary shadow-sm">
+                <i class="fas fa-save mr-1"></i> Salvar
+              </button>
+              <a th:href="@{/usuarios/listar}" class="btn btn-secondary ml-2 shadow-sm">
+                <i class="fas fa-times-circle mr-1"></i> Cancelar
+              </a>
+            </form>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div th:replace="~{fragments/foot :: bot}"></div>
+  <th:block th:replace="~{fragments/foot :: bot}"></th:block>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script th:inline="javascript">
+    // Validação do Bootstrap para exibir mensagens de erro
+    (function () {
+      'use strict';
+      window.addEventListener('load', function () {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, function (form) {
+          form.addEventListener('submit', function (event) {
+            if (form.checkValidity() === false) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+          }, false);
+        });
+      }, false);
+    })();
+
+    // Função de validação personalizada para o formulário de usuário
+    function validateUserForm() {
+      const form = document.querySelector('.needs-validation');
+
+      // Validação básica do Bootstrap (required, minlength, type="email")
+      if (form.checkValidity() === false) {
+        form.classList.add('was-validated');
+        return false;
+      }
+
+      // Validação de Confirmação de Senha
+      const senhaInput = document.getElementById('senha');
+      const confirmarSenhaInput = document.getElementById('confirmarSenha');
+
+      if (senhaInput.value !== confirmarSenhaInput.value) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro de Validação!',
+          text: 'As senhas digitadas não coincidem. Por favor, verifique.',
+          confirmButtonText: 'Ok'
+        });
+        confirmarSenhaInput.classList.add('is-invalid'); // Marca o campo como inválido
+        confirmarSenhaInput.focus();
+        return false;
+      } else {
+        confirmarSenhaInput.classList.remove('is-invalid'); // Remove a marcação se estiver correto
+      }
+
+      // Se todas as validações passarem
+      Swal.fire({
+        icon: 'success',
+        title: 'Usuário Cadastrado!',
+        text: 'O novo usuário foi registrado com sucesso.',
+        showConfirmButton: false,
+        timer: 2000 // Fecha automaticamente após 2 segundos
+      });
+
+      return true; // Permite o envio do formulário
+    }
+
+    // Você pode adicionar mais validações aqui, como complexidade da senha (regex)
+    // Se precisar de máscaras (ex: para um telefone de usuário), adicione aqui também.
+
+  </script>
 </body>
+
 </html>
