@@ -1,8 +1,187 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+
 <head th:replace="~{fragments/head :: top}"></head>
 
-<div class="card shadow mb-4">
+<style>
+  /* Estilo para arredondar as bordas da tabela */
+  .table-rounded-corners {
+    border-collapse: separate;
+    /* Necessário para border-radius em tabelas */
+    border-spacing: 0;
+    /* Remove espaçamento entre células para bordas contínuas */
+    border-radius: .5rem;
+    /* Ajuste o valor para o quão arredondado você quer */
+    overflow: hidden;
+    /* Garante que o conteúdo não vaze das bordas arredondadas */
+  }
+
+  /* Estilo para o cabeçalho da tabela */
+  .table-rounded-corners thead {
+    background-color: #e2e6ea;
+    /* Um cinza claro e elegante */
+    color: #343a40;
+    /* Cor do texto mais escura para contraste */
+  }
+
+  /* Centralizar o conteúdo das células do cabeçalho */
+  .table-rounded-corners th {
+    text-align: center;
+    vertical-align: middle;
+    /* Alinha verticalmente no meio */
+  }
+
+  /* Centralizar o conteúdo das células do corpo e alinhar verticalmente no meio */
+  .table-rounded-corners td {
+    text-align: center;
+    /* Mantém a centralização horizontal para texto */
+    vertical-align: middle;
+    /* Alinha verticalmente no meio */
+    /* Reduz o padding para tabelas com muitas colunas */
+    padding: 0.5rem;
+    /* Ajuste conforme necessário */
+  }
+
+  /* Diminui o tamanho da fonte para todo o corpo da tabela */
+  .table-rounded-corners tbody {
+    font-size: 0.85rem;
+    /* Reduz a fonte do corpo da tabela */
+  }
+
+  /* Ajuste para botões circulares */
+  .btn-circle {
+    width: 35px;
+    /* Define a largura */
+    height: 35px;
+    /* Define a altura */
+    padding: 0;
+    /* Remove o padding padrão */
+    border-radius: 50%;
+    /* Transforma em círculo */
+    display: flex;
+    /* Permite centralizar conteúdo com flexbox */
+    align-items: center;
+    /* Centraliza verticalmente */
+    justify-content: center;
+    /* Centraliza horizontalmente */
+    flex-shrink: 0;
+    /* Evita que o botão encolha */
+  }
+
+  /* Ajuste para botões pequenos circulares */
+  .btn-circle.btn-sm {
+    width: 30px;
+    /* Tamanho um pouco menor para 'btn-sm' */
+    height: 30px;
+    font-size: 0.8rem;
+    /* Ajusta o tamanho da fonte do ícone, se necessário */
+  }
+
+  /* Garante que o TD da coluna de ações tenha altura suficiente para o flexbox e centraliza */
+  /* Estas propriedades são cruciais para a centralização interna do conteúdo flex */
+  .table-rounded-corners td.d-flex {
+    display: flex;
+    /* Torna a célula um container flex */
+    align-items: center;
+    /* Centraliza os itens verticalmente */
+    justify-content: center;
+    /* Centraliza os itens horizontalmente */
+    height: 100%;
+    /* Garante que o container flex ocupe a altura total da célula */
+    box-sizing: border-box;
+    /* Inclui padding e bordas no cálculo da largura/altura */
+  }
+
+  /* Garante que os ícones dentro dos botões sejam centralizados */
+  .btn-circle i {
+    display: block;
+    /* Para que o ícone se comporte como um bloco dentro do flex do botão */
+  }
+
+  /* --- Estilos para fixar largura de colunas específicas --- */
+  /* Você pode ajustar os valores de 'width' conforme a necessidade e conteúdo de cada coluna */
+  #tabelaProcessos th:nth-child(1),
+  /* ID */
+  #tabelaProcessos td:nth-child(1) {
+    width: 5%;
+    /* Exemplo: ID pode ser menor */
+  }
+
+  #tabelaProcessos th:nth-child(2),
+  /* Interno */
+  #tabelaProcessos td:nth-child(2) {
+    width: 8%;
+  }
+
+  #tabelaProcessos th:nth-child(3),
+  /* Processo */
+  #tabelaProcessos td:nth-child(3) {
+    width: 10%;
+  }
+
+  #tabelaProcessos th:nth-child(7),
+  /* Início */
+  #tabelaProcessos td:nth-child(7) {
+    width: 8%;
+  }
+
+  #tabelaProcessos th:nth-child(8),
+  /* Status */
+  #tabelaProcessos td:nth-child(8) {
+    width: 8%;
+  }
+
+  #tabelaProcessos th:nth-child(11),
+  /* Obs */
+  #tabelaProcessos td:nth-child(11) {
+    width: 8%;
+    /* Ou um valor maior se a Obs for relevante */
+    max-width: 150px;
+    /* Limita a largura máxima */
+    white-space: nowrap;
+    /* Evita que o texto quebre */
+    overflow: hidden;
+    /* Esconde o texto que excede */
+    text-overflow: ellipsis;
+    /* Adiciona "..." */
+  }
+
+  #tabelaProcessos th:nth-child(12),
+  /* Ações */
+  #tabelaProcessos td:nth-child(12) {
+    width: 7%;
+    /* Ações costumam ser compactas */
+    min-width: 80px;
+    /* Garante espaço mínimo para os botões */
+  }
+
+  /* Ocultar colunas em telas menores para otimizar espaço */
+  /* Você pode ajustar os breakpoints (md, lg, xl) */
+  @media (max-width: 991.98px) {
+
+    /* md breakpoint */
+    #tabelaProcessos th:nth-child(6),
+    /* Médico */
+    #tabelaProcessos td:nth-child(6) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+
+    /* sm breakpoint */
+    #tabelaProcessos th:nth-child(5),
+    /* Advogado */
+    #tabelaProcessos td:nth-child(5),
+    #tabelaProcessos th:nth-child(9),
+    /* Local */
+    #tabelaProcessos td:nth-child(9) {
+      display: none;
+    }
+  }
+</style>
+
+<div class="card shadow mb-4 table-rounded-corners">
   <div class="card-header py-3 d-sm-flex align-items-center justify-content-between mb-4">
     <h6 class="m-0 font-weight-bold text-primary">
       <i class="fas fa-clipboard-list mr-2"></i> Listar Processos
@@ -14,21 +193,21 @@
 
   <div class="card-body">
     <div class="table-responsive">
-      <table id="tabelaProcessos" class="table table-bordered table-hover" width="100%" cellspacing="0">
+      <table id="tabelaProcessos" class="table table-bordered table-hover w-100 table-rounded-corners" cellspacing="0">
         <thead class="thead-light">
           <tr>
-            <th>ID</th>
-            <th>Interno</th>
-            <th>Processo</th>
-            <th>Paciente</th>
-            <th>Advogado</th>
-            <th>Médico</th>
-            <th>Início</th>
-            <th>Status</th>
-            <th>Local</th>
-            <th>Produtos</th>
-            <th>Obs</th>
-            <th>Ações</th>
+            <th class="text-center">ID</th>
+            <th class="text-center">Interno</th>
+            <th class="text-center">Processo</th>
+            <th class="text-center">Paciente</th>
+            <th class="text-center">Advogado</th>
+            <th class="text-center">Médico</th>
+            <th class="text-center">Início</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Local</th>
+            <th class="text-center">Produtos</th>
+            <th class="text-center">Obs</th>
+            <th class="text-center">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -46,7 +225,7 @@
             <td th:text="${proc.status}"></td>
             <td th:text="${proc.local.comarca + ' – ' + proc.local.localizacao}"></td>
             <td>
-              <ul class="mb-0 pl-3">
+              <ul class="mb-0 pl-3 text-left">
                 <li th:each="item : ${proc.itens}">
                   <span th:text="${item.produto.nomeItem}"></span>
                   &nbsp;– Qtd: <span th:text="${item.quantidade}"></span>
@@ -55,13 +234,46 @@
               </ul>
             </td>
             <td th:text="${proc.obs}"></td>
-            <td class="text-nowrap">
-              <a th:href="@{/processos/editar/{id}(id=${proc.id})}" class="btn btn-sm btn-secondary">
+            <style>
+              /* Ajuste para a célula da coluna de Ações */
+              #tabelaProcessos td:nth-child(12) {
+                /* Seleciona especificamente a 12ª coluna (Ações) */
+                text-align: center;
+                /* Centraliza horizontalmente o conteúdo (botões) */
+                vertical-align: middle;
+                /* Centraliza verticalmente o conteúdo (botões) */
+                white-space: nowrap;
+                /* Evita que os botões quebrem linha, se houver espaço */
+                /* Remova ou comente as propriedades flexbox que estavam aqui se você tinha antes:
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       height: 100%;
+    */
+              }
+
+              /* Mantenha os estilos para os botões circulares, eles ainda usam flexbox internamente */
+              .btn-circle {
+                width: 35px;
+                height: 35px;
+                padding: 0;
+                border-radius: 50%;
+                display: inline-flex;
+                /* Use inline-flex para que eles se comportem como inline-block mas ainda usem flexbox internamente */
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+              }
+
+              /* O me-1 (ou mr-1) já está no HTML e é suficiente para o espaçamento */
+            </style>
+            <td>
+              <a th:href="@{/processos/editar/{id}(id=${proc.id})}" class="btn btn-circle btn-sm btn-secondary me-1"
+                title="Editar">
                 <i class="fas fa-edit"></i>
               </a>
-              <button class="btn btn-sm btn-info" 
-                      data-toggle="modal" data-target="#modalVerProcesso"
-                      th:attr="data-id=${proc.id}"> 
+              <button class="btn btn-circle btn-sm btn-info" data-toggle="modal" data-target="#modalVerProcesso"
+                th:attr="data-id=${proc.id}" title="Ver Detalhes">
                 <i class="fas fa-eye"></i>
               </button>
             </td>
@@ -72,8 +284,185 @@
   </div>
 </div>
 
-<!-- Modal de Visualização -->
-<div class="modal fade" id="modalVerProcesso" tabindex="-1" role="dialog" aria-labelledby="modalVerLabel" aria-hidden="true">
+<style>
+  /* ... (seus estilos existentes para a tabela) ... */
+
+  /* --- Estilos para o Modal de Detalhes (Estilo Documento Formal) --- */
+  #modalVerProcesso .modal-dialog {
+    max-width: 900px;
+    /* Definindo uma largura máxima mais controlada para o modal */
+  }
+
+  #modalVerProcesso .modal-content {
+    border-radius: 0.5rem;
+    /* Bordas levemente arredondadas */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    /* Sombra suave para profundidade */
+  }
+
+  #modalVerProcesso .modal-header {
+    background-color: #f0f2f5;
+    /* Um cinza muito claro, quase branco */
+    color: #343a40;
+    /* Texto do cabeçalho em cinza escuro */
+    border-bottom: 1px solid #e0e0e0;
+    /* Borda inferior sutil */
+    padding: 1.25rem 1.5rem;
+    /* Padding generoso */
+  }
+
+  #modalVerProcesso .modal-title {
+    font-weight: 600;
+    /* Título mais encorpado */
+    font-size: 1.25rem;
+    /* Tamanho da fonte padrão para títulos */
+  }
+
+  #modalVerProcesso .close {
+    color: #6c757d;
+    /* Cor do botão de fechar mais discreta */
+    opacity: 0.7;
+    /* Transparência para o X de fechar */
+  }
+
+  #modalVerProcesso .close:hover {
+    opacity: 1;
+  }
+
+
+  #modalVerProcesso .modal-body {
+    padding: 2rem;
+    /* Mais padding interno para sensação de documento */
+    background-color: #ffffff;
+    /* Fundo branco puro */
+    font-family: 'Arial', sans-serif;
+    /* Fonte mais clássica e formal */
+    color: #343a40;
+    /* Cor do texto principal */
+  }
+
+  #conteudoProcesso p {
+    margin-bottom: 0.75rem;
+    /* Espaçamento entre parágrafos de detalhes */
+    font-size: 0.95rem;
+    /* Tamanho de fonte padrão */
+    line-height: 1.6;
+    /* Altura da linha para melhor leitura */
+  }
+
+  #conteudoProcesso p strong {
+    color: #212529;
+    /* Cor quase preta para os rótulos (negrito) */
+    display: inline-block;
+    /* Permite controlar a largura, se necessário */
+    min-width: 120px;
+    /* Garante que os rótulos tenham uma largura mínima para alinhamento */
+    vertical-align: top;
+    /* Alinha o rótulo ao topo se o conteúdo for longo */
+  }
+
+  #conteudoProcesso hr {
+    border-top: 1px solid #dcdcdc;
+    /* Linha divisória mais clara */
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  #conteudoProcesso h5 {
+    color: #495057;
+    /* Um cinza médio para títulos de seção */
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    font-size: 1.1rem;
+    /* Tamanho para títulos de seção */
+    border-bottom: 1px solid #efefef;
+    /* Borda inferior sutil para os títulos */
+    padding-bottom: 0.5rem;
+  }
+
+  /* Estilo para a lista de produtos */
+  #conteudoProcesso ul {
+    list-style-type: none;
+    /* Removendo marcadores padrão */
+    padding-left: 0;
+    /* Removendo recuo padrão */
+    margin-bottom: 1.5rem;
+  }
+
+  #conteudoProcesso ul li {
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+    position: relative;
+    /* Para posicionar um marcador customizado */
+    padding-left: 1.2rem;
+    /* Espaço para o marcador customizado */
+  }
+
+  #conteudoProcesso ul li::before {
+    content: '\2022';
+    /* Ponto (bullet) Unicode */
+    color: #6c757d;
+    /* Cor do ponto */
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1.2em;
+    /* Alinha o ponto fora do padding-left */
+  }
+
+
+  /* Estilo para o contêiner de Logs (com scroll) */
+  .logs-container {
+    max-height: 300px;
+    /* Altura máxima para a área de logs (um pouco mais alta) */
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    /* Uma borda leve */
+    padding: 1.25rem;
+    background-color: #fdfdfd;
+    /* Fundo quase branco para os logs */
+    border-radius: 0.25rem;
+  }
+
+  .logs-container ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 0;
+    /* Remover margem extra da ul interna */
+  }
+
+  .logs-container ul li {
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #495057;
+    border-bottom: 1px dashed #e0e0e0;
+    /* Linha tracejada mais clara */
+    padding-bottom: 0.6rem;
+  }
+
+  .logs-container ul li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .logs-container ul li strong {
+    color: #343a40;
+    /* Rótulos dos logs em cinza escuro */
+  }
+
+  /* Ícones no título das seções (mais sutis) */
+  #conteudoProcesso h5 i {
+    color: #6c757d;
+    /* Ícones em cinza sutil */
+    margin-right: 0.5rem;
+    font-size: 0.9em;
+    /* Ícones um pouco menores que o texto do título */
+  }
+</style>
+
+<div class="modal fade" id="modalVerProcesso" tabindex="-1" role="dialog" aria-labelledby="modalVerLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header bg-primary text-white">
@@ -82,7 +471,6 @@
       </div>
       <div class="modal-body">
         <div id="conteudoProcesso">
-          <!-- Conteúdo será carregado via JavaScript -->
           <p class="text-muted">Carregando informações do processo...</p>
         </div>
       </div>
@@ -90,18 +478,21 @@
   </div>
 </div>
 
-<!-- Fragmentos e DataTables -->
 <div th:replace="~{fragments/foot :: bot}"></div>
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
   $(document).ready(function () {
     $('#tabelaProcessos').DataTable({
-      language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json' },
+      language: { url: '/datatables/i18n/pt-BR.json' },
       pageLength: 10,
-      lengthMenu: [5, 10, 25, 50]
+      lengthMenu: [5, 10, 25, 50],
+      columnDefs: [
+        { orderable: false, targets: [9, 10, 11] } // Índices das colunas (Produtos, Obs, Ações)
+      ]
     });
 
     $('#modalVerProcesso').on('show.bs.modal', function (e) {
@@ -111,58 +502,72 @@
       modalBody.innerHTML = "<p class='text-muted'>Buscando informações...</p>";
 
       fetch(`/api/processos/${procId}/detalhes`)
-      .then(res => res.json())
-      .then(data => {
-        // Lista de campos booleanos que devem ser traduzidos
-        const camposBooleanos = [
-          "CPF Anexado",
-          "Comp. Residência",
-          "Comp. Renda",
-          "Procuração",
-          "Decl. Insuficiência"
-        ];
-
-        // Gera o HTML dos logs
-        const logsHtml = data.logs.map(log => {
-          let valorAntigo = log.valorAntigo;
-          let valorNovo = log.valorNovo;
-
-          if (camposBooleanos.includes(log.campo)) {
-            valorAntigo = log.valorAntigo === "true" ? "Anexado" : "Não anexado";
-            valorNovo = log.valorNovo === "true" ? "Anexado" : "Removido";
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
           }
+          return res.json();
+        })
+        .then(data => {
+          const formatDate = (dateString) => {
+            if (!dateString) return '–';
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            try {
+              const date = new Date(dateString);
+              return new Date(date).toLocaleDateString('pt-BR', options);
+            } catch (error) {
+              console.error("Erro ao formatar data:", dateString, error);
+              return 'Data Inválida';
+            }
+          };
 
-          return `<li><strong>${log.campo}</strong>: "${valorAntigo}" → "${valorNovo}" (${log.data})</li>`;
-        }).join('');
+          const camposBooleanos = [
+            "CPF Anexado", "Comp. Residência", "Comp. Renda", "Procuração", "Decl. Insuficiência"
+          ];
 
-        // Monta o HTML final
-        let html = `
-          <h6><strong>Interno:</strong> ${data.numeroInterno}</h6>
-          <h6><strong>Processo:</strong> ${data.numeroProcesso}</h6>
-          <h6><strong>Paciente:</strong> ${data.paciente.nome} - CPF: ${data.paciente.cpf}</h6>
-          <h6><strong>Advogado:</strong> ${data.advogado.nome} - OAB: ${data.advogado.oab}</h6>
-          <h6><strong>Médico:</strong> ${data.medico.nome} - CRM: ${data.medico.crm}</h6>
-          <h6><strong>Status:</strong> ${data.status}</h6>
-          <h6><strong>Data Início:</strong> ${data.dataInicio}</h6>
-          <h6><strong>Local:</strong> ${data.local.comarca} – ${data.local.localizacao}</h6>
-          <h6><strong>Observações:</strong> ${data.obs || '–'}</h6>
+          const logsHtml = data.logs.map(log => {
+            let valorAntigo = log.valorAntigo;
+            let valorNovo = log.valorNovo;
 
-          <hr><h5>Produtos:</h5>
-          <ul>${data.itens.map(item => `<li>${item.produto} – Qtd: ${item.quantidade} – Enviado: ${item.dataEnvio}</li>`).join('')}</ul>
+            if (camposBooleanos.includes(log.campo)) {
+              valorAntigo = log.valorAntigo === "true" ? "Anexado" : "Não anexado";
+              valorNovo = log.valorNovo === "true" ? "Anexado" : "Não anexado";
+            }
+            // Use <span> para envolver os valores para possível estilização futura
+            return `<li><strong>${log.campo}</strong>: <span>${valorAntigo}</span> &rarr; <span>${valorNovo}</span> (${formatDate(log.data)})</li>`;
+          }).join('');
 
-          <hr><h5>Logs de Alterações:</h5>
-          <ul>${logsHtml}</ul>
-        `;
+          const produtosHtml = data.itens.map(item => `<li>${item.produto.nomeItem} &ndash; Qtd: ${item.quantidade} &ndash; Enviado: ${formatDate(item.dataEnvio)}</li>`).join('');
 
-        document.getElementById('conteudoProcesso').innerHTML = html;
-      })
-      .catch(err => {
-        document.getElementById('conteudoProcesso').innerHTML =
-          "<div class='alert alert-danger'>Erro ao carregar dados do processo.</div>";
-        console.error(err);
-      });
+          let html = `
+                        <p><strong>Interno:</strong> ${data.numeroInterno || '–'}</p>
+                        <p><strong>Processo:</strong> ${data.numeroProcesso || '–'}</p>
+                        <p><strong>Paciente:</strong> ${data.paciente ? `${data.paciente.nome} - CPF: ${data.paciente.cpf || '–'}` : '–'}</p>
+                        <p><strong>Advogado:</strong> ${data.advogado ? `${data.advogado.nome} - OAB: ${data.advogado.oab || '–'}` : '–'}</p>
+                        <p><strong>Médico:</strong> ${data.medico ? `${data.medico.nome} - CRM: ${data.medico.crm || '–'}` : '–'}</p>
+                        <p><strong>Status:</strong> ${data.status || '–'}</p>
+                        <p><strong>Data Início:</strong> ${formatDate(data.dataInicio)}</p>
+                        <p><strong>Local:</strong> ${data.local ? `${data.local.comarca} – ${data.local.localizacao}` : '–'}</p>
+                        <p><strong>Observações:</strong> ${data.obs || '–'}</p>
 
+                        <hr>
+                        <h5><i class="fas fa-file-alt"></i> Detalhes Adicionais:</h5> <ul>${produtosHtml || '<li>Nenhum produto associado.</li>'}</ul>
+
+                        <hr>
+                        <h5><i class="fas fa-list-ul"></i> Histórico de Alterações:</h5> <div class="logs-container">
+                            <ul>${logsHtml || '<li>Nenhum log de alteração.</li>'}</ul>
+                        </div>
+                    `;
+
+          document.getElementById('conteudoProcesso').innerHTML = html;
+        })
+        .catch(err => {
+          document.getElementById('conteudoProcesso').innerHTML =
+            "<div class='alert alert-danger'>Erro ao carregar dados do processo. Por favor, tente novamente.</div>";
+          console.error("Erro ao buscar detalhes do processo:", err);
+        });
     });
   });
 </script>
+
 </html>

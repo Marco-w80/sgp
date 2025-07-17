@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
 
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<style>
+  .btn-circle-sm {
+    width: 30px !important;
+    height: 30px !important;
+    padding: 6px 0px !important;
+    border-radius: 15px !important;
+    text-align: center !important;
+    font-size: 12px !important;
+    line-height: 1.42857 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+</style>
+
 <head th:replace="~{fragments/head :: top}"></head>
 
 <div class="card shadow mb-4">
@@ -10,7 +30,7 @@
     </h6>
   </div>
   <div class="card-body">
-    <form th:action="@{|/processos/editar/${processo.id}|}" method="post">
+    <form th:action="@{|/processos/editar/${processo.id}|}" method="post" novalidate>
 
       <!-- DADOS DO PROCESSO -->
       <fieldset class="form-group border p-3">
@@ -18,11 +38,13 @@
         <div class="form-row">
           <div class="form-group col-md-3">
             <label for="numeroInterno">Número Interno</label>
-            <input type="text" class="form-control" name="numeroInterno" readonly required th:value="${processo.numeroInterno}">
+            <input type="text" class="form-control" name="numeroInterno" readonly required
+              th:value="${processo.numeroInterno}">
           </div>
           <div class="form-group col-md-5">
             <label for="numeroProcesso">Número Processo</label>
-            <input type="text" class="form-control" name="numeroProcesso" required th:value="${processo.numeroProcesso}">
+            <input type="text" class="form-control" name="numeroProcesso" required
+              th:value="${processo.numeroProcesso}">
           </div>
           <div class="form-group col-md-2">
             <label for="dataInicio">Data Início</label>
@@ -31,13 +53,15 @@
           <div class="form-group col-md-2">
             <label for="status">Status</label>
             <select class="form-control" name="status" required>
-              <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}" th:selected="${processo.status == s}"></option>
+              <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"
+                th:selected="${processo.status == s}"></option>
             </select>
           </div>
           <div class="form-group col-md-12">
             <label for="localId">Local do Processo</label>
             <select class="form-control" name="localId" required>
-              <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca + ' – ' + l.localizacao}" th:selected="${processo.local.id == l.id}"></option>
+              <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca + ' – ' + l.localizacao}"
+                th:selected="${processo.local.id == l.id}"></option>
             </select>
           </div>
         </div>
@@ -50,7 +74,8 @@
           <div class="form-group col-md-6">
             <label for="pacienteId">Paciente</label>
             <select class="form-control" id="pacienteId" name="pacienteId" required>
-              <option th:each="p : ${pacientes}" th:value="${p.id}" th:text="${p.nome}" th:selected="${processo.paciente.id == p.id}"></option>
+              <option th:each="p : ${pacientes}" th:value="${p.id}" th:text="${p.nome}"
+                th:selected="${processo.paciente.id == p.id}"></option>
             </select>
           </div>
           <div class="form-group col-md-6">
@@ -67,7 +92,8 @@
           <div class="form-group col-md-6">
             <label for="advogadoId">Advogado</label>
             <select class="form-control" id="advogadoId" name="advogadoId" required>
-              <option th:each="a : ${advogados}" th:value="${a.id}" th:text="${a.nome}" th:selected="${processo.advogado.id == a.id}"></option>
+              <option th:each="a : ${advogados}" th:value="${a.id}" th:text="${a.nome}"
+                th:selected="${processo.advogado.id == a.id}"></option>
             </select>
           </div>
           <div class="form-group col-md-6">
@@ -84,7 +110,8 @@
           <div class="form-group col-md-6">
             <label for="medicoId">Médico</label>
             <select class="form-control" id="medicoId" name="medicoId" required>
-              <option th:each="m : ${medicos}" th:value="${m.id}" th:text="${m.nome}" th:selected="${processo.medico.id == m.id}"></option>
+              <option th:each="m : ${medicos}" th:value="${m.id}" th:text="${m.nome}"
+                th:selected="${processo.medico.id == m.id}"></option>
             </select>
           </div>
           <div class="form-group col-md-6">
@@ -96,24 +123,22 @@
           <div class="form-group col-md-6">
             <label for="hospitalInput">Hospital</label>
             <input type="text" class="form-control" id="hospitalInput" name="hospitalNome"
-                  th:value="${processo.hospital != null ? processo.hospital.nome : ''}" autocomplete="off">
+              th:value="${processo.hospital != null ? processo.hospital.nome : ''}" autocomplete="off">
             <input type="hidden" id="hospitalId" name="hospitalId"
-                  th:value="${processo.hospital != null ? processo.hospital.id : ''}">
+              th:value="${processo.hospital != null ? processo.hospital.id : ''}">
             <div id="autocompleteHospital" class="list-group mt-1"></div>
           </div>
 
           <div class="form-group col-md-6">
-                  <label for="tipoHospital">Tipo de Hospital</label>
-                  <select class="form-control" id="tipoHospital" name="tipoHospital">
-          <option value="">Selecione</option>
-          <option th:each="tipo : ${tiposHospital}"
-                  th:value="${tipo}"
-                  th:text="${tipo}"
-                  th:selected="${processo.tipoHospital == tipo}">
-          </option>
-        </select>
+            <label for="tipoHospital">Tipo de Hospital</label>
+            <select class="form-control" id="tipoHospital" name="tipoHospital">
+              <option value="">Selecione</option>
+              <option th:each="tipo : ${tiposHospital}" th:value="${tipo}" th:text="${tipo}"
+                th:selected="${processo.tipoHospital == tipo}">
+              </option>
+            </select>
 
-        </div>
+          </div>
         </div>
       </fieldset>
 
@@ -125,15 +150,16 @@
             <label>Localização da Doença</label>
             <select class="form-control" id="grupoDoenca" name="grupoDoencaId" required>
               <option value="">Selecione</option>
-              <option th:each="g : ${gruposDoenca}" th:value="${g.id}" th:text="${g.nome}" th:selected="${g.id == processo.doenca?.grupo?.id}"></option>
+              <option th:each="g : ${gruposDoenca}" th:value="${g.id}" th:text="${g.nome}"
+                th:selected="${g.id == processo.doenca?.grupo?.id}"></option>
             </select>
           </div>
           <div class="form-group col-md-6">
             <label>Tipo de Tumor</label>
             <select class="form-control" id="doenca" name="doencaId" required
-                  th:attr="data-selected-id=${processo.doenca != null ? processo.doenca.id : ''}">
-            <option value="">Selecione</option>
-          </select>
+              th:attr="data-selected-id=${processo.doenca != null ? processo.doenca.id : ''}">
+              <option value="">Selecione</option>
+            </select>
           </div>
         </div>
       </fieldset>
@@ -171,7 +197,9 @@
                   <input class="form-control" type="number" name="produtoQuantidades" th:value="${item.quantidade}" />
                 </td>
                 <td>
-                  <button type="button" class="btn btn-sm btn-danger" onclick="removeProduto(this)">×</button>
+                  <button type="button" class="btn btn-danger btn-circle-sm" onclick="removeProduto(this)">
+                    <i class="fas fa-times"></i>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -187,19 +215,23 @@
           <label class="form-check-label">CPF</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="compResidenciaAnexado" th:checked="${processo.compResidenciaAnexado}" />
+          <input class="form-check-input" type="checkbox" name="compResidenciaAnexado"
+            th:checked="${processo.compResidenciaAnexado}" />
           <label class="form-check-label">Comprovante de Residência</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="compRendaAnexado" th:checked="${processo.compRendaAnexado}" />
+          <input class="form-check-input" type="checkbox" name="compRendaAnexado"
+            th:checked="${processo.compRendaAnexado}" />
           <label class="form-check-label">Comprovante de Renda</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="procuracaoAnexado" th:checked="${processo.procuracaoAnexado}" />
+          <input class="form-check-input" type="checkbox" name="procuracaoAnexado"
+            th:checked="${processo.procuracaoAnexado}" />
           <label class="form-check-label">Procuração</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="declaracaoInsuficienciaAnexado" th:checked="${processo.declaracaoInsuficienciaAnexado}" />
+          <input class="form-check-input" type="checkbox" name="declaracaoInsuficienciaAnexado"
+            th:checked="${processo.declaracaoInsuficienciaAnexado}" />
           <label class="form-check-label">Declaração de Insuficiência</label>
         </div>
       </fieldset>
@@ -211,8 +243,13 @@
       </fieldset>
 
       <div class="mt-4">
-        <button type="submit" class="btn btn-success">Salvar Alterações</button>
-        <a th:href="@{/processos/listar}" class="btn btn-secondary ml-2">Cancelar</a>
+        <button type="submit" class="btn btn-success">
+          <i class="fas fa-save mr-2"></i>Salvar Alterações
+        </button>
+
+        <a th:href="@{/processos/listar}" class="btn btn-secondary ml-2">
+          <i class="fas fa-times-circle mr-2"></i>Cancelar
+        </a>
       </div>
     </form>
   </div>
@@ -220,160 +257,199 @@
 
 <!-- Scripts comuns -->
 <div th:replace="~{fragments/foot :: bot}"></div>
-<script>
-  function removeProduto(btn) {
-    btn.closest('tr').remove();
-  }
-</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
 <script th:inline="javascript">
   /*<![CDATA[*/
-  const OK_BUTTON_CONFIG = {
-    confirmButtonText: 'OK',
-    confirmButtonColor: '#1B9BAE'
-  };
-  var produtos = /*[[${produtos}]]*/ [];
-  console.log(produtos);
+
+  // --- DEFINIÇÃO DAS FUNÇÕES AUXILIARES ---
+
+  function removeProduto(btn) {
+    // Usando jQuery para simplificar a remoção
+    $(btn).closest('tr').remove();
+  }
 
   function addProduto() {
-    var nome = document.getElementById('produtoBusca').value;
+    var produtos = /*[[${produtos}]]*/[];
+    // Usando jQuery para pegar o valor e encontrar o produto
+    var nome = $('#produtoBusca').val();
     var prod = produtos.find(p => p.nomeItem === nome);
+
     if (!prod) {
-      Swal.fire({ icon: 'warning', title: 'Produto não encontrado', ...OK_BUTTON_CONFIG });
+      Swal.fire({ icon: 'warning', title: 'Produto não encontrado', confirmButtonColor: '#1B9BAE' });
       return;
     }
 
-    var tbody = document.querySelector('#tabelaProdutos tbody');
-    var tr = document.createElement('tr');
+    // Usando jQuery para adicionar a nova linha na tabela
+    var novaLinha = `
+        <tr>
+            <td>${prod.nomeItem}</td>
+            <td>
+                <input type="hidden" name="produtoIds" value="${prod.id}"/>
+                <input type="date" name="produtoDatas" required class="form-control"/>
+            </td>
+            <td>
+                <input type="number" name="produtoQuantidades" min="1" value="1" required class="form-control"/>
+            </td>
+            <td>
+            <button type="button" class="btn btn-danger btn-circle-sm" onclick="removeProduto(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </td>
+        </tr>
+    `;
+    $('#tabelaProdutos tbody').append(novaLinha);
 
-    // Coluna: nome do produto
-    var tdNome = document.createElement('td');
-    tdNome.textContent = prod.nomeItem;
-    tr.appendChild(tdNome);
-
-    // Coluna: data + hidden id
-    var tdData = document.createElement('td');
-    tdData.innerHTML =
-      '<input type="hidden" name="produtoIds" value="' + prod.id + '"/>' +
-      '<input type="date" name="produtoDatas" required class="form-control"/>';
-    tr.appendChild(tdData);
-
-    // Coluna: quantidade
-    var tdQtd = document.createElement('td');
-    tdQtd.innerHTML =
-      '<input type="number" name="produtoQuantidades" min="1" value="1" required class="form-control"/>';
-    tr.appendChild(tdQtd);
-
-    // Coluna: botão de remoção
-    var tdAcao = document.createElement('td');
-    tdAcao.innerHTML =
-      '<button type="button" class="btn btn-sm btn-danger" onclick="removeProduto(this)">&times;</button>';
-    tr.appendChild(tdAcao);
-
-    tbody.appendChild(tr);
-    document.getElementById('produtoBusca').value = '';
+    // Limpa o campo Select2 de busca de produto
+    $('#produtoBusca').val(null).trigger('change');
   }
 
-  function removeProduto(btn) {
-    btn.closest('tr').remove();
-  }
-  /*]]>*/
-</script>
-
-<!-- Preencher CPF, OAB e CRM dinamicamente -->
-<script>
   function preencherInfoPessoa(id, tipo) {
-    if (!id) return;
+    if (!id) {
+      // Limpa o campo correspondente se a seleção for removida
+      if (tipo === 'paciente') $('#cpfPaciente').val('');
+      else if (tipo === 'advogado') $('#oabAdvogado').val('');
+      else if (tipo === 'medico') $('#crmMedico').val('');
+      return;
+    }
 
     fetch(`/api/pessoas/${id}`)
       .then(res => res.json())
       .then(data => {
-        if (tipo === 'paciente') {
-          document.getElementById("cpfPaciente").value = data.cpf || '';
-        } else if (tipo === 'advogado') {
-          document.getElementById("oabAdvogado").value = data.oab || '';
-        } else if (tipo === 'medico') {
-          document.getElementById("crmMedico").value = data.crm || '';
-        }
+        if (tipo === 'paciente') $('#cpfPaciente').val(data.cpf || '');
+        else if (tipo === 'advogado') $('#oabAdvogado').val(data.oab || '');
+        else if (tipo === 'medico') $('#crmMedico').val(data.crm || '');
       });
   }
 
-  document.getElementById("pacienteId").addEventListener("change", e => preencherInfoPessoa(e.target.value, 'paciente'));
-  document.getElementById("advogadoId").addEventListener("change", e => preencherInfoPessoa(e.target.value, 'advogado'));
-  document.getElementById("medicoId").addEventListener("change", e => preencherInfoPessoa(e.target.value, 'medico'));
-</script>
+  function carregarDoencas(grupoId, doencaSelecionadaId = null) {
+    const doencaSelect = $("#doenca");
 
-<!-- Autocomplete hospital -->
-<script>
-  document.getElementById("hospitalInput").addEventListener("input", function () {
-    const input = this.value;
-    const resultBox = document.getElementById("autocompleteHospital");
-    if (input.length < 2) {
-      resultBox.innerHTML = '';
+    if (!grupoId) {
+      doencaSelect.html('<option value=""></option>').prop("disabled", true);
+      // Atualiza o Select2 para mostrar o placeholder de desabilitado
+      doencaSelect.select2({
+        theme: 'bootstrap4',
+        placeholder: 'Selecione uma localização primeiro'
+      });
       return;
     }
 
-    fetch(`/api/hospitais/buscar?nome=${encodeURIComponent(input)}`)
+    fetch(`/api/doencas/por-grupo/${grupoId}`)
       .then(res => res.json())
-      .then(hospitais => {
-        resultBox.innerHTML = '';
-        hospitais.forEach(h => {
-          const item = document.createElement("button");
-          item.type = "button";
-          item.classList.add("list-group-item", "list-group-item-action");
-          item.textContent = h.nome + (h.cidade ? ` (${h.cidade}/${h.estado})` : '');
-          item.onclick = () => {
-            document.getElementById("hospitalInput").value = h.nome;
-            document.getElementById("hospitalId").value = h.id;
-            resultBox.innerHTML = '';
-          };
-          resultBox.appendChild(item);
+      .then(data => {
+        let options = '<option value="">Selecione</option>';
+        data.forEach(d => {
+          const isSelected = doencaSelecionadaId && d.id == doencaSelecionadaId ? 'selected' : '';
+          options += `<option value="${d.id}" ${isSelected}>${d.nome}</option>`;
         });
+
+        doencaSelect.html(options).prop("disabled", false);
+        // Reinicializa ou atualiza o Select2 com as novas opções
+        doencaSelect.select2({ theme: 'bootstrap4' });
       });
-  });
-</script>
+  }
 
-<!-- Carregar tipos de doença ao trocar grupo -->
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const grupoSelect = document.getElementById("grupoDoenca");
-    const doencaSelect = document.getElementById("doenca");
+  // --- CÓDIGO DE INICIALIZAÇÃO (Executa quando a página carrega) ---
 
-    function carregarDoencas(grupoId, doencaSelecionadaId = null) {
-      if (!grupoId) {
-        doencaSelect.innerHTML = '<option value="">Selecione uma localização primeiro</option>';
-        doencaSelect.setAttribute("disabled", "disabled");
+  $(document).ready(function () {
+
+    // ✅ PASSO PRINCIPAL: Ativa o Select2 em todos os campos <select>
+    // A opção 'theme' faz com que ele se pareça com os campos do Bootstrap
+    $('select').select2({
+      theme: 'bootstrap4',
+      allowClear: true,
+      placeholder: "Selecione"
+    });
+
+    // --- ANEXANDO OS EVENTOS (Listeners) ---
+
+    // Adiciona o listener para o botão de adicionar produto
+    $('button[onclick="addProduto()"]').on('click', addProduto);
+
+    // Anexa os listeners para preencher os dados de Paciente, Advogado e Médico
+    $('#pacienteId, #advogadoId, #medicoId').on("change", function () {
+      const id = $(this).val();
+      const tipo = $(this).attr('id').replace('Id', '');
+      preencherInfoPessoa(id, tipo);
+    });
+
+    // Anexa o listener para o autocomplete de hospital
+    $('#hospitalInput').on("input", function () {
+      const input = this.value;
+      const resultBox = $("#autocompleteHospital");
+      if (input.length < 2) {
+        resultBox.html('');
         return;
       }
-
-      fetch(`/api/doencas/por-grupo/${grupoId}`)
+      fetch(`/api/hospitais/buscar?nome=${encodeURIComponent(input)}`)
         .then(res => res.json())
-        .then(data => {
-          doencaSelect.innerHTML = '<option value="">Selecione</option>';
-          data.forEach(d => {
-            const opt = document.createElement("option");
-            opt.value = d.id;
-            opt.textContent = d.nome;
-            if (doencaSelecionadaId && d.id == doencaSelecionadaId) {
-              opt.selected = true;
-            }
-            doencaSelect.appendChild(opt);
+        .then(hospitais => {
+          resultBox.html('');
+          hospitais.forEach(h => {
+            const item = $(`<button type="button" class="list-group-item list-group-item-action"></button>`);
+            item.text(h.nome + (h.cidade ? ` (${h.cidade}/${h.estado})` : ''));
+            item.on('click', () => {
+              $("#hospitalInput").val(h.nome);
+              $("#hospitalId").val(h.id);
+              resultBox.html('');
+            });
+            resultBox.append(item);
           });
-          doencaSelect.removeAttribute("disabled");
         });
-    }
+    });
 
-    grupoSelect.addEventListener("change", function () {
+    // Anexa o listener para carregar as doenças dependentes
+    $('#grupoDoenca').on("change", function () {
       carregarDoencas(this.value);
     });
 
-    // 🚨 Executa automaticamente no carregamento se já houver doença
-    const grupoSelecionado = grupoSelect.value;
-    const doencaSelecionada = document.getElementById("doenca").getAttribute("data-selected-id");
-    if (grupoSelecionado && doencaSelecionada) {
+    // --- EXECUTANDO CÓDIGO INICIAL ---
+
+    // Executa o carregamento inicial da doença (caso de edição)
+    const grupoSelecionado = $('#grupoDoenca').val();
+    const doencaSelecionada = $('#doenca').attr("data-selected-id");
+    if (grupoSelecionado) {
       carregarDoencas(grupoSelecionado, doencaSelecionada);
     }
+
+    // Dentro de $(document).ready(function () { ... });
+
+    // --- VALIDAÇÃO COM SWEETALERT ---
+    $('form').on('submit', function (event) {
+      let form = this;
+      let camposValidos = true;
+
+      // Verifica cada input/select com o atributo 'required'
+      $(form).find('input[required], select[required]').each(function () {
+        if ($(this).val() === "" || $(this).val() === null) {
+          camposValidos = false;
+        }
+      });
+
+      if (!camposValidos) {
+        // Impede o envio do formulário
+        event.preventDefault();
+
+        // Mostra o alerta de erro
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Por favor, preencha todos os campos obrigatórios!',
+          confirmButtonColor: '#4e73df'
+        });
+      }
+      // Se 'camposValidos' for true, o formulário será enviado normalmente.
+    });
+
   });
+
+  /*]]>*/
 </script>
-
-
