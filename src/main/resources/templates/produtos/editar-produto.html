@@ -7,6 +7,9 @@
 </head>
 
 <body>
+  <div class="text-right mb-3">
+    <p class="text-muted small">Os campos marcados com <span class="text-danger">*</span> são obrigatórios.</p>
+  </div>
   <div class="card shadow mb-4">
     <div class="card-header py-3">
       <h6 class="m-0 font-weight-bold text-primary">
@@ -15,42 +18,59 @@
     </div>
 
     <div class="card-body">
-      <form th:action="@{|/produtos/editar/${produto.id}|}" th:object="${produto}" method="post">
-
-        <fieldset class="form-group border p-3">
+      <form th:action="@{|/produtos/editar/${produto.id}|}" th:object="${produto}" method="post"
+        class="needs-validation" novalidate onsubmit="return validateProdutoForm()">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <fieldset class="form-group border p-3 rounded">
           <legend class="w-auto px-2">Dados Principais</legend>
           <div class="form-row">
             <div class="form-group col-md-4">
-              <label for="codigo">Código:</label>
+              <label for="codigo">Código<span class="text-danger">*</span>:</label>
               <input type="text" class="form-control" id="codigo" th:field="*{codigo}" required />
+              <div class="invalid-feedback">
+                Por favor, insira o código do produto.
+              </div>
             </div>
             <div class="form-group col-md-8">
-              <label for="nomeItem">Nome do Item:</label>
+              <label for="nomeItem">Nome do Item<span class="text-danger">*</span>:</label>
               <input type="text" class="form-control" id="nomeItem" th:field="*{nomeItem}" required />
+              <div class="invalid-feedback">
+                Por favor, insira o nome do item.
+              </div>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group col-md-4">
-              <label for="unidadeMedida">Unidade Medida:</label>
+              <label for="unidadeMedida">Unidade Medida<span class="text-danger">*</span>:</label>
               <input type="text" class="form-control" id="unidadeMedida" th:field="*{unidadeMedida}" required />
+              <div class="invalid-feedback">
+                Por favor, insira a unidade de medida.
+              </div>
             </div>
             <div class="form-group col-md-4">
-              <label for="siglaUnidade">Sigla Unidade:</label>
-              <input type="text" class="form-control" id="siglaUnidade" th:field="*{siglaUnidade}" required />
+              <label for="siglaUnidade">Sigla Unidade<span class="text-danger">*</span>:</label>
+              <input type="text" class="form-control" id="siglaUnidade" th:field="*{siglaUnidade}" required
+                maxlength="2" />
+              <div class="invalid-feedback">
+                A sigla da unidade deve conter exatamente 2 caracteres.
+              </div>
             </div>
             <div class="form-group col-md-4">
-              <label for="grupo">Grupo:</label>
+              <label for="grupo">Grupo<span class="text-danger">*</span>:</label>
               <select class="form-control" id="grupo" th:field="*{grupo}" required>
                 <option value="">Selecione...</option>
                 <option th:each="g : ${grupos}" th:value="${g}" th:text="${g}" th:selected="${g == produto.grupo}">
                 </option>
               </select>
+              <div class="invalid-feedback">
+                Por favor, selecione um grupo.
+              </div>
             </div>
           </div>
         </fieldset>
 
-        <fieldset class="form-group border p-3 mt-4">
+        <fieldset class="form-group border p-3 mt-4 rounded">
           <legend class="w-auto px-2">Outros Detalhes</legend>
           <div class="form-row">
             <div class="form-group col-md-6">
@@ -75,13 +95,89 @@
 
         <hr class="mt-4 mb-4">
 
-        <button type="submit" class="btn btn-primary">Atualizar</button>
-        <a th:href="@{/produtos/listar}" class="btn btn-secondary ml-2">Cancelar</a>
+        <button type="submit" class="btn btn-primary shadow-sm">
+          <i class="fas fa-save mr-1"></i> Atualizar
+        </button>
+        <a th:href="@{/produtos/listar}" class="btn btn-secondary ml-2 shadow-sm">
+          <i class="fas fa-times-circle mr-1"></i> Cancelar
+        </a>
       </form>
     </div>
   </div>
 
-  <div th:replace="~{fragments/foot :: bot}"></div>
+  <th:block th:replace="~{fragments/foot :: bot}"></th:block>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script th:inline="javascript">
+    // Validação do Bootstrap para exibir mensagens de erro
+    (function () {
+      'use strict';
+      window.addEventListener('load', function () {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, function (form) {
+          form.addEventListener('submit', function (event) {
+            if (form.checkValidity() === false) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+          }, false);
+        });
+      }, false);
+    })();
+
+    // Função de validação personalizada para o formulário de edição de produto
+    function validateProdutoForm() {
+      const form = document.querySelector('.needs-validation');
+      const siglaUnidadeInput = document.getElementById('siglaUnidade');
+
+      // 1. Validação básica do Bootstrap (required, etc.)
+      if (form.checkValidity() === false) {
+        form.classList.add('was-validated');
+        return false;
+      }
+
+      // 2. Validação específica para Sigla Unidade (2 caracteres)
+      if (siglaUnidadeInput.value.length !== 2) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro de Validação!',
+          text: 'A Sigla da Unidade deve conter exatamente 2 caracteres.',
+          confirmButtonText: 'Ok'
+        });
+        siglaUnidadeInput.classList.add('is-invalid'); // Marca o campo como inválido
+        siglaUnidadeInput.focus();
+        return false;
+      } else {
+        siglaUnidadeInput.classList.remove('is-invalid'); // Remove a marcação se estiver correto
+      }
+
+      // Se todas as validações passarem
+      Swal.fire({
+        icon: 'success',
+        title: 'Produto Atualizado!',
+        text: 'Os dados do produto foram salvos com sucesso.',
+        showConfirmButton: false,
+        timer: 2000 // Fecha automaticamente após 2 segundos
+      });
+
+      return true; // Permite o envio do formulário
+    }
+
+    // --- Aplicação de Formatação e Event Listeners ---
+    $(document).ready(function () {
+      const siglaUnidadeInput = document.getElementById('siglaUnidade');
+
+      // Evento para formatar a sigla da unidade para maiúscula ao digitar
+      if (siglaUnidadeInput) {
+        siglaUnidadeInput.addEventListener('input', function () {
+          this.value = this.value.toUpperCase();
+        });
+      }
+    });
+  </script>
 </body>
 
 </html>
