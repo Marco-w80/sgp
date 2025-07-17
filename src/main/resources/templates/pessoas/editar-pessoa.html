@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
 
-<!-- Head, sidebar, topbar e abertura de container -->
 <th:block th:replace="~{fragments/head :: top}"></th:block>
 
-<div class="card shadow mb-4">
+<div class="text-right mb-4">
+  <p class="text-muted small">Os campos marcados com <span class="text-danger">*</span> são obrigatórios.</p>
+</div>
+
+<div class="card shadow mb-4 rounded">
   <div class="card-header py-3">
     <h6 class="m-0 font-weight-bold text-warning">
       <i class="fas fa-user-edit mr-2"></i> Editar Pessoa
@@ -14,12 +17,12 @@
   <div class="card-body">
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-    <form th:action="@{|/pessoas/editar/${pessoaForm.id}|}" th:object="${pessoaForm}" method="post">
-      <!-- Dados pessoais -->
+    <form th:action="@{|/pessoas/editar/${pessoaForm.id}|}" th:object="${pessoaForm}" method="post"
+      class="needs-validation" novalidate onsubmit="return showSweetAlert()">
       <div class="form-row">
-        <div class="form-group col-md-4">
-          <label>Tipo</label>
-          <select th:field="*{tipo}" class="form-control" onchange="toggleFields()" required>
+        <div class="form-group col-md-2">
+          <label for="tipo">Tipo<span class="text-danger">*</span></label>
+          <select th:field="*{tipo}" id="tipo" class="form-control" onchange="toggleFields()" required>
             <option value="">Selecione...</option>
             <option value="MEDICO">Médico</option>
             <option value="ADVOGADO">Advogado</option>
@@ -27,48 +30,49 @@
           </select>
         </div>
         <div class="form-group col-md-8">
-          <label>Nome</label>
+          <label>Nome<span class="text-danger">*</span></label>
           <input type="text" th:field="*{nome}" class="form-control" required>
         </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label>Sexo</label>
+        <div class="form-group col-md-2">
+          <label>Sexo<span class="text-danger">*</span></label>
           <select th:field="*{sexo}" class="form-control" required>
             <option value="MASCULINO">Masculino</option>
             <option value="FEMININO">Feminino</option>
             <option value="OUTRO">Outro</option>
           </select>
         </div>
-        <div class="form-group col-md-4">
-          <label>Data de Nascimento</label>
-          <input type="date" th:field="*{dataNascimento}" class="form-control" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label>Data de Nascimento<span class="text-danger">*</span></label>
+          <input type="date" th:field="*{dataNascimento}" class="form-control" id="dataNascimentoInput" required>
         </div>
-        <div class="form-group col-md-4">
-          <label>CPF</label>
-          <input type="text" th:field="*{cpf}" class="form-control" required>
+        <div class="form-group col-md-3">
+          <label>CPF<span class="text-danger">*</span></label>
+          <input type="text" th:field="*{cpf}" class="form-control" id="cpfInput" required>
+        </div>
+        <div class="form-group col-md-3">
+          <label>Identidade<span class="text-danger">*</span></label>
+          <input type="text" th:field="*{identidade}" class="form-control" id="identidadeInput" required>
+        </div>
+        <div class="form-group col-md-4" id="crm-field" style="display:none;">
+          <label>CRM</label>
+          <input type="text" th:field="*{crm}" class="form-control" id="crmInput">
+        </div>
+
+        <div class="form-group col-md-4" id="oab-field" style="display:none;">
+          <label>OAB</label>
+          <input type="text" th:field="*{oab}" class="form-control" id="oabInput">
         </div>
       </div>
 
       <div class="form-row">
-        <div class="form-group col-md-6">
-          <label>Identidade</label>
-          <input type="text" th:field="*{identidade}" class="form-control" required>
-        </div>
 
-        <div class="form-group col-md-6" id="crm-field" style="display:none;">
-          <label>CRM</label>
-          <input type="text" th:field="*{crm}" class="form-control">
-        </div>
 
-        <div class="form-group col-md-6" id="oab-field" style="display:none;">
-          <label>OAB</label>
-          <input type="text" th:field="*{oab}" class="form-control">
-        </div>
+
       </div>
 
-      <!-- Endereço -->
       <hr>
       <h6><i class="fas fa-map-marker-alt mr-2"></i> Endereço</h6>
 
@@ -97,7 +101,7 @@
 
         <div class="form-group col-md-2">
           <label>Complemento</label>
-          <input type="text" th:field="*{enderecos[0].complemento}" id="complemento" class="form-control" readonly>
+          <input type="text" th:field="*{enderecos[0].complemento}" id="complemento" class="form-control">
         </div>
       </div>
 
@@ -116,26 +120,69 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-warning mt-2">
-        <i class="fas fa-save mr-1"></i> Atualizar
+      <button type="submit" class="btn btn-warning mt-2 shadow-sm"> <i class="fas fa-save mr-1"></i> Atualizar
       </button>
     </form>
   </div>
 </div>
 
-<!-- Scripts -->
+<th:block th:replace="~{fragments/foot :: bot}"></th:block>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
 <script th:inline="javascript">
+  // Validação do Bootstrap para exibir mensagens de erro
+  (function () {
+    'use strict';
+    window.addEventListener('load', function () {
+      var forms = document.getElementsByClassName('needs-validation');
+      var validation = Array.prototype.filter.call(forms, function (form) {
+        form.addEventListener('submit', function (event) {
+          if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    }, false);
+  })();
+
+  // Função para mostrar/esconder campos CRM/OAB e aplicar máscaras na inicialização
   function toggleFields() {
     const tipo = document.getElementById('tipo').value;
     const crmField = document.getElementById('crm-field');
     const oabField = document.getElementById('oab-field');
+    const crmInput = document.getElementById('crmInput');
+    const oabInput = document.getElementById('oabInput');
 
-    if (crmField) crmField.style.display = tipo === 'MEDICO' ? 'block' : 'none';
-    if (oabField) oabField.style.display = tipo === 'ADVOGADO' ? 'block' : 'none';
+    // Garante que os campos não sejam 'required' por padrão
+    // É importante remover o required antes de ocultar para evitar problemas de validação
+    if (crmInput) crmInput.removeAttribute('required');
+    if (oabInput) oabInput.removeAttribute('required');
+
+    if (crmField) crmField.style.display = 'none';
+    if (oabField) oabField.style.display = 'none';
+
+    if (tipo === 'MEDICO') {
+      if (crmField) crmField.style.display = 'block';
+      if (crmInput) crmInput.setAttribute('required', 'required');
+    } else if (tipo === 'ADVOGADO') {
+      if (oabField) oabField.style.display = 'block';
+      if (oabInput) oabInput.setAttribute('required', 'required');
+    }
+    // Nota: Não limpa os campos aqui, pois na edição queremos manter os valores existentes
+    // A limpeza só seria necessária se o tipo mudasse de um que tem o campo para outro que não tem
+    // e se você quisesse que o valor não fosse enviado
   }
 
+  // Função para buscar CEP
   function buscarCep() {
-    const cep = document.getElementById("cep").value.replace(/\D/g, '');
+    const cepInput = document.getElementById("cep");
+    const cep = cepInput.value.replace(/\D/g, '');
+
     if (cep.length !== 8) {
       Swal.fire("CEP inválido", "Digite um CEP com 8 números.", "warning");
       return;
@@ -158,9 +205,121 @@
       });
   }
 
-  document.addEventListener('DOMContentLoaded', toggleFields);
-</script>
+  // Função para exibir o SweetAlert2 após o envio do formulário E REALIZAR VALIDAÇÕES
+  function showSweetAlert() {
+    var form = document.querySelector('.needs-validation');
 
-<th:block th:replace="~{fragments/foot :: bot}"></th:block>
+    // 1. Validação do Bootstrap (campos 'required')
+    if (form.checkValidity() === false) {
+      form.classList.add('was-validated');
+      return false; // Impede o envio se o formulário for inválido
+    }
+
+    // 2. Validação da Data de Nascimento (não pode ser futura)
+    const dataNascimentoInput = document.getElementById('dataNascimentoInput');
+    const dataNascimento = new Date(dataNascimentoInput.value);
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0); // Zera horas para comparar apenas a data
+
+    if (dataNascimento > hoje) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de Validação!',
+        text: 'A Data de Nascimento não pode ser no futuro.',
+        confirmButtonText: 'Ok'
+      });
+      dataNascimentoInput.focus(); // Coloca o foco no campo
+      return false;
+    }
+
+    // 3. Validação de Campos com Máscara (CPF, CRM, OAB, Identidade)
+    const tipo = document.getElementById('tipo').value;
+    const cpfInput = $('#cpfInput');
+    const identidadeInput = $('#identidadeInput');
+    const crmInput = $('#crmInput');
+    const oabInput = $('#oabInput');
+
+    // Valida CPF
+    if (cpfInput.length && !cpfInput.val().match(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de Validação!',
+        text: 'Por favor, preencha o CPF corretamente.',
+        confirmButtonText: 'Ok'
+      });
+      cpfInput.focus();
+      return false;
+    }
+
+    // Valida Identidade (RG)
+    if (identidadeInput.length && identidadeInput.val().replace(/\D/g, '').length < 8) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de Validação!',
+        text: 'Por favor, preencha a Identidade (RG) corretamente (mínimo 8 dígitos).',
+        confirmButtonText: 'Ok'
+      });
+      identidadeInput.focus();
+      return false;
+    }
+
+    // Valida CRM se for MÉDICO
+    if (tipo === 'MEDICO' && crmInput.length && crmInput.attr('required') && !crmInput.val().match(/^\d{6}\/[A-Za-z]{2}$/)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de Validação!',
+        text: 'Por favor, preencha o CRM corretamente (ex: 123456/SP).',
+        confirmButtonText: 'Ok'
+      });
+      crmInput.focus();
+      return false;
+    }
+
+    // Valida OAB se for ADVOGADO
+    if (tipo === 'ADVOGADO' && oabInput.length && oabInput.attr('required') && !oabInput.val().match(/^\d{6}[A-Za-z]{2}$/)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de Validação!',
+        text: 'Por favor, preencha o OAB corretamente (ex: 123456RJ).',
+        confirmButtonText: 'Ok'
+      });
+      oabInput.focus();
+      return false;
+    }
+
+    // Se todas as validações passarem, exibe o SweetAlert de sucesso (ou de atualização)
+    Swal.fire({
+      icon: 'success',
+      title: 'Pessoa Atualizada!',
+      text: 'Os dados foram salvos com sucesso.',
+      showConfirmButton: false,
+      timer: 2000
+    });
+
+    return true; // Permite o envio do formulário
+  }
+
+  // --- APLICAÇÃO DAS MÁSCARAS ---
+  $(document).ready(function () {
+    $('#cpfInput').mask('000.000.000-00');
+    $('#identidadeInput').mask('00.000.000-0', { reverse: true });
+    $('#crmInput').mask('000000/AA', {
+      translation: {
+        'A': { pattern: /[A-Za-z]/ }
+      }
+    });
+    $('#oabInput').mask('000000AA', {
+      translation: {
+        'A': { pattern: /[A-Za-z]/ }
+      }
+    });
+    $('#cep').mask('00000-000');
+
+    // Chama toggleFields no DOMContentLoaded e após as máscaras serem aplicadas
+    // para garantir que os campos CRM/OAB sejam exibidos/ocultados corretamente
+    // e as máscaras sejam aplicadas aos valores já existentes.
+    toggleFields();
+  });
+</script>
 
 </html>

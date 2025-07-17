@@ -3,7 +3,10 @@
 
 <th:block th:replace="~{fragments/head :: top}"></th:block>
 
-<!-- Card -->
+<div class="text-right mb-4">
+  <p class="text-muted small">Os campos marcados com <span class="text-danger">*</span> são obrigatórios.</p>
+</div>
+
 <div class="card shadow mb-4">
   <div class="card-header py-3">
     <h6 class="m-0 font-weight-bold text-primary">
@@ -12,11 +15,11 @@
   </div>
 
   <div class="card-body">
-    <form th:action="@{/pessoas/cadastrar}" th:object="${pessoaForm}" method="post" class="needs-validation" novalidate>
-      <!-- 1ª linha -->
+    <form th:action="@{/pessoas/cadastrar}" th:object="${pessoaForm}" method="post" class="needs-validation" novalidate
+      onsubmit="return showSweetAlert()">
       <div class="form-row">
-        <div class="form-group col-md-4">
-          <label for="tipo">Tipo</label>
+        <div class="form-group col-md-2">
+          <label for="tipo">Tipo<span class="text-danger">*</span></label>
           <select id="tipo" name="tipo" class="form-control" onchange="toggleFields()" required>
             <option value="" disabled selected>Selecione...</option>
             <th:block th:each="t : ${tipos}">
@@ -25,46 +28,41 @@
           </select>
         </div>
         <div class="form-group col-md-8">
-          <label>Nome</label>
+          <label>Nome<span class="text-danger">*</span></label>
           <input type="text" name="nome" class="form-control" required>
         </div>
-      </div>
-
-      <!-- 2ª linha -->
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label>Sexo</label>
+        <div class="form-group col-md-2">
+          <label>Sexo<span class="text-danger">*</span></label>
           <select name="sexo" class="form-control" required>
             <option value="MASCULINO">Masculino</option>
             <option value="FEMININO">Feminino</option>
             <option value="OUTRO">Outro</option>
           </select>
         </div>
-        <div class="form-group col-md-4">
-          <label>Data de Nascimento</label>
-          <input type="date" name="dataNascimento" class="form-control" required>
-        </div>
-        <div class="form-group col-md-4">
-          <label>CPF</label>
-          <input type="text" name="cpf" class="form-control" required>
-        </div>
       </div>
 
-      <!-- 3ª linha -->
       <div class="form-row">
-        <div class="form-group col-md-6">
-          <label>Identidade</label>
-          <input type="text" name="identidade" class="form-control" required>
+        <div class="form-group col-md-2">
+          <label>Data de Nascimento<span class="text-danger">*</span></label>
+          <input type="date" name="dataNascimento" class="form-control" id="dataNascimentoInput" required>
+        </div>
+        <div class="form-group col-md-3">
+          <label>CPF<span class="text-danger">*</span></label>
+          <input type="text" name="cpf" class="form-control" id="cpfInput" required>
+        </div>
+        <div class="form-group col-md-3">
+          <label>Identidade<span class="text-danger">*</span></label>
+          <input type="text" name="identidade" class="form-control" id="identidadeInput" required>
         </div>
 
-        <div class="form-group col-md-6" id="crm-field" style="display:none;">
+        <div class="form-group col-md-4" id="crm-field" style="display:none;">
           <label>CRM</label>
-          <input type="text" name="crm" class="form-control">
+          <input type="text" name="crm" class="form-control" id="crmInput">
         </div>
 
-        <div class="form-group col-md-6" id="oab-field" style="display:none;">
+        <div class="form-group col-md-4" id="oab-field" style="display:none;">
           <label>OAB</label>
-          <input type="text" name="oab" class="form-control">
+          <input type="text" name="oab" class="form-control" id="oabInput">
         </div>
       </div>
 
@@ -72,7 +70,6 @@
       <h6><i class="fas fa-map-marker-alt mr-2"></i> Endereço (opcional)</h6>
 
       <div class="form-row">
-        <!-- CEP primeiro -->
         <div class="form-group col-md-4">
           <label>CEP</label>
           <div class="input-group">
@@ -115,82 +112,121 @@
           <input type="text" th:field="*{enderecos[0].estado}" class="form-control" id="estado" readonly>
         </div>
       </div>
+      <button type="submit" class="btn btn-primary mt-2 shadow-sm">
+        <i class="fas fa-save mr-1"></i> Salvar
+      </button>
+    </form>
   </div>
-
-
 </div>
 
-<button type="submit" class="btn btn-primary mb-5">
-  <i class="fas fa-save mr-1"></i> Salvar
-</button>
-</form>
+
 
 
 <th:block th:replace="~{fragments/foot :: bot}"></th:block>
 
-</div>
-</div>
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script th:inline="javascript">
-  let enderecoIndex = 1;
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
+<script th:inline="javascript">
+  // --- FUNÇÕES JAVASCRIPT EXISTENTES ---
+
+  // Validação do Bootstrap para exibir mensagens de erro
+  (function () {
+    'use strict';
+    window.addEventListener('load', function () {
+      var forms = document.getElementsByClassName('needs-validation');
+      var validation = Array.prototype.filter.call(forms, function (form) {
+        form.addEventListener('submit', function (event) {
+          if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    }, false);
+  })();
+
+  // Função para adicionar endereço (mantida como está no seu código)
+  let enderecoIndex = 1;
   function adicionarEndereco() {
     const container = document.getElementById('enderecos-container');
 
     const novoEndereco = document.createElement('div');
     novoEndereco.className = "endereco-row border rounded p-3 mb-3";
     novoEndereco.innerHTML = `
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label>Logradouro</label>
-          <input type="text" name="enderecos[${enderecoIndex}].logradouro" class="form-control">
-        </div>
-        <div class="form-group col-md-2">
-          <label>Número</label>
-          <input type="text" name="enderecos[${enderecoIndex}].numero" class="form-control">
-        </div>
-        <div class="form-group col-md-3">
-          <label>Bairro</label>
-          <input type="text" name="enderecos[${enderecoIndex}].bairro" class="form-control">
-        </div>
-        <div class="form-group col-md-3">
-          <label>Complemento</label>
-          <input type="text" name="enderecos[${enderecoIndex}].complemento" class="form-control">
-        </div>
-      </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label>Logradouro</label>
+                    <input type="text" name="enderecos[${enderecoIndex}].logradouro" class="form-control">
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Número</label>
+                    <input type="text" name="enderecos[${enderecoIndex}].numero" class="form-control">
+                </div>
+                <div class="form-group col-md-3">
+                    <label>Bairro</label>
+                    <input type="text" name="enderecos[${enderecoIndex}].bairro" class="form-control">
+                </div>
+                <div class="form-group col-md-3">
+                    <label>Complemento</label>
+                    <input type="text" name="enderecos[${enderecoIndex}].complemento" class="form-control">
+                </div>
+            </div>
 
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label>Cidade</label>
-          <input type="text" name="enderecos[${enderecoIndex}].cidade" class="form-control">
-        </div>
-        <div class="form-group col-md-4">
-          <label>Estado</label>
-          <input type="text" name="enderecos[${enderecoIndex}].estado" class="form-control">
-        </div>
-        <div class="form-group col-md-4">
-          <label>CEP</label>
-          <input type="text" name="enderecos[${enderecoIndex}].cep" class="form-control">
-        </div>
-      </div>
-    `;
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label>Cidade</label>
+                    <input type="text" name="enderecos[${enderecoIndex}].cidade" class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Estado</label>
+                    <input type="text" name="enderecos[${enderecoIndex}].estado" class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <label>CEP</label>
+                    <input type="text" name="enderecos[${enderecoIndex}].cep" class="form-control">
+                </div>
+            </div>
+        `;
     container.appendChild(novoEndereco);
     enderecoIndex++;
   }
 
+  // Função para mostrar/esconder campos CRM/OAB, gerenciar 'required' E LIMPAR OS CAMPOS
   function toggleFields() {
     const tipo = document.getElementById('tipo').value;
-    document.getElementById('crm-field').style.display = tipo === 'MEDICO' ? 'block' : 'none';
-    document.getElementById('oab-field').style.display = tipo === 'ADVOGADO' ? 'block' : 'none';
+    const crmField = document.getElementById('crm-field');
+    const oabField = document.getElementById('oab-field');
+    const crmInput = document.getElementById('crmInput');
+    const oabInput = document.getElementById('oabInput');
+
+    // Oculta ambos os campos por padrão e remove o 'required'
+    crmField.style.display = 'none';
+    oabField.style.display = 'none';
+    crmInput.removeAttribute('required');
+    oabInput.removeAttribute('required');
+
+    // Adição chave: Limpa os valores dos campos SEMPRE que a opção de tipo é alterada
+    // Isso garante que dados de um tipo anterior não sejam enviados inadvertidamente
+    crmInput.value = '';
+    oabInput.value = '';
+
+    if (tipo === 'MEDICO') {
+      crmField.style.display = 'block';
+      crmInput.setAttribute('required', 'required');
+    } else if (tipo === 'ADVOGADO') {
+      oabField.style.display = 'block';
+      oabInput.setAttribute('required', 'required');
+    }
+    // Se for 'PACIENTE' ou outro tipo, os campos já estarão ocultos e limpos.
   }
 
+  // Chamada inicial de toggleFields para garantir o estado correto ao carregar a página
   document.addEventListener('DOMContentLoaded', toggleFields);
-</script>
 
-<script>
+  // Função para buscar CEP
   function buscarCep() {
     const cep = document.getElementById("cep").value.replace(/\D/g, '');
 
@@ -215,11 +251,121 @@
         Swal.fire("Erro", "Não foi possível buscar o CEP.", "error");
       });
   }
+
+  // Função para exibir o SweetAlert2 após o envio do formulário E REALIZAR VALIDAÇÕES
+  function showSweetAlert() {
+    var form = document.querySelector('.needs-validation');
+
+    // 1. Validação do Bootstrap (campos 'required')
+    if (form.checkValidity() === false) {
+      form.classList.add('was-validated');
+      return false; // Impede o envio se o formulário for inválido
+    }
+
+    // 2. Validação da Data de Nascimento (não pode ser futura)
+    const dataNascimentoInput = document.getElementById('dataNascimentoInput');
+    const dataNascimento = new Date(dataNascimentoInput.value);
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0); // Zera horas para comparar apenas a data
+
+    if (dataNascimento > hoje) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de Validação!',
+        text: 'A Data de Nascimento não pode ser no futuro.',
+        confirmButtonText: 'Ok'
+      });
+      dataNascimentoInput.focus(); // Coloca o foco no campo
+      return false;
+    }
+
+    // 3. Validação de Campos com Máscara (CPF, CRM, OAB)
+    const tipo = document.getElementById('tipo').value;
+    const cpfInput = $('#cpfInput'); // Usando jQuery para a máscara
+    const crmInput = $('#crmInput');
+    const oabInput = $('#oabInput');
+    const identidadeInput = $('#identidadeInput');
+
+    // Valida CPF
+    if (cpfInput.length && !cpfInput.val().match(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)) { // Verifica o padrão da máscara completa
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de Validação!',
+        text: 'Por favor, preencha o CPF corretamente.',
+        confirmButtonText: 'Ok'
+      });
+      cpfInput.focus();
+      return false;
+    }
+
+    if (identidadeInput.length && identidadeInput.val().replace(/\D/g, '').length < 8) { // Verifica se tem pelo menos 8 dígitos numéricos
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de Validação!',
+        text: 'Por favor, preencha a Identidade (RG) corretamente (mínimo 8 dígitos).',
+        confirmButtonText: 'Ok'
+      });
+      identidadeInput.focus();
+      return false;
+    }
+
+    // Valida CRM se for MÉDICO
+    if (tipo === 'MEDICO' && crmInput.length && !crmInput.val().match(/^\d{6}\/[A-Za-z]{2}$/)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de Validação!',
+        text: 'Por favor, preencha o CRM corretamente (ex: 123456/SP).',
+        confirmButtonText: 'Ok'
+      });
+      crmInput.focus();
+      return false;
+    }
+
+    // Valida OAB se for ADVOGADO
+    if (tipo === 'ADVOGADO' && oabInput.length && !oabInput.val().match(/^\d{6}[A-Za-z]{2}$/)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de Validação!',
+        text: 'Por favor, preencha o OAB corretamente (ex: 123456RJ).',
+        confirmButtonText: 'Ok'
+      });
+      oabInput.focus();
+      return false;
+    }
+
+    // Se todas as validações passarem, exibe o SweetAlert de sucesso
+    Swal.fire({
+      icon: 'success',
+      title: 'Cadastrado com Sucesso!',
+      text: 'A pessoa foi registrada em seu sistema.',
+      showConfirmButton: false,
+      timer: 2000
+    });
+
+    return true;
+  }
+
+  // --- APLICAÇÃO DAS MÁSCARAS ---
+  $(document).ready(function () {
+    $('#cpfInput').mask('000.000.000-00');
+    // Para identidade, muitas vezes não há um padrão fixo nacional, então uma máscara mais flexível ou genérica pode ser usada.
+    // Se houver um padrão específico para seu caso, ajuste a máscara.
+    $('#identidadeInput').mask('00.000.000-0', { reverse: true });
+    $('#crmInput').mask('000000/AA', {
+      translation: {
+        'A': { pattern: /[A-Za-z]/ }
+      }
+    });
+    $('#oabInput').mask('000000AA', {
+      translation: {
+        'A': { pattern: /[A-Za-z]/ }
+      }
+    });
+
+    // Aplica a máscara ao campo CEP principal
+    $('#cep').mask('00000-000');
+  });
+
 </script>
-
-
-
-
-
 
 </html>
