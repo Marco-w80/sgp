@@ -10,201 +10,253 @@
 <link rel="stylesheet" th:href="@{/css/custom-select2-validation.css}">
 
 <style>
-  /* Customizações básicas do Select2 (suas regras existentes) */
+  /* ==========================================================================
+     1. VARIÁVEIS DE COR E ESTILOS GERAIS
+     ========================================================================== */
+  :root {
+    --cor-primaria: #166298;
+    --cor-secundaria: #192f51;
+    --cor-fundo-claro: #f8f9fc;
+    --cor-texto-escuro: #5a5c69;
+    --cor-borda-suave: #e3e6f0;
+    --cor-fundo-hover: #f1f3f8;
+    --cor-perigo: #e74a3b;
+    --cor-sucesso: #1cc88a;
+  }
+
+  /* ==========================================================================
+     2. PADRÃO PARA FORMULÁRIOS (CABEÇALHO, LABEL, FIELDSET)
+     ========================================================================== */
+  .card-header.form-header {
+    background-color: var(--cor-fundo-claro);
+    border-bottom: 2px solid var(--cor-primaria);
+  }
+
+  .form-header .font-weight-bold {
+    color: var(--cor-primaria) !important;
+    font-size: 1.1rem;
+  }
+
+  form label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--cor-secundaria);
+  }
+
+  form fieldset {
+    border-color: var(--cor-borda-suave) !important;
+  }
+
+  form legend {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--cor-secundaria);
+  }
+
+  .form-control:focus {
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 0.2rem rgba(22, 98, 152, 0.25);
+  }
+
+  /* ==========================================================================
+     3. INTEGRAÇÃO E TEMA PARA SELECT2
+     ========================================================================== */
   .select2-container .select2-selection--single {
     height: calc(2.25rem + 2px);
-    /* Altura do form-control padrão do Bootstrap */
-    border-radius: .35rem;
-    /* Bordas arredondadas */
-    border-color: #ced4da;
-    /* Cor da borda padrão do Bootstrap */
+    border: 1px solid var(--cor-borda-suave);
   }
 
   .select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 2.25rem;
-    /* Alinhamento do texto */
+    line-height: calc(2.25rem + 2px);
+    color: var(--cor-texto-escuro);
     padding-left: .75rem;
-    /* Espaçamento interno à esquerda */
-    /* Padding-right será ajustado pelo CSS de validação para o 'x' e ícones */
+    padding-right: 50px;
   }
 
   .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: calc(2.25rem + 2px);
-    /* Alinhamento da seta */
-    right: 0px;
-    /* Garante que a seta fique bem à direita */
   }
 
-  .select2-container--default .select2-selection--single .select2-selection__placeholder {
-    color: #6c757d;
-    /* Cor do placeholder */
+  .select2-dropdown {
+    border-color: var(--cor-borda-suave);
   }
 
   .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
-    background-color: #4e73df;
-    /* Cor de destaque azul para hover */
+    background-color: var(--cor-primaria);
     color: white;
   }
 
-  .select2-container--default .select2-results__option--selected {
-    background-color: #e9ecef;
-    /* Cor de fundo para opção selecionada */
-  }
-
-  .select2-container .select2-search--dropdown .select2-search__field {
-    border-radius: .35rem;
-    /* Bordas arredondadas para o campo de busca */
-  }
-
-
-  /* --- Customizações para alinhamento Select2 com feedback de validação do Bootstrap (CSS NOVO) --- */
-
-  /* Remove ícones de background do Bootstrap dos Select2 para evitar duplicação ou desalinhamento */
-  /* Aplica bordas de validação diretamente ao Select2 */
+  /* Validação */
   .select2-container--default .select2-selection--single.is-invalid {
-    border-color: #dc3545 !important;
-    /* Borda vermelha */
-    background-image: none !important;
-    /* Remove o ícone padrão do Bootstrap */
+    border-color: var(--cor-perigo) !important;
   }
 
   .select2-container--default .select2-selection--single.is-valid {
-    border-color: #28a745 !important;
-    /* Borda verde */
-    background-image: none !important;
-    /* Remove o ícone padrão do Bootstrap */
+    border-color: var(--cor-sucesso) !important;
   }
 
-  /* Ajusta o padding para que o ícone de feedback não cause scroll horizontal se o Bootstrap tentasse adicioná-lo */
-  .select2-container--default .select2-selection--single.is-invalid,
-  .select2-container--default .select2-selection--single.is-valid {
-    padding-right: .75rem !important;
-  }
-
-
-  /* Ajusta a posição do botão de limpar (x) do Select2 */
-  .select2-container--default .select2-selection--single .select2-selection__clear {
-    float: none;
-    /* Remove o float para melhor controle de posicionamento */
-    position: absolute;
-    right: 25px;
-    /* Ajuste conforme necessário para o seu layout, pois o ícone da seta Select2 está em right: 0px */
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    /* Garante que esteja acima de outros elementos */
-  }
-
-  /* Ajusta o padding do texto dentro do Select2 para dar espaço ao 'x' de limpar e à seta */
-  .select2-container--default .select2-selection--single .select2-selection__rendered {
-    padding-right: 50px;
-    /* Espaço para o 'x' e a seta. Ajuste se necessário. */
-  }
-
-
-  /* Garante que o feedback de validação do Bootstrap (a mensagem de texto) apareça abaixo do Select2 */
-  /* Isso é crucial para que as mensagens "A data é obrigatória." etc. funcionem */
-  .select2-container.is-invalid+.invalid-feedback,
-  .select2-container.is-valid+.valid-feedback {
+  .select2-container.is-invalid+.invalid-feedback {
     display: block;
-    /* Sobrescreve o display: none padrão do Bootstrap para validação */
-    width: 100%;
-    /* Ocupa a largura total */
-    margin-top: .25rem;
-    /* Espaço entre o campo e a mensagem */
-    font-size: 80%;
-    /* Tamanho da fonte padrão do feedback */
-    color: #dc3545;
-    /* Cor vermelha para inválido */
   }
 
-  .select2-container.is-valid+.valid-feedback {
-    color: #28a745;
-    /* Cor verde para válido, se for usar */
+  .select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 0.2rem rgba(22, 98, 152, 0.25);
   }
 
-  /* Remove a borda azul ao focar Select2 inválido, substituindo por uma sombra vermelha */
-  .select2-container--default.select2-container--focus .select2-selection--single.is-invalid {
-    box-shadow: 0 0 0 .2rem rgba(220, 53, 69, .25);
-    border-color: #dc3545 !important;
-    /* Garante a borda vermelha no foco */
-  }
-
-  /* Estilo de foco para campos válidos */
-  .select2-container--default.select2-container--focus .select2-selection--single.is-valid {
-    box-shadow: 0 0 0 .2rem rgba(40, 167, 69, .25);
-    border-color: #28a745 !important;
-    /* Garante a borda verde no foco */
-  }
-
-  /* Estilos para Select2 múltiplos (se você usar) */
-  .select2-container--default .select2-selection--multiple.is-invalid {
-    border-color: #dc3545 !important;
-    background-image: none !important;
-  }
-
-  .select2-container--default .select2-selection--multiple.is-valid {
-    border-color: #28a745 !important;
-    background-image: none !important;
-  }
-
-  /* Estilo para autocomplete do hospital */
-  #autocompleteHospital {
+  /* ==========================================================================
+     4. AUTOCOMPLETE E TABELA DE PRODUTOS
+     ========================================================================== */
+  .autocomplete-results {
     position: absolute;
-    z-index: 1000;
-    /* Garante que fique acima de outros elementos */
+    z-index: 1050;
+    /* Acima de outros elementos, mas abaixo de modais se necessário */
     width: 100%;
     max-height: 200px;
-    /* Limite de altura para scroll */
     overflow-y: auto;
-    border: 1px solid #ced4da;
-    border-top: none;
-    border-radius: 0 0 .25rem .25rem;
-    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
+    border: 1px solid var(--cor-borda-suave);
+    background-color: white;
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
   }
 
-  #autocompleteHospital .list-group-item {
-    cursor: pointer;
-    border-left: none;
-    border-right: none;
+  .autocomplete-results .list-group-item:hover {
+    background-color: var(--cor-fundo-hover);
   }
 
-  #autocompleteHospital .list-group-item:first-child {
-    border-top: none;
+  #tabelaProdutos thead {
+    background-color: var(--cor-fundo-claro);
   }
 
-  #autocompleteHospital .list-group-item:hover {
-    background-color: #f8f9fa;
+  #tabelaProdutos th {
+    color: var(--cor-secundaria);
+    font-weight: 700;
   }
 
-  /* Estilo para campos obrigatórios */
-  .form-group label .text-danger {
-    margin-left: 0.25rem;
-  }
-
-  /* Ajustes para a tabela de produtos */
-  #tabelaProdutos th,
   #tabelaProdutos td {
     vertical-align: middle;
   }
 
-  #tabelaProdutos input[type="date"],
-  #tabelaProdutos input[type="number"] {
-    padding: .375rem .75rem;
-    /* Padding padrão do form-control */
-    border-radius: .25rem;
-    border: 1px solid #ced4da;
-    width: 100%;
-    /* Ocupar a largura total da célula */
-    box-sizing: border-box;
-    /* Incluir padding e borda na largura */
+  #tabelaProdutos .btn-danger {
+    background-color: var(--cor-perigo);
+    border-color: var(--cor-perigo);
   }
 
-  #tabelaProdutos input:focus {
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
-    /* Sombra de foco azul do Bootstrap */
-    border-color: #80bdff;
+  /* ==========================================================================
+   5. CHECKBOXES CUSTOMIZADOS (CORRIGIDO E CENTRALIZADO)
+   ========================================================================== */
+  .form-check {
+    padding-left: 2rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    /* Adicionado para garantir alinhamento */
+    align-items: center;
+    /* Adicionado para garantir alinhamento */
+  }
+
+  .form-check .form-check-input {
+    opacity: 0;
+    position: absolute;
+  }
+
+  .form-check .form-check-label {
+    position: relative;
+    cursor: pointer;
+    font-weight: 500;
+    line-height: 1.5;
+    /* Garante que a altura da linha não afete o alinhamento */
+  }
+
+  /* A "caixinha" do checkbox */
+  .form-check .form-check-label::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 50%;
+    /* Alinha o início da caixa ao meio da altura da label */
+    transform: translateY(-50%);
+    /* Centraliza a caixa verticalmente */
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid var(--cor-borda-suave);
+    background-color: white;
+    border-radius: .25rem;
+    transition: all 0.2s ease;
+  }
+
+  /* A "caixinha" quando selecionada */
+  .form-check .form-check-input:checked~.form-check-label::before {
+    background-color: var(--cor-primaria);
+    border-color: var(--cor-primaria);
+  }
+
+  /* O símbolo de "check", agora usando um SVG branco e perfeitamente centralizado */
+  .form-check .form-check-input:checked~.form-check-label::after {
+    /* SVG de um checkmark branco, garantindo a cor correta em todos os sistemas */
+    content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e");
+    position: absolute;
+
+    /* Posiciona o checkmark no centro exato da "caixinha" (::before) */
+    left: -1.375rem;
+    /* Posição X: left da caixa (-2rem) + metade da largura (0.625rem) */
+    top: 50%;
+    /* Posição Y: alinhado ao meio da altura da label */
+
+    /* Centraliza o próprio checkmark em seu ponto de âncora */
+    transform: translate(-50%, -50%);
+
+    /* Controla o tamanho do SVG */
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  /* ==========================================================================
+     6. BOTÕES
+     ========================================================================== */
+  /* Estilo geral para todos os botões para dar peso e efeito de transição */
+  .btn {
+    font-weight: 600 !important;
+    transition: all 0.2s ease-in-out !important;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  /* --- Botão Principal (Salvar) --- */
+  .btn-primary {
+    background-color: var(--cor-primaria) !important;
+    border-color: var(--cor-primaria) !important;
+    color: white !important;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--cor-secundaria) !important;
+    border-color: var(--cor-secundaria) !important;
+  }
+
+  /* --- Botão Secundário (Cancelar) --- */
+  .btn-secondary {
+    background-color: #858796 !important;
+    border-color: #858796 !important;
+    color: white !important;
+  }
+
+  .btn-secondary:hover {
+    background-color: #707280 !important;
+    border-color: #696b78 !important;
+  }
+
+  /* --- Botão de Adicionar (Estilo 'Outline') --- */
+  .btn-outline-primary {
+    color: var(--cor-primaria) !important;
+    border-color: var(--cor-primaria) !important;
+    background-color: transparent !important;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: var(--cor-primaria) !important;
+    color: white !important;
   }
 </style>
 
@@ -216,7 +268,7 @@
 </div>
 
 <div class="card shadow mb-4">
-  <div class="card-header py-3">
+  <div class="card-header py-3 form-header">
     <h6 class="m-0 font-weight-bold text-primary">
       <i class="fas fa-file-alt mr-2"></i> Cadastrar Processo
     </h6>
@@ -414,33 +466,36 @@
 
       <fieldset class="form-group border p-3 mt-4 rounded">
         <legend class="w-auto px-2">Documentos Anexados</legend>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="cpfAnexado" name="cpfAnexado" value="true" />
-          <input type="hidden" name="cpfAnexado" value="false" />
-          <label class="form-check-label" for="cpfAnexado">CPF</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="compResidenciaAnexado" name="compResidenciaAnexado"
-            value="true" />
-          <input type="hidden" name="compResidenciaAnexado" value="false" />
-          <label class="form-check-label" for="compResidenciaAnexado">Comprovante de Residência</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="compRendaAnexado" name="compRendaAnexado" value="true" />
-          <input type="hidden" name="compRendaAnexado" value="false" />
-          <label class="form-check-label" for="compRendaAnexado">Comprovante de Renda</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="procuracaoAnexado" name="procuracaoAnexado"
-            value="true" />
-          <input type="hidden" name="procuracaoAnexado" value="false" />
-          <label class="form-check-label" for="procuracaoAnexado">Procuração</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="declaracaoInsuficienciaAnexado"
-            name="declaracaoInsuficienciaAnexado" value="true" />
-          <input type="hidden" name="declaracaoInsuficienciaAnexado" value="false" />
-          <label class="form-check-label" for="declaracaoInsuficienciaAnexado">Declaração de Insuficiência</label>
+        <div class="ml-4">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="cpfAnexado" name="cpfAnexado" value="true" />
+            <input type="hidden" name="cpfAnexado" value="false" />
+            <label class="form-check-label" for="cpfAnexado">CPF</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="compResidenciaAnexado" name="compResidenciaAnexado"
+              value="true" />
+            <input type="hidden" name="compResidenciaAnexado" value="false" />
+            <label class="form-check-label" for="compResidenciaAnexado">Comprovante de Residência</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="compRendaAnexado" name="compRendaAnexado"
+              value="true" />
+            <input type="hidden" name="compRendaAnexado" value="false" />
+            <label class="form-check-label" for="compRendaAnexado">Comprovante de Renda</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="procuracaoAnexado" name="procuracaoAnexado"
+              value="true" />
+            <input type="hidden" name="procuracaoAnexado" value="false" />
+            <label class="form-check-label" for="procuracaoAnexado">Procuração</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="declaracaoInsuficienciaAnexado"
+              name="declaracaoInsuficienciaAnexado" value="true" />
+            <input type="hidden" name="declaracaoInsuficienciaAnexado" value="false" />
+            <label class="form-check-label" for="declaracaoInsuficienciaAnexado">Declaração de Insuficiência</label>
+          </div>
         </div>
       </fieldset>
 

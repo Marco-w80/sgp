@@ -6,37 +6,127 @@
   <th:block th:replace="~{fragments/head :: top}"></th:block>
 
   <style>
-    /* Estilo para garantir que o input no modal não fique grudado na borda superior */
-    .modal-body .form-group {
-      margin-bottom: 1rem;
+    /* ==========================================================================
+     1. VARIÁVEIS DE COR E ESTILOS GERAIS
+     ========================================================================== */
+    :root {
+      --cor-primaria: #166298;
+      --cor-secundaria: #192f51;
+      --cor-fundo-claro: #f8f9fc;
+      --cor-texto-escuro: #5a5c69;
+      --cor-borda-suave: #e3e6f0;
+      --cor-fundo-hover: #f1f3f8;
     }
 
-    /* Estilo para arredondar a borda da lista de grupos */
-    .list-group.rounded {
+    /* ==========================================================================
+     2. PADRÃO PARA CABEÇALHOS E FILTROS
+     ========================================================================== */
+    .card-header.form-header {
+      background-color: var(--cor-fundo-claro);
+      border-bottom: 2px solid var(--cor-primaria);
+    }
+
+    .form-header .font-weight-bold {
+      color: var(--cor-primaria) !important;
+      font-size: 1.1rem;
+    }
+
+    #grupoSelect:focus {
+      border-color: var(--cor-primaria);
+      box-shadow: 0 0 0 0.2rem rgba(22, 98, 152, 0.25);
+    }
+
+    #grupoSelect,
+    .form-group>label {
+      color: var(--cor-secundaria);
+    }
+
+    /* ==========================================================================
+     3. LISTA DE GERENCIAMENTO (List Group)
+     ========================================================================== */
+    .list-group {
+      border: 1px solid var(--cor-borda-suave) !important;
       border-radius: .5rem;
       overflow: hidden;
-      /* Garante que os cantos internos também sejam arredondados */
     }
 
-    /* Ajuste para que o botão dentro do list-group-item tenha bom espaçamento e alinhamento */
-    .list-group-item .btn-group {
-      display: flex;
-      align-items: center;
+    .list-group-item {
+      transition: background-color 0.2s ease-in-out;
+      border-color: var(--cor-borda-suave) !important;
     }
 
-    .list-group-item .btn {
-      margin-left: 0.5rem;
-      /* Espaçamento para o botão de editar, se houver múltiplos */
+    .list-group-item:not(.text-muted):hover {
+      background-color: var(--cor-fundo-hover);
+      cursor: pointer;
     }
 
-    /* Estilo para o span do nome do tumor para evitar que ele quebre a linha abruptamente com botões */
     .list-group-item>span {
       flex-grow: 1;
-      /* Permite que o span ocupe o espaço disponível */
       margin-right: 1rem;
-      /* Espaço entre o nome e os botões */
       word-break: break-word;
-      /* Quebra a palavra se for muito longa */
+      color: var(--cor-texto-escuro);
+      font-weight: 500;
+    }
+
+    /* ==========================================================================
+     4. JANELAS MODAIS
+     ========================================================================== */
+    .modal-header {
+      background-color: var(--cor-fundo-claro);
+      border-bottom: 2px solid var(--cor-primaria);
+    }
+
+    .modal-title {
+      color: var(--cor-primaria);
+      font-weight: 700;
+    }
+
+    .modal-footer {
+      background-color: var(--cor-fundo-claro);
+      border-top: 1px solid var(--cor-borda-suave);
+    }
+
+    .modal-body label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--cor-secundaria);
+    }
+
+    .modal-body .form-control:focus {
+      border-color: var(--cor-primaria);
+      box-shadow: 0 0 0 0.2rem rgba(22, 98, 152, 0.25);
+    }
+
+    /* ==========================================================================
+     5. BOTÕES
+     ========================================================================== */
+    .btn {
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .btn-primary {
+      background-color: var(--cor-primaria);
+      border-color: var(--cor-primaria);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--cor-secundaria);
+      border-color: var(--cor-secundaria);
+    }
+
+    .btn-secondary {
+      background-color: #858796;
+      border-color: #858796;
+    }
+
+    .btn-secondary:hover {
+      background-color: #707280;
+      border-color: #696b78;
     }
   </style>
 </head>
@@ -44,7 +134,7 @@
 <body>
 
   <div class="card shadow mb-4 rounded">
-    <div class="card-header py-3">
+    <div class="card-header py-3 form-header">
       <h6 class="m-0 font-weight-bold text-primary">
         <i class="fas fa-brain mr-2"></i> Gerenciar Tumores por Localização
       </h6>
@@ -67,7 +157,7 @@
 
       <div th:if="${grupoSelecionado != null}">
         <div class="card shadow mb-4 rounded">
-          <div class="card-header py-3 d-flex justify-content-between align-items-center">
+          <div class="card-header py-3 d-flex justify-content-between align-items-center form-header">
             <h6 class="m-0 font-weight-bold text-primary">
               <i class="fas fa-map-marker-alt mr-2"></i> Localização Selecionada: <span
                 th:text="${grupoSelecionado.nome}"></span>

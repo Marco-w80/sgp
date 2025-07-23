@@ -4,6 +4,91 @@
 <head>
   <title>Cadastrar Usuário</title>
   <th:block th:replace="~{fragments/head :: top}"></th:block>
+
+  <style>
+    /* ==========================================================================
+     1. VARIÁVEIS DE COR E ESTILOS GERAIS
+     ========================================================================== */
+    :root {
+      --cor-primaria: #166298;
+      --cor-secundaria: #192f51;
+      --cor-fundo-claro: #f8f9fc;
+      --cor-texto-escuro: #5a5c69;
+      --cor-borda-suave: #e3e6f0;
+    }
+
+    /* ==========================================================================
+     2. PADRÃO PARA FORMULÁRIOS
+     ========================================================================== */
+
+    /* Padroniza o cabeçalho do card */
+    .card-header.form-header {
+      background-color: var(--cor-fundo-claro);
+      border-bottom: 2px solid var(--cor-primaria);
+    }
+
+    .form-header .font-weight-bold {
+      color: var(--cor-primaria) !important;
+      font-size: 1.1rem;
+    }
+
+    /* Estiliza os rótulos (labels) dos campos */
+    form label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--cor-secundaria);
+    }
+
+    /* Dá destaque ao campo quando ele está em foco (selecionado) */
+    .form-control:focus {
+      border-color: var(--cor-primaria);
+      box-shadow: 0 0 0 0.2rem rgba(22, 98, 152, 0.25);
+    }
+
+    /* Estiliza a linha divisória */
+    form hr {
+      background-color: var(--cor-borda-suave);
+    }
+
+    /* ==========================================================================
+     3. BOTÕES DO FORMULÁRIO (SALVAR E CANCELAR)
+     ========================================================================== */
+    .card-body .btn {
+      padding: 8px 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .card-body .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* Botão Primário (Salvar) */
+    .card-body .btn-primary {
+      background-color: var(--cor-primaria);
+      border-color: var(--cor-primaria);
+    }
+
+    .card-body .btn-primary:hover {
+      background-color: var(--cor-secundaria);
+      border-color: var(--cor-secundaria);
+    }
+
+    /* Botão Secundário (Cancelar) */
+    .card-body .btn-secondary {
+      background-color: #858796;
+      /* Cinza padrão do SB Admin */
+      border-color: #858796;
+    }
+
+    .card-body .btn-secondary:hover {
+      background-color: #707280;
+      border-color: #696b78;
+    }
+  </style>
 </head>
 
 <body>
@@ -15,7 +100,7 @@
           </p>
         </div>
         <div class="card shadow mb-4 rounded">
-          <div class="card-header py-3">
+          <div class="card-header py-3 form-header">
             <h6 class="m-0 font-weight-bold text-primary">
               <i class="fas fa-user-plus mr-2"></i> Cadastrar Novo Usuário
             </h6>

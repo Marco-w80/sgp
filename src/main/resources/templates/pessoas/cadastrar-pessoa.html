@@ -1,14 +1,110 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
 
+
+<style>
+  /* ==========================================================================
+       1. ESTILOS GERAIS E VARIÁVEIS (Pode ir para um arquivo global depois)
+       ========================================================================== */
+  :root {
+    --cor-primaria: #166298;
+    --cor-secundaria: #192f51;
+    --cor-sucesso: #1cc88a;
+    --cor-perigo: #e74a3b;
+    --cor-fundo-claro: #f8f9fc;
+    --cor-texto: #5a5c69;
+  }
+
+  /* ==========================================================================
+       2. PADRÃO PARA FORMULÁRIOS DE CADASTRO E EDIÇÃO
+       ========================================================================== */
+
+  /* Padroniza o cabeçalho do card */
+  .card-header.form-header {
+    background-color: var(--cor-fundo-claro);
+    border-bottom: 2px solid var(--cor-primaria);
+  }
+
+  .form-header .font-weight-bold {
+    color: var(--cor-primaria) !important;
+    /* Garante que a cor primária seja usada */
+    font-size: 1.1rem;
+  }
+
+  /* Estiliza os rótulos (labels) dos campos */
+  form label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--cor-secundaria);
+  }
+
+  /* Dá destaque ao campo quando ele está em foco (selecionado) */
+  .form-control:focus {
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 0.2rem rgba(22, 98, 152, 0.25);
+    /* Sombra com a cor primária */
+  }
+
+  /* Melhora a interação com o botão principal */
+  .btn-primary {
+    background-color: var(--cor-primaria);
+    border-color: var(--cor-primaria);
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--cor-secundaria);
+    /* Usa o azul mais escuro no hover */
+    border-color: var(--cor-secundaria);
+  }
+
+  /* Estiliza os subtítulos dentro do formulário para separar seções */
+  form h6 {
+    margin-top: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e3e6f0;
+    color: var(--cor-secundaria);
+    font-weight: 700;
+  }
+
+  /* ==========================================================================
+   BOTÃO DE SALVAR PERSONALIZADO
+   ========================================================================== */
+  .btn-salvar-custom {
+    background-color: var(--cor-primaria) !important;
+    padding: 10px 28px !important;
+    /* Deixa o botão um pouco maior e mais largo */
+    font-size: 1rem !important;
+    /* Garante um bom tamanho de fonte */
+    font-weight: 600 !important;
+    /* Texto um pouco mais forte */
+    letter-spacing: 0.5px !important;
+    /* Leve espaçamento para um look mais refinado */
+    border-radius: 8px !important;
+    /* Bordas um pouco mais arredondadas */
+    transition: all 0.3s ease !important;
+    /* Transição suave para todos os efeitos */
+  }
+
+  .btn-salvar-custom:hover {
+    background-color: var(--cor-secundaria) !important;
+    /* Azul mais escuro no hover */
+    border-color: var(--cor-secundaria) !important;
+    transform: translateY(-3px) !important;
+    /* Efeito sutil de "levantar" o botão */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2) !important;
+    /* Sombra mais destacada */
+  }
+</style>
+
 <th:block th:replace="~{fragments/head :: top}"></th:block>
 
-<div class="text-right mb-4">
+<div class="text-right mb-0 pb-0">
   <p class="text-muted small">Os campos marcados com <span class="text-danger">*</span> são obrigatórios.</p>
 </div>
 
 <div class="card shadow mb-4">
-  <div class="card-header py-3">
+  <div class="card-header py-3 form-header">
     <h6 class="m-0 font-weight-bold text-primary">
       <i class="fas fa-user-plus mr-2"></i> Cadastrar Pessoa
     </h6>
@@ -112,9 +208,11 @@
           <input type="text" th:field="*{enderecos[0].estado}" class="form-control" id="estado" readonly>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary mt-2 shadow-sm">
-        <i class="fas fa-save mr-1"></i> Salvar
-      </button>
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary btn-salvar-custom mt-3 shadow-sm">
+          <i class="fas fa-save mr-1"></i> Salvar
+        </button>
+      </div>
     </form>
   </div>
 </div>
