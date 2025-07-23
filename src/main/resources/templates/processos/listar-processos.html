@@ -526,18 +526,21 @@
           ];
 
           const logsHtml = data.logs.map(log => {
-            let valorAntigo = log.valorAntigo;
-            let valorNovo = log.valorNovo;
+          let valorAntigo = log.valorAntigo;
+          let valorNovo = log.valorNovo;
 
-            if (camposBooleanos.includes(log.campo)) {
-              valorAntigo = log.valorAntigo === "true" ? "Anexado" : "Não anexado";
-              valorNovo = log.valorNovo === "true" ? "Anexado" : "Não anexado";
-            }
-            // Use <span> para envolver os valores para possível estilização futura
-            return `<li><strong>${log.campo}</strong>: <span>${valorAntigo}</span> &rarr; <span>${valorNovo}</span> (${formatDate(log.data)})</li>`;
-          }).join('');
+          if (camposBooleanos.includes(log.campo)) {
+            valorAntigo = log.valorAntigo === "true" ? "Anexado" : "Não anexado";
+            valorNovo = log.valorNovo === "true" ? "Anexado" : "Não anexado";
+          }
+          // Apenas use log.data direto!
+          return `<li><strong>${log.campo}</strong>: <span>${valorAntigo}</span> &rarr; <span>${valorNovo}</span> (${log.data || '–'})</li>`;
+        }).join('');
 
-          const produtosHtml = data.itens.map(item => `<li>${item.produto.nomeItem} &ndash; Qtd: ${item.quantidade} &ndash; Enviado: ${formatDate(item.dataEnvio)}</li>`).join('');
+
+          const produtosHtml = data.itens.map(item => 
+            `<li>${item.produto} &ndash; Qtd: ${item.quantidade} &ndash; Enviado: ${item.dataEnvio || '–'}</li>`
+          ).join('');
 
           let html = `
                         <p><strong>Interno:</strong> ${data.numeroInterno || '–'}</p>
