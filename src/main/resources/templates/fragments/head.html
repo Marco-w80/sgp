@@ -13,6 +13,50 @@
     <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900" rel="stylesheet">
     <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <style>
+      /* src/main/resources/static/css/custom.css */
+
+      /*
+ * Usamos as cores que você escolheu:
+ * --cor-primaria: #166298;
+ * --cor-escura: #192f51;
+ */
+
+      /*
+ * Sobrescreve a classe .bg-gradient-primary do SB Admin 2
+ * para aplicar seu novo gradiente na barra lateral.
+ */
+      .bg-gradient-primary {
+        background-color: #192f51;
+        background-image: linear-gradient(180deg, #166298 10%, #192f51 100%);
+        background-size: cover;
+      }
+
+      /*
+ * Ajusta a cor do link ativo na sidebar para ter mais destaque.
+ */
+      .sidebar-dark .nav-item.active .nav-link {
+        background-color: rgba(255, 255, 255, 0.1);
+        /* Um leve brilho branco */
+      }
+
+      /*
+ * Ajusta a cor do botão que minimiza a sidebar.
+ */
+      #sidebarToggle::after {
+        color: rgba(255, 255, 255, 0.7) !important;
+      }
+
+      /* Adicione este código ao seu arquivo custom.css */
+
+      #logo-sidebar {
+        width: 80%;
+        /* Defina a largura desejada */
+        height: auto;
+        /* O 'auto' mantém a proporção original da imagem */
+      }
+    </style>
   </head>
 
   <body id="page-top">
@@ -20,9 +64,11 @@
 
       <!-- Sidebar -->
       <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-        <!-- Sidebar Brand -->
+
         <a class="sidebar-brand d-flex align-items-center justify-content-center" th:href="@{/intranet}">
-          <div class="sidebar-brand-text mx-3">GrupoProd</div>
+          <div class="sidebar-brand-icon">
+            <img id="logo-sidebar" src="/img/branca-lat.png" alt="Logo GrupoProd">
+          </div>
         </a>
 
         <hr class="sidebar-divider my-0" />
