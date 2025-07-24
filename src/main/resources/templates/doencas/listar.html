@@ -6,78 +6,117 @@
     <th:block th:replace="~{fragments/head :: top}"></th:block>
 
     <style>
-        /* Ajuste para o campo de pesquisa com ícone */
-        .search-container {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-
-        .search-container .form-control-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #aaa;
-        }
-
-        .search-container .form-control {
-            padding-left: 2.5rem; /* Espaço para o ícone */
-        }
-
-        /* --- Novas Estilizações para os Cards de Grupo --- */
-
-        /* Remover margens verticais desnecessárias entre os cards de grupo para compactar */
-        .tumor-group-card {
-            margin-bottom: 1.25rem; /* Ajustado para um espaçamento mais elegante */
-        }
-
-        /* Estilização do card de grupo principal */
-        .card.tumor-group-card .card { /* Seleciona o card interno, não o container externo */
-            border-left: .25rem solid #4e73df !important; /* Mantém a barra azul lateral */
-            border-radius: .5rem; /* Bordas arredondadas */
-            overflow: hidden; /* Garante que o conteúdo não vaze */
-            box-shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important; /* Sombra sutil */
-        }
-
-        /* Estilização do cabeçalho do card de grupo */
-        .card.tumor-group-card .card-header {
-            background-color: #f8f9fc; /* Fundo mais claro, mas não branco puro, para distinguir */
-            border-bottom: 1px solid #e3e6f0; /* Borda inferior sutil */
-            padding: .75rem 1.25rem; /* Padding ajustado para ser menos "faixa" */
-            display: flex;
-            align-items: center;
-        }
-
-        /* Estilização do título dentro do cabeçalho do card de grupo */
-        .card.tumor-group-card .card-header h6 {
-            margin: 0; /* Remover margem padrão do h6 */
-            font-size: 1rem; /* Ajustar tamanho da fonte se necessário */
-        }
-
-        /* Estilização do corpo do card de grupo */
-        .card.tumor-group-card .card-body {
-            padding: 1.25rem; /* Padding padrão do Bootstrap */
-        }
-
-        /* Estilização da lista de tumores dentro do card */
-        .card.tumor-group-card .list-group {
-            border: none; /* Remover borda redundante se list-group-flush já removeu */
-            border-radius: .35rem; /* Bordas arredondadas para a lista */
-            overflow: hidden; /* Para que as bordas do primeiro/último item se encaixem */
-        }
-
-        .card.tumor-group-card .list-group-item {
-            border-color: #eaecf4; /* Cor de borda mais suave para os itens da lista */
-            padding: .75rem 1.25rem; /* Padding para os itens da lista */
-            font-size: .95rem; /* Tamanho da fonte para os itens */
-        }
-
-        /* Mensagem quando não há tumores em um grupo (manter estilização para consistência) */
-        .no-tumors-message {
-            background-color: #fdfdfe; /* Fundo suave */
-            color: #6c757d; /* Cor do texto */
-            font-style: italic;
-        }
+      /* ==========================================================================
+         1. DEFINIÇÃO DE CORES (Usaremos o tema azul padrão de "Cadastro")
+         ========================================================================== */
+      :root {
+        --cor-primaria-ativa: #166298;      /* Azul */
+        --cor-hover-ativa: #192f51;        /* Azul Escuro */
+        --cor-fundo-claro: #f8f9fc;
+        --cor-texto-escuro: #5a5c69;
+        --cor-borda-suave: #e3e6f0;
+        --cor-fundo-hover: #f1f3f8;
+      }
+    
+      /* ==========================================================================
+         2. CABEÇALHO PRINCIPAL E BOTÕES
+         ========================================================================== */
+      .card-header.main-header {
+        background-color: var(--cor-fundo-claro);
+        border-bottom: 2px solid var(--cor-primaria-ativa);
+      }
+    
+      .main-header .font-weight-bold {
+        color: var(--cor-primaria-ativa) !important;
+        font-size: 1.1rem;
+      }
+      
+      /* Botão "Gerenciar" - Usando a cor primária para consistência */
+      .btn-gerenciar {
+          background-color: var(--cor-primaria-ativa);
+          border-color: var(--cor-primaria-ativa);
+          color: white; /* Adicionado para garantir texto branco */
+          transition: all 0.2s ease;
+      }
+      .btn-gerenciar:hover {
+          background-color: var(--cor-hover-ativa);
+          border-color: var(--cor-hover-ativa);
+          transform: translateY(-2px);
+      }
+    
+      /* ==========================================================================
+         3. CAMPO DE PESQUISA
+         ========================================================================== */
+      .search-container {
+        position: relative;
+      }
+    
+      .search-container .form-control-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #ccc;
+        transition: color 0.2s ease;
+      }
+    
+      .search-container .form-control {
+        padding-left: 2.5rem;
+      }
+      
+      /* Quando o campo de busca está em foco, a cor do ícone muda */
+      .search-container .form-control:focus {
+        border-color: var(--cor-primaria-ativa);
+        box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--cor-primaria-ativa) 25%, transparent);
+      }
+      .search-container .form-control:focus ~ .form-control-icon {
+        color: var(--cor-primaria-ativa);
+      }
+    
+      /* ==========================================================================
+         4. CARDS DE LOCALIZAÇÃO E LISTAS
+         ========================================================================== */
+      .tumor-group-card {
+        margin-bottom: 1rem;
+      }
+    
+      /* O card interno usa a cor do tema na borda esquerda */
+      .tumor-group-card .card {
+        border-left: .25rem solid var(--cor-primaria-ativa) !important;
+        border-radius: .35rem;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+      }
+      .tumor-group-card .card:hover {
+          box-shadow: 0 .25rem 2rem rgba(58,59,69,.18) !important;
+          transform: translateY(-2px);
+      }
+    
+      .tumor-group-card .card-header {
+        background-color: white;
+        border-bottom: 1px solid var(--cor-borda-suave);
+      }
+      
+      .tumor-group-card .card-header h6 {
+          color: var(--cor-primaria-ativa);
+          font-size: 1rem;
+      }
+    
+      /* Itens da lista com hover */
+      .tumor-group-card .list-group-item {
+        border-color: var(--cor-borda-suave);
+        font-size: .95rem;
+        color: var(--cor-texto-escuro);
+        transition: background-color 0.2s ease;
+      }
+      .tumor-group-card .list-group-item:not(.no-tumors-message):hover {
+          background-color: var(--cor-fundo-hover);
+      }
+    
+      .no-tumors-message {
+        background-color: var(--cor-fundo-claro);
+        color: #858796;
+        font-style: italic;
+      }
     </style>
 </head>
 
@@ -87,11 +126,11 @@
             <div class="col-lg-10 col-md-12">
 
                 <div class="card shadow mb-4 rounded">
-                    <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
+                    <div class="card-header py-3 d-sm-flex align-items-center justify-content-between main-header">
                         <h6 class="m-0 font-weight-bold text-primary">
                             <i class="fas fa-microscope mr-2"></i> Todos os Tumores Cadastrados por Localização
                         </h6>
-                        <a th:href="@{/doencas/cadastrar}" class="btn btn-info btn-sm shadow-sm">
+                        <a th:href="@{/doencas/cadastrar}" class="btn btn-gerenciar btn-sm shadow-sm">
                             <i class="fas fa-cogs mr-1"></i> Gerenciar Tumores
                         </a>
                     </div>
@@ -100,7 +139,7 @@
                         <div class="search-container mb-4">
                             <i class="fas fa-search form-control-icon"></i>
                             <input type="text" id="filterInput" class="form-control" placeholder="Filtrar por nome do tumor ou localização..."
-                                aria-label="Filtrar Tumores">
+                                   aria-label="Filtrar Tumores">
                         </div>
 
                         <div th:if="${grupos == null or grupos.isEmpty()}" class="text-center">
@@ -115,7 +154,7 @@
                             <div th:each="grupo : ${grupos}" class="tumor-group-card">
                                 <div class="card border-left-primary shadow h-100 py-2 rounded">
                                     <div class="card-header py-2">
-                                        <h6 class="m-0 font-weight-bold text-primary group-name">
+                                        <h6 class="m-0 font-weight-bold group-name">
                                             <i class="fas fa-map-marker-alt mr-2"></i> <span th:text="${grupo.nome}">Localização</span>
                                         </h6>
                                     </div>
@@ -193,19 +232,13 @@
                 }
 
                 // Se não houver filtro e o grupo não tiver tumores, exibe a mensagem padrão
-                // Isso garante que a mensagem "Nenhum tipo de tumor cadastrado nesta localização"
-                // volte a aparecer quando o filtro é limpo e o grupo realmente não tem tumores
                 if (filterValue === '') {
                     $('.tumor-group-card').each(function() {
                         var $groupCardContainer = $(this);
                         var $groupCard = $groupCardContainer.find('.card');
                         var $noTumorsMessage = $groupCard.find('.no-tumors-message');
                         var $tumorItems = $groupCard.find('.tumor-item');
-
-                        // Aqui precisamos verificar se o grupo TEM tumores no DOM,
-                        // não apenas os visíveis pelo filtro.
-                        // Podemos verificar se o elemento '.no-tumors-message' existe
-                        // e está th:if (que significa que a lista do backend era vazia)
+                        
                         if ($tumorItems.length === 0 && $noTumorsMessage.length > 0) {
                             $noTumorsMessage.show(); // Mostra a mensagem padrão
                         }
