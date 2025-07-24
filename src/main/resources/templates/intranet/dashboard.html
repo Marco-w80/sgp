@@ -81,7 +81,7 @@
             </thead>
             <tbody>
               <tr th:if="${#lists.isEmpty(pendencias)}">
-                <td colspan="4" class="text-center text-muted">
+                <td colspan="5" class="text-center text-muted">
                   Nenhum processo com pendência para o critério selecionado.
                 </td>
               </tr>
@@ -148,83 +148,88 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- DataTables + Modal JS -->
-  <script>
-    $(document).ready(function () {
-      if ($.fn.DataTable) {
-        $('#tabelaPendencias').DataTable({
-          language: { url: '/datatables/i18n/pt-BR.json' },
-          pageLength: 10,
-          lengthMenu: [5, 10, 25, 50]
-        });
-      }
+ <script>
+  $(document).ready(function () {
+    const $tabela = $('#tabelaPendencias');
+    const linhas = $tabela.find('tbody tr');
+    const temDados = linhas.length > 0 && !linhas.first().find('td').attr('colspan');
 
-      $('#modalVerProcesso').on('show.bs.modal', function (e) {
-        const button = $(e.relatedTarget);
-        const procId = button.data('id');
-        const modalBody = document.getElementById('conteudoProcesso');
-        modalBody.innerHTML = "<p class='text-muted'>Buscando informações...</p>";
-
-        fetch(`/api/processos/${procId}/detalhes`)
-          .then(res => {
-            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-            return res.json();
-          })
-          .then(data => {
-            const formatDate = (dateString) => {
-              if (!dateString) return '–';
-              try {
-                return new Date(dateString).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-              } catch {
-                return 'Data Inválida';
-              }
-            };
-
-            const camposBooleanos = [
-              "CPF Anexado", "Comp. Residência", "Comp. Renda", "Procuração", "Decl. Insuficiência"
-            ];
-
-            const logsHtml = (data.logs || []).map(log => {
-              let antigo = log.valorAntigo;
-              let novo   = log.valorNovo;
-              if (camposBooleanos.includes(log.campo)) {
-                antigo = antigo === "true" ? "Anexado" : "Não anexado";
-                novo   = novo   === "true" ? "Anexado" : "Não anexado";
-              }
-              return `<li><strong>${log.campo}</strong>: <span>${antigo}</span> &rarr; <span>${novo}</span> (${log.data || '–'})</li>`;
-            }).join('');
-
-            const produtosHtml = (data.itens || []).map(item =>
-              `<li>${item.produto} &ndash; Qtd: ${item.quantidade} &ndash; Enviado: ${item.dataEnvio || '–'}</li>`
-            ).join('');
-
-            const html = `
-              <p><strong>Interno:</strong> ${data.numeroInterno || '–'}</p>
-              <p><strong>Processo:</strong> ${data.numeroProcesso || '–'}</p>
-              <p><strong>Paciente:</strong> ${data.paciente ? `${data.paciente.nome} - CPF: ${data.paciente.cpf || '–'}` : '–'}</p>
-              <p><strong>Advogado:</strong> ${data.advogado ? `${data.advogado.nome} - OAB: ${data.advogado.oab || '–'}` : '–'}</p>
-              <p><strong>Médico:</strong> ${data.medico ? `${data.medico.nome} - CRM: ${data.medico.crm || '–'}` : '–'}</p>
-              <p><strong>Status:</strong> ${data.status || '–'}</p>
-              <p><strong>Data Início:</strong> ${formatDate(data.dataInicio)}</p>
-              <p><strong>Local:</strong> ${data.local ? `${data.local.comarca} – ${data.local.localizacao}` : '–'}</p>
-              <p><strong>Observações:</strong> ${data.obs || '–'}</p>
-
-              <hr>
-              <h5><i class="fas fa-file-alt"></i> Detalhes Adicionais:</h5>
-              <ul>${produtosHtml || '<li>Nenhum produto associado.</li>'}</ul>
-
-              <hr>
-              <h5><i class="fas fa-list-ul"></i> Histórico de Alterações:</h5>
-              <div class="logs-container">
-                <ul>${logsHtml || '<li>Nenhum log de alteração.</li>'}</ul>
-              </div>
-            `;
-            modalBody.innerHTML = html;
-          })
-          .catch(err => {
-            modalBody.innerHTML = "<div class='alert alert-danger'>Erro ao carregar dados do processo. Por favor, tente novamente.</div>";
-            console.error("Erro ao buscar detalhes do processo:", err);
-          });
+    if (temDados && $.fn.DataTable) {
+      $tabela.DataTable({
+        language: { url: '/datatables/i18n/pt-BR.json' },
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50]
       });
+    }
+
+    $('#modalVerProcesso').on('show.bs.modal', function (e) {
+      const button = $(e.relatedTarget);
+      const procId = button.data('id');
+      const modalBody = document.getElementById('conteudoProcesso');
+      modalBody.innerHTML = "<p class='text-muted'>Buscando informações...</p>";
+
+      fetch(`/api/processos/${procId}/detalhes`)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+          return res.json();
+        })
+        .then(data => {
+          const formatDate = (dateString) => {
+            if (!dateString) return '–';
+            try {
+              return new Date(dateString).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            } catch {
+              return 'Data Inválida';
+            }
+          };
+
+          const camposBooleanos = [
+            "CPF Anexado", "Comp. Residência", "Comp. Renda", "Procuração", "Decl. Insuficiência"
+          ];
+
+          const logsHtml = (data.logs || []).map(log => {
+            let antigo = log.valorAntigo;
+            let novo = log.valorNovo;
+            if (camposBooleanos.includes(log.campo)) {
+              antigo = antigo === "true" ? "Anexado" : "Não anexado";
+              novo = novo === "true" ? "Anexado" : "Não anexado";
+            }
+            return `<li><strong>${log.campo}</strong>: <span>${antigo}</span> &rarr; <span>${novo}</span> (${log.data || '–'})</li>`;
+          }).join('');
+
+          const produtosHtml = (data.itens || []).map(item =>
+            `<li>${item.produto} &ndash; Qtd: ${item.quantidade} &ndash; Enviado: ${item.dataEnvio || '–'}</li>`
+          ).join('');
+
+          const html = `
+            <p><strong>Interno:</strong> ${data.numeroInterno || '–'}</p>
+            <p><strong>Processo:</strong> ${data.numeroProcesso || '–'}</p>
+            <p><strong>Paciente:</strong> ${data.paciente ? `${data.paciente.nome} - CPF: ${data.paciente.cpf || '–'}` : '–'}</p>
+            <p><strong>Advogado:</strong> ${data.advogado ? `${data.advogado.nome} - OAB: ${data.advogado.oab || '–'}` : '–'}</p>
+            <p><strong>Médico:</strong> ${data.medico ? `${data.medico.nome} - CRM: ${data.medico.crm || '–'}` : '–'}</p>
+            <p><strong>Status:</strong> ${data.status || '–'}</p>
+            <p><strong>Data Início:</strong> ${formatDate(data.dataInicio)}</p>
+            <p><strong>Local:</strong> ${data.local ? `${data.local.comarca} – ${data.local.localizacao}` : '–'}</p>
+            <p><strong>Observações:</strong> ${data.obs || '–'}</p>
+
+            <hr>
+            <h5><i class="fas fa-file-alt"></i> Detalhes Adicionais:</h5>
+            <ul>${produtosHtml || '<li>Nenhum produto associado.</li>'}</ul>
+
+            <hr>
+            <h5><i class="fas fa-list-ul"></i> Histórico de Alterações:</h5>
+            <div class="logs-container">
+              <ul>${logsHtml || '<li>Nenhum log de alteração.</li>'}</ul>
+            </div>
+          `;
+          modalBody.innerHTML = html;
+        })
+        .catch(err => {
+          modalBody.innerHTML = "<div class='alert alert-danger'>Erro ao carregar dados do processo. Por favor, tente novamente.</div>";
+          console.error("Erro ao buscar detalhes do processo:", err);
+        });
     });
-  </script>
+  });
+</script>
+
 </html>
