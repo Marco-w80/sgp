@@ -7,251 +7,424 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 <style>
-  .btn-circle-sm {
-    width: 30px !important;
-    height: 30px !important;
-    padding: 6px 0px !important;
-    border-radius: 15px !important;
-    text-align: center !important;
-    font-size: 12px !important;
-    line-height: 1.42857 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+  /* ==========================================================================
+     1. DEFINIÇÃO DE CORES E TEMA DE EDIÇÃO
+     ========================================================================== */
+  :root {
+    --cor-edicao: #4e5aa6;
+    /* Roxo-azulado */
+    --cor-edicao-hover: #3c447f;
+    /* Roxo-azulado Escuro */
+    --cor-secundaria: #192f51;
+    --cor-sucesso: #1cc88a;
+    --cor-perigo: #e74a3b;
+    --cor-fundo-claro: #f8f9fc;
+    --cor-texto-escuro: #5a5c69;
+    --cor-borda-suave: #e3e6f0;
+  }
+
+  /* ==========================================================================
+     2. ESTILOS DE FORMULÁRIO (Automáticos com a classe pai)
+     ========================================================================== */
+  .pagina-edicao .card-header {
+    background-color: var(--cor-fundo-claro);
+    border-bottom: 2px solid var(--cor-edicao);
+  }
+
+  .pagina-edicao .card-header .font-weight-bold {
+    color: var(--cor-edicao) !important;
+    font-size: 1.1rem;
+  }
+
+  .pagina-edicao form label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--cor-texto-escuro);
+  }
+
+  .pagina-edicao .form-control:focus {
+    border-color: var(--cor-edicao);
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--cor-edicao) 25%, transparent);
+  }
+
+  .pagina-edicao form fieldset {
+    border-color: var(--cor-borda-suave) !important;
+  }
+
+  .pagina-edicao form legend {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--cor-secundaria);
+  }
+
+  /* ==========================================================================
+     3. TEMA PARA COMPONENTES (Select2, Tabela)
+     ========================================================================== */
+  .pagina-edicao .select2-container--bootstrap4.select2-container--focus .select2-selection {
+    border-color: var(--cor-edicao);
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--cor-edicao) 25%, transparent);
+  }
+
+  .pagina-edicao .select2-container--bootstrap4 .select2-results__option--highlighted {
+    background-color: var(--cor-edicao);
+  }
+
+  .pagina-edicao #tabelaProdutos thead {
+    background-color: var(--cor-fundo-claro);
+  }
+
+  .pagina-edicao #tabelaProdutos th {
+    color: var(--cor-secundaria);
+    font-weight: 700;
+  }
+
+  .pagina-edicao .btn-circle-sm {
+    width: 30px;
+    height: 30px;
+    padding: 6px 0;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.42857;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .pagina-edicao .btn-danger.btn-circle-sm:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+  }
+
+  /* ==========================================================================
+     4. CHECKBOXES CUSTOMIZADOS (CORRIGIDO E ESCOPO DEFINIDO)
+     ========================================================================== */
+  .pagina-edicao .form-check {
+    padding-left: 2rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .pagina-edicao .form-check .form-check-input {
+    opacity: 0;
+    position: absolute;
+  }
+
+  .pagina-edicao .form-check .form-check-label {
+    position: relative;
+    cursor: pointer;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .pagina-edicao .form-check .form-check-label::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid var(--cor-borda-suave);
+    background-color: white;
+    border-radius: .25rem;
+    transition: all 0.2s ease;
+  }
+
+  .pagina-edicao .form-check .form-check-input:checked~.form-check-label::before {
+    background-color: var(--cor-edicao);
+    border-color: var(--cor-edicao);
+  }
+
+  .pagina-edicao .form-check .form-check-input:checked~.form-check-label::after {
+    content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e");
+    position: absolute;
+    left: -1.375rem;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  /* ==========================================================================
+     5. BOTÕES (Automático)
+     ========================================================================== */
+  .pagina-edicao form button[type="submit"] {
+    background-color: var(--cor-edicao);
+    border-color: var(--cor-edicao);
+    color: white;
+    padding: 10px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .pagina-edicao form button[type="submit"]:hover {
+    background-color: var(--cor-edicao-hover);
+    border-color: var(--cor-edicao-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .pagina-edicao .btn-secondary {
+    padding: 10px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .pagina-edicao .btn-outline-primary {
+    color: var(--cor-edicao);
+    border-color: var(--cor-edicao);
+  }
+
+  .pagina-edicao .btn-outline-primary:hover {
+    background-color: var(--cor-edicao);
+    border-color: var(--cor-edicao);
+    color: white;
   }
 </style>
 
 <head th:replace="~{fragments/head :: top}"></head>
 
-<div class="card shadow mb-4">
-  <div class="card-header py-3">
-    <h6 class="m-0 font-weight-bold text-primary">
-      <i class="fas fa-edit mr-2"></i> Editar Processo
-    </h6>
-  </div>
-  <div class="card-body">
-    <form th:action="@{|/processos/editar/${processo.id}|}" method="post" novalidate>
+<div class="pagina-edicao">
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">
+        <i class="fas fa-edit mr-2"></i> Editar Processo
+      </h6>
+    </div>
+    <div class="card-body">
+      <form th:action="@{|/processos/editar/${processo.id}|}" method="post" novalidate>
 
-      <!-- DADOS DO PROCESSO -->
-      <fieldset class="form-group border p-3">
-        <legend class="w-auto px-2">Dados do Processo</legend>
-        <div class="form-row">
-          <div class="form-group col-md-3">
-            <label for="numeroInterno">Número Interno</label>
-            <input type="text" class="form-control" name="numeroInterno" readonly required
-              th:value="${processo.numeroInterno}">
-          </div>
-          <div class="form-group col-md-5">
-            <label for="numeroProcesso">Número Processo</label>
-            <input type="text" class="form-control" name="numeroProcesso" required
-              th:value="${processo.numeroProcesso}">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="dataInicio">Data Início</label>
-            <input type="date" class="form-control" name="dataInicio" required th:value="${processo.dataInicio}">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="status">Status</label>
-            <select class="form-control" name="status" required>
-              <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"
-                th:selected="${processo.status == s}"></option>
-            </select>
-          </div>
-          <div class="form-group col-md-12">
-            <label for="localId">Local do Processo</label>
-            <select class="form-control" name="localId" required>
-              <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca + ' – ' + l.localizacao}"
-                th:selected="${processo.local.id == l.id}"></option>
-            </select>
-          </div>
-        </div>
-      </fieldset>
-
-      <!-- PACIENTE -->
-      <fieldset class="form-group border p-3 mt-4">
-        <legend class="w-auto px-2">Dados do Paciente</legend>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="pacienteId">Paciente</label>
-            <select class="form-control" id="pacienteId" name="pacienteId" required>
-              <option th:each="p : ${pacientes}" th:value="${p.id}" th:text="${p.nome}"
-                th:selected="${processo.paciente.id == p.id}"></option>
-            </select>
-          </div>
-          <div class="form-group col-md-6">
-            <label>CPF do Paciente</label>
-            <input type="text" class="form-control" id="cpfPaciente" readonly th:value="${processo.paciente.cpf}">
-          </div>
-        </div>
-      </fieldset>
-
-      <!-- ADVOGADO -->
-      <fieldset class="form-group border p-3 mt-4">
-        <legend class="w-auto px-2">Dados do Advogado</legend>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="advogadoId">Advogado</label>
-            <select class="form-control" id="advogadoId" name="advogadoId" required>
-              <option th:each="a : ${advogados}" th:value="${a.id}" th:text="${a.nome}"
-                th:selected="${processo.advogado.id == a.id}"></option>
-            </select>
-          </div>
-          <div class="form-group col-md-6">
-            <label>OAB do Advogado</label>
-            <input type="text" class="form-control" id="oabAdvogado" readonly th:value="${processo.advogado.oab}">
-          </div>
-        </div>
-      </fieldset>
-
-      <!-- MÉDICO -->
-      <fieldset class="form-group border p-3 mt-4">
-        <legend class="w-auto px-2">Dados Médicos e Hospitalares</legend>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="medicoId">Médico</label>
-            <select class="form-control" id="medicoId" name="medicoId" required>
-              <option th:each="m : ${medicos}" th:value="${m.id}" th:text="${m.nome}"
-                th:selected="${processo.medico.id == m.id}"></option>
-            </select>
-          </div>
-          <div class="form-group col-md-6">
-            <label>CRM do Médico</label>
-            <input type="text" class="form-control" id="crmMedico" readonly th:value="${processo.medico.crm}">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="hospitalInput">Hospital</label>
-            <input type="text" class="form-control" id="hospitalInput" name="hospitalNome"
-              th:value="${processo.hospital != null ? processo.hospital.nome : ''}" autocomplete="off">
-            <input type="hidden" id="hospitalId" name="hospitalId"
-              th:value="${processo.hospital != null ? processo.hospital.id : ''}">
-            <div id="autocompleteHospital" class="list-group mt-1"></div>
-          </div>
-
-          <div class="form-group col-md-6">
-            <label for="tipoHospital">Tipo de Hospital</label>
-            <select class="form-control" id="tipoHospital" name="tipoHospital">
-              <option value="">Selecione</option>
-              <option th:each="tipo : ${tiposHospital}" th:value="${tipo}" th:text="${tipo}"
-                th:selected="${processo.tipoHospital == tipo}">
-              </option>
-            </select>
-
-          </div>
-        </div>
-      </fieldset>
-
-      <!-- DOENÇA -->
-      <fieldset class="form-group border p-3 mt-4">
-        <legend class="w-auto px-2">Detalhes da Doença</legend>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label>Localização da Doença</label>
-            <select class="form-control" id="grupoDoenca" name="grupoDoencaId" required>
-              <option value="">Selecione</option>
-              <option th:each="g : ${gruposDoenca}" th:value="${g.id}" th:text="${g.nome}"
-                th:selected="${g.id == processo.doenca?.grupo?.id}"></option>
-            </select>
-          </div>
-          <div class="form-group col-md-6">
-            <label>Tipo de Tumor</label>
-            <select class="form-control" id="doenca" name="doencaId" required
-              th:attr="data-selected-id=${processo.doenca != null ? processo.doenca.id : ''}">
-              <option value="">Selecione</option>
-            </select>
-          </div>
-        </div>
-      </fieldset>
-
-      <!-- PRODUTOS -->
-      <fieldset class="form-group border p-3 mt-4">
-        <legend class="w-auto px-2">Produtos do Processo</legend>
-        <div class="form-group">
-          <label for="produtoBusca">Adicionar Produto</label>
-          <div class="input-group mb-2">
-            <select id="produtoBusca" class="form-control">
-              <option th:each="prod : ${produtos}" th:value="${prod.nomeItem}" th:text="${prod.nomeItem}"></option>
-            </select>
-            <div class="input-group-append">
-              <button class="btn btn-outline-primary" type="button" onclick="addProduto()">Adicionar</button>
+        <!-- DADOS DO PROCESSO -->
+        <fieldset class="form-group border p-3">
+          <legend class="w-auto px-2">Dados do Processo</legend>
+          <div class="form-row">
+            <div class="form-group col-md-3">
+              <label for="numeroInterno">Número Interno</label>
+              <input type="text" class="form-control" name="numeroInterno" readonly required
+                th:value="${processo.numeroInterno}">
+            </div>
+            <div class="form-group col-md-5">
+              <label for="numeroProcesso">Número Processo</label>
+              <input type="text" class="form-control" name="numeroProcesso" required
+                th:value="${processo.numeroProcesso}">
+            </div>
+            <div class="form-group col-md-2">
+              <label for="dataInicio">Data Início</label>
+              <input type="date" class="form-control" name="dataInicio" required th:value="${processo.dataInicio}">
+            </div>
+            <div class="form-group col-md-2">
+              <label for="status">Status</label>
+              <select class="form-control" name="status" required>
+                <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"
+                  th:selected="${processo.status == s}"></option>
+              </select>
+            </div>
+            <div class="form-group col-md-12">
+              <label for="localId">Local do Processo</label>
+              <select class="form-control" name="localId" required>
+                <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca + ' – ' + l.localizacao}"
+                  th:selected="${processo.local.id == l.id}"></option>
+              </select>
             </div>
           </div>
-          <table class="table table-bordered" id="tabelaProdutos">
-            <thead class="thead-light">
-              <tr>
-                <th>Produto</th>
-                <th>Data</th>
-                <th>Quantidade</th>
-                <th style="width:1%">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="item : ${processo.itens}">
-                <td th:text="${item.produto.nomeItem}"></td>
-                <td>
-                  <input type="hidden" name="produtoIds" th:value="${item.produto.id}" />
-                  <input class="form-control" type="date" name="produtoDatas" th:value="${item.dataEnvio}" />
-                </td>
-                <td>
-                  <input class="form-control" type="number" name="produtoQuantidades" th:value="${item.quantidade}" />
-                </td>
-                <td>
-                  <button type="button" class="btn btn-danger btn-circle-sm" onclick="removeProduto(this)">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </fieldset>
+        </fieldset>
 
-      <!-- DOCUMENTOS -->
-      <fieldset class="form-group border p-3 mt-4">
-        <legend class="w-auto px-2">Documentos Anexados</legend>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="cpfAnexado" th:checked="${processo.cpfAnexado}" />
-          <label class="form-check-label">CPF</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="compResidenciaAnexado"
-            th:checked="${processo.compResidenciaAnexado}" />
-          <label class="form-check-label">Comprovante de Residência</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="compRendaAnexado"
-            th:checked="${processo.compRendaAnexado}" />
-          <label class="form-check-label">Comprovante de Renda</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="procuracaoAnexado"
-            th:checked="${processo.procuracaoAnexado}" />
-          <label class="form-check-label">Procuração</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="declaracaoInsuficienciaAnexado"
-            th:checked="${processo.declaracaoInsuficienciaAnexado}" />
-          <label class="form-check-label">Declaração de Insuficiência</label>
-        </div>
-      </fieldset>
+        <!-- PACIENTE -->
+        <fieldset class="form-group border p-3 mt-4">
+          <legend class="w-auto px-2">Dados do Paciente</legend>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="pacienteId">Paciente</label>
+              <select class="form-control" id="pacienteId" name="pacienteId" required>
+                <option th:each="p : ${pacientes}" th:value="${p.id}" th:text="${p.nome}"
+                  th:selected="${processo.paciente.id == p.id}"></option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label>CPF do Paciente</label>
+              <input type="text" class="form-control" id="cpfPaciente" readonly th:value="${processo.paciente.cpf}">
+            </div>
+          </div>
+        </fieldset>
 
-      <!-- OBSERVAÇÕES -->
-      <fieldset class="form-group border p-3 mt-4">
-        <legend class="w-auto px-2">Observações</legend>
-        <textarea class="form-control" name="obs" rows="3" th:text="${processo.obs}"></textarea>
-      </fieldset>
+        <!-- ADVOGADO -->
+        <fieldset class="form-group border p-3 mt-4">
+          <legend class="w-auto px-2">Dados do Advogado</legend>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="advogadoId">Advogado</label>
+              <select class="form-control" id="advogadoId" name="advogadoId" required>
+                <option th:each="a : ${advogados}" th:value="${a.id}" th:text="${a.nome}"
+                  th:selected="${processo.advogado.id == a.id}"></option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label>OAB do Advogado</label>
+              <input type="text" class="form-control" id="oabAdvogado" readonly th:value="${processo.advogado.oab}">
+            </div>
+          </div>
+        </fieldset>
 
-      <div class="mt-4">
-        <button type="submit" class="btn btn-success">
-          <i class="fas fa-save mr-2"></i>Salvar Alterações
-        </button>
+        <!-- MÉDICO -->
+        <fieldset class="form-group border p-3 mt-4">
+          <legend class="w-auto px-2">Dados Médicos e Hospitalares</legend>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="medicoId">Médico</label>
+              <select class="form-control" id="medicoId" name="medicoId" required>
+                <option th:each="m : ${medicos}" th:value="${m.id}" th:text="${m.nome}"
+                  th:selected="${processo.medico.id == m.id}"></option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label>CRM do Médico</label>
+              <input type="text" class="form-control" id="crmMedico" readonly th:value="${processo.medico.crm}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="hospitalInput">Hospital</label>
+              <input type="text" class="form-control" id="hospitalInput" name="hospitalNome"
+                th:value="${processo.hospital != null ? processo.hospital.nome : ''}" autocomplete="off">
+              <input type="hidden" id="hospitalId" name="hospitalId"
+                th:value="${processo.hospital != null ? processo.hospital.id : ''}">
+              <div id="autocompleteHospital" class="list-group mt-1"></div>
+            </div>
 
-        <a th:href="@{/processos/listar}" class="btn btn-secondary ml-2">
-          <i class="fas fa-times-circle mr-2"></i>Cancelar
-        </a>
-      </div>
-    </form>
+            <div class="form-group col-md-6">
+              <label for="tipoHospital">Tipo de Hospital</label>
+              <select class="form-control" id="tipoHospital" name="tipoHospital">
+                <option value="">Selecione</option>
+                <option th:each="tipo : ${tiposHospital}" th:value="${tipo}" th:text="${tipo}"
+                  th:selected="${processo.tipoHospital == tipo}">
+                </option>
+              </select>
+
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- DOENÇA -->
+        <fieldset class="form-group border p-3 mt-4">
+          <legend class="w-auto px-2">Detalhes da Doença</legend>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label>Localização da Doença</label>
+              <select class="form-control" id="grupoDoenca" name="grupoDoencaId" required>
+                <option value="">Selecione</option>
+                <option th:each="g : ${gruposDoenca}" th:value="${g.id}" th:text="${g.nome}"
+                  th:selected="${g.id == processo.doenca?.grupo?.id}"></option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Tipo de Tumor</label>
+              <select class="form-control" id="doenca" name="doencaId" required
+                th:attr="data-selected-id=${processo.doenca != null ? processo.doenca.id : ''}">
+                <option value="">Selecione</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- PRODUTOS -->
+        <fieldset class="form-group border p-3 mt-4">
+          <legend class="w-auto px-2">Produtos do Processo</legend>
+          <div class="form-group">
+            <label for="produtoBusca">Adicionar Produto</label>
+            <div class="input-group mb-2">
+              <select id="produtoBusca" class="form-control">
+                <option th:each="prod : ${produtos}" th:value="${prod.nomeItem}" th:text="${prod.nomeItem}"></option>
+              </select>
+              <div class="input-group-append">
+                <button class="btn btn-outline-primary" type="button" onclick="addProduto()">Adicionar</button>
+              </div>
+            </div>
+            <table class="table table-bordered" id="tabelaProdutos">
+              <thead class="thead-light">
+                <tr>
+                  <th>Produto</th>
+                  <th>Data</th>
+                  <th>Quantidade</th>
+                  <th style="width:1%">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="item : ${processo.itens}">
+                  <td th:text="${item.produto.nomeItem}"></td>
+                  <td>
+                    <input type="hidden" name="produtoIds" th:value="${item.produto.id}" />
+                    <input class="form-control" type="date" name="produtoDatas" th:value="${item.dataEnvio}" />
+                  </td>
+                  <td>
+                    <input class="form-control" type="number" name="produtoQuantidades" th:value="${item.quantidade}" />
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-danger btn-circle-sm" onclick="removeProduto(this)">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </fieldset>
+
+        <!-- DOCUMENTOS -->
+        <fieldset class="form-group border p-3 mt-4 rounded">
+          <legend class="w-auto px-2">Documentos Anexados</legend>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="cpfAnexado" name="cpfAnexado"
+              th:checked="${processo.cpfAnexado}" />
+            <label class="form-check-label" for="cpfAnexado">CPF</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="compResidenciaAnexado" name="compResidenciaAnexado"
+              th:checked="${processo.compResidenciaAnexado}" />
+            <label class="form-check-label" for="compResidenciaAnexado">Comprovante de Residência</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="compRendaAnexado" name="compRendaAnexado"
+              th:checked="${processo.compRendaAnexado}" />
+            <label class="form-check-label" for="compRendaAnexado">Comprovante de Renda</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="procuracaoAnexado" name="procuracaoAnexado"
+              th:checked="${processo.procuracaoAnexado}" />
+            <label class="form-check-label" for="procuracaoAnexado">Procuração</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="declaracaoInsuficienciaAnexado"
+              name="declaracaoInsuficienciaAnexado" th:checked="${processo.declaracaoInsuficienciaAnexado}" />
+            <label class="form-check-label" for="declaracaoInsuficienciaAnexado">Declaração de Insuficiência</label>
+          </div>
+        </fieldset>
+
+        <!-- OBSERVAÇÕES -->
+        <fieldset class="form-group border p-3 mt-4">
+          <legend class="w-auto px-2">Observações</legend>
+          <textarea class="form-control" name="obs" rows="3" th:text="${processo.obs}"></textarea>
+        </fieldset>
+
+        <div class="mt-4">
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-save mr-2"></i>Salvar Alterações
+          </button>
+
+          <a th:href="@{/processos/listar}" class="btn btn-secondary ml-2">
+            <i class="fas fa-times-circle mr-2"></i>Cancelar
+          </a>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 

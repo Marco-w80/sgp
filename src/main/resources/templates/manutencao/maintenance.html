@@ -4,237 +4,170 @@
 <head>
     <th:block th:replace="~{fragments/head :: top}"></th:block>
     <style>
-        :root {
-            --primary-dark-blue: #2c3e50;
-            --primary-blue-hover: #1a252f;
-            --secondary-gray: #6c757d;
-            --light-gray-bg: #f4f6f9;
-            --card-border: #dee2e6;
-            --text-dark: #2d2f33;
-            --text-light: #ffffff;
-            --line-separator: #e0e0e0;
-            --success-color: #198754;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-        }
+    /* ==========================================================================
+       1. PALETA DE CORES (DO DESIGN ORIGINAL)
+       ========================================================================== */
+    :root {
+        --cor-primaria: #166298;      /* Azul principal */
+        --cor-secundaria: #192f51;     /* Azul escuro para textos e hover */
+        --cor-fundo-claro: #f8f9fc;    /* Fundo de cabeçalhos e seções */
+        --cor-texto-escuro: #5a5c69;  /* Cinza para textos comuns */
+        --cor-borda-suave: #e3e6f0;   /* Cinza claro para bordas */
+        --cor-fundo-hover: #f1f3f8;   /* Fundo para hover em listas */
+        --cor-perigo: #dc3545;       /* Vermelho (Bootstrap padrão) */
+        --cor-sucesso: #198754;      /* Verde (Bootstrap padrão) */
+        --cor-aviso: #ffc107;        /* Amarelo (Bootstrap padrão) */
+    }
 
-        body {
-            background-color: var(--light-gray-bg);
-            color: var(--text-dark);
-            font-size: 0.85rem;
-        }
+    body {
+        background-color: #f1f5f9; /* Um fundo levemente acinzentado */
+        color: var(--cor-texto-escuro);
+    }
 
-        /* Container principal */
-        /* Removido o padding geral aqui, pois você introduziu .card para o layout principal */
-        /* .container-fluid {
-            padding: 3rem 2rem;
-        } */
+    /* ==========================================================================
+       2. CABEÇALHO PRINCIPAL DO CARD
+       ========================================================================== */
+    .card.shadow {
+        border: none;
+        border-radius: 0.5rem;
+    }
+    
+    .card-header {
+        background-color: var(--cor-fundo-claro);
+        border-bottom: 2px solid var(--cor-primaria); /* Borda azul destacada */
+        padding: 1rem 1.5rem;
+    }
 
-        /* Estilo para o CARD principal que você adicionou */
-        .card.shadow {
-            border: 1px solid var(--card-border);
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important; /* Mais forte para o card principal */
-            margin: 2rem auto; /* Centraliza e adiciona margem externa */
-            max-width: 1200px; /* Limita a largura para melhor legibilidade */
-        }
+    .card-header h6 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--cor-primaria) !important; /* Cor do título principal */
+    }
 
-        .card-header {
-            background-color: #fff; /* Fundo branco para o header do card */
-            border-bottom: 1px solid var(--card-border);
-            border-top-left-radius: 0.75rem;
-            border-top-right-radius: 0.75rem;
-            padding: 1.2rem 2rem; /* Padding para o header */
-        }
+    .card-header h6 .fas {
+        margin-right: 10px;
+    }
 
-        .card-header h6 {
-            margin: 0; /* Remove margem padrão do h6 */
-            font-size: 1.2rem; /* Tamanho da fonte do título principal */
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            color: var(--text-dark) !important; /* Cor cinza escuro */
-        }
+    .card-body {
+        padding: 2rem;
+    }
 
-        .card-header h6 .fas {
-            margin-right: 10px;
-            font-size: 1.1rem; /* Tamanho do ícone um pouco menor que o texto */
-            color: var(--secondary-gray) !important; /* Cor cinza para o ícone do título principal */
-        }
+    /* ==========================================================================
+       3. TÍTULOS E CARDS INTERNOS (SEÇÕES)
+       ========================================================================== */
+    .custom-card {
+        background-color: #fff;
+        border: 1px solid var(--cor-borda-suave); /* Borda suave */
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
 
-        .card-body {
-            padding: 2rem; /* Padding interno do corpo do card principal */
-        }
+    h2 {
+        font-size: 1.05rem; /* Ajustado para hierarquia */
+        font-weight: 700;
+        color: var(--cor-secundaria); /* Cor secundária, como nas 'legends' */
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
 
-        /* Títulos */
-        /* Removido o h1 padrão, pois o título principal agora é h6 dentro do card-header */
-        /* h1,
-        h2 {
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-        }
+    h2 .fas {
+        margin-right: 10px;
+        color: var(--cor-secundaria);
+    }
 
-        h1 {
-            font-size: 1.75rem;
-            color: var(--primary-dark-blue);
-            margin-bottom: 2rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--primary-dark-blue);
-        }
+    /* ==========================================================================
+       4. FORMULÁRIOS E INPUTS
+       ========================================================================== */
+    label, .form-label-icon {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--cor-secundaria);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-label-icon .fas {
+        margin-right: 6px;
+        font-size: 0.8rem;
+    }
+    
+    .form-control,
+    .form-select {
+        border-radius: 0.375rem;
+        border: 1px solid var(--cor-borda-suave);
+        transition: all 0.2s ease;
+    }
 
-        h1 .fas {
-            margin-right: 12px;
-            font-size: 1.2rem;
-            color: var(--primary-dark-blue);
-        } */
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--cor-primaria);
+        box-shadow: 0 0 0 0.2rem rgba(22, 98, 152, 0.25); /* Sombra de foco azul */
+    }
 
-        h2 {
-            font-size: 1.3rem;
-            color: var(--text-dark);
-            margin-bottom: 1.5rem;
-            font-weight: 600; /* Mantém o peso para os subtítulos */
-            display: flex; /* Para alinhar ícone e texto */
-            align-items: center; /* Para alinhar ícone e texto */
-        }
+    /* ==========================================================================
+       5. BOTÕES
+       ========================================================================== */
+    .btn {
+        font-weight: 600 !important;
+        transition: all 0.2s ease-in-out !important;
+        border-radius: 0.375rem;
+        padding: 0.6rem 1.2rem;
+    }
 
-        h2 .fas {
-            margin-right: 10px;
-            color: var(--secondary-gray);
-            font-size: 1rem;
-        }
+    .btn:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+    }
 
-        /* Cards internos (custom-card) */
-        .custom-card {
-            background-color: #fff;
-            border: 1px solid var(--card-border);
-            border-radius: 0.75rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        }
+    .btn-primary {
+        background-color: var(--cor-primaria) !important;
+        border-color: var(--cor-primaria) !important;
+        color: white !important;
+    }
 
-        /* Formulários */
-        .form-label-icon {
-            display: flex;
-            align-items: center;
-            font-weight: 500;
-            color: var(--text-dark);
-            margin-bottom: 0.4rem;
-        }
+    .btn-primary:hover {
+        background-color: var(--cor-secundaria) !important;
+        border-color: var(--cor-secundaria) !important;
+    }
 
-        .form-label-icon .fas {
-            margin-right: 6px;
-            color: var(--secondary-gray);
-            font-size: 0.9rem;
-        }
+    /* ==========================================================================
+       6. OUTROS ELEMENTOS (TABELA, PROGRESS BAR)
+       ========================================================================== */
+    .progress-bar {
+       font-weight: 600;
+    }
+    .bg-success-custom { background-color: var(--cor-sucesso); }
+    .bg-warning-custom { background-color: var(--cor-aviso); color: var(--cor-texto-escuro); }
+    .bg-danger-custom { background-color: var(--cor-perigo); }
+       
+    .table {
+        border: 1px solid var(--cor-borda-suave);
+        border-radius: 0.5rem;
+        overflow: hidden; /* Garante que o thead respeite o border-radius */
+    }
 
-        .form-control,
-        .form-select {
-            /* Ajuste chave para alinhar altura */
-            min-height: calc(0.65rem + 1rem + 2px); /* Padding vertical + altura da fonte + bordas */
-            height: auto; /* Permite que o conteúdo determine a altura se necessário */
-            box-sizing: border-box; /* Garante que padding e borda sejam incluídos na altura */
+    .table thead {
+        background-color: var(--cor-fundo-claro);
+    }
+    
+    .table th {
+        color: var(--cor-secundaria);
+        font-weight: 700;
+    }
 
-            border-radius: 0.5rem;
-            border: 1px solid var(--line-separator);
-            padding: 0.65rem 1rem;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-            transition: all 0.2s ease;
-        }
+    .table tbody tr:hover {
+        background-color: var(--cor-fundo-hover);
+    }
 
-        .form-control:focus,
-        .form-select:focus {
-            border-color: var(--primary-dark-blue);
-            box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.15);
-        }
-
-        /* Botões */
-        .btn-primary {
-            background-color: var(--primary-dark-blue);
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.7rem 1.4rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-blue-hover);
-            transform: translateY(-2px);
-        }
-
-        .btn-primary .fas {
-            margin-right: 8px;
-            color: var(--text-light);
-        }
-
-        /* Progress */
-        .progress {
-            height: 1.1rem;
-            background-color: #e9ecef;
-            border-radius: 0.5rem;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: width 0.6s ease-in-out;
-        }
-
-        .bg-success-custom {
-            background-color: var(--success-color);
-        }
-
-        .bg-warning-custom {
-            background-color: var(--warning-color);
-            color: var(--text-dark);
-        }
-
-        .bg-danger-custom {
-            background-color: var(--danger-color);
-        }
-
-        /* Tabela */
-        .table {
-            background-color: #fff;
-            border: 1px solid var(--card-border);
-            border-radius: 0.5rem;
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .table thead {
-            background-color: var(--primary-dark-blue);
-            color: var(--text-light);
-        }
-
-        .table th,
-        .table td {
-            padding: 0.9rem 1.25rem;
-            text-align: left;
-        }
-
-        .table th .fas {
-            margin-right: 6px;
-            font-size: 0.85rem;
-        }
-
-        .table tbody tr:hover {
-            background-color: #f1f5f9;
-        }
-
-        .table tfoot {
-            background-color: var(--light-gray-bg);
-            font-weight: 600;
-            border-top: 1px solid var(--line-separator);
-        }
-    </style>
+    .table tfoot {
+        background-color: var(--cor-fundo-claro);
+        font-weight: 700;
+        border-top: 2px solid var(--cor-borda-suave);
+    }
+</style>
 </head>
 
 <body>
@@ -260,14 +193,14 @@
                         </div>
                         <div class="col-md-2">
                             <label for="type" class="form-label-icon"><i class="fas fa-tags"></i> Tipo</label>
-                            <select id="type" th:field="*{type}" class="form-select">
+                            <select id="type" th:field="*{type}" class="form-control">
                                 <option value="" disabled th:if="${form.type == null}" selected>— selecione —</option>
                                 <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label for="performedBy" class="form-label-icon"><i class="fas fa-user-circle"></i> Quem</label>
-                            <select id="performedBy" th:field="*{performedBy}" class="form-select">
+                            <select id="performedBy" th:field="*{performedBy}" class="form-control">
                                 <option value="" disabled th:if="${form.performedBy == null}" selected>— selecione —</option>
                                 <option th:each="u : ${users}" th:value="${u}" th:text="${u}"></option>
                             </select>
