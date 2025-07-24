@@ -264,6 +264,26 @@
       font-weight: bold !important;
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12) !important;
     }
+
+    /* -------            teste*/
+
+    .card-pessoa {
+      background-color: #fff;
+      border: 1px solid var(--cor-borda-suave);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-pessoa strong {
+      color: var(--cor-primaria);
+    }
+
+    .card-pessoa .acoes {
+      margin-top: 0.75rem;
+      text-align: right;
+    }
   </style>
 </head>
 
@@ -280,8 +300,12 @@
 
     <!-- MUDANÇA 1: Adicionada a classe .card-body-table para remover o padding -->
     <div class="card-body card-body-table">
+      <div class="d-md-none p-3">
+        <input type="text" id="filtroMobile" class="form-control" placeholder="Buscar pessoa...">
+      </div>
+
       <!-- MUDANÇA 2: A tabela agora está dentro de um .table-container para ter cantos arredondados -->
-      <div class="table-container">
+      <div id="tabela-origem" class="table-container">
         <table id="tabelaPessoas" class="table table-hover w-100" cellspacing="0">
           <thead>
             <tr>
@@ -319,6 +343,7 @@
           </tbody>
         </table>
       </div>
+      <div id="cardsContainer" class="d-md-none px-3"></div>
     </div>
   </div>
 
@@ -330,6 +355,8 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
+    let dadosPessoas = [];
+
     $(document).ready(function () {
       const langUrl = '/datatables/i18n/pt-BR.json';
       // MUDANÇA 4: Armazenar a instância da tabela em uma variável
@@ -375,7 +402,78 @@
 
       // Executa a função na carga inicial
       addTooltipsToTruncatedCells();
+
+      /*------------------    teste*/
+
+      // Coletar todos os dados da tabela original uma vez
+      $('#tabelaPessoas tbody tr').each(function () {
+        const colunas = $(this).find('td');
+        dadosPessoas.push({
+          nome: colunas.eq(1).text(),
+          tipo: colunas.eq(2).text(),
+          sexo: colunas.eq(3).text(),
+          nascimento: colunas.eq(4).text(),
+          cpf: colunas.eq(5).text(),
+          identidade: colunas.eq(6).text(),
+          documentoEspecial: colunas.eq(7).text(),
+          acoes: colunas.eq(8).html()
+        });
+      });
+
+
+      if (window.innerWidth < 768) {
+        $('#tabela-origem').hide();       // Oculta a tabela
+        $('#cardsContainer').show();      // Mostra os cards
+      } else {
+        $('#tabela-origem').show();       // Mostra a tabela
+        $('#cardsContainer').hide();      // Oculta os cards
+      }
+
+
+      function gerarCardsMobile(lista) {
+        const container = $('#cardsContainer');
+        container.empty();
+
+        lista.forEach(p => {
+          const card = $(`
+      <div class="card-pessoa">
+        <p><strong>Nome:</strong> ${p.nome}</p>
+        <p><strong>Tipo:</strong> ${p.tipo}</p>
+        <p><strong>Sexo:</strong> ${p.sexo}</p>
+        <p><strong>Nascimento:</strong> ${p.nascimento}</p>
+        <p><strong>CPF:</strong> ${p.cpf}</p>
+        <p><strong>Identidade:</strong> ${p.identidade}</p>
+        <p><strong>CRM/OAB:</strong> ${p.documentoEspecial}</p>
+        <div class="acoes">${p.acoes}</div>
+      </div>
+    `);
+          container.append(card);
+        });
+      }
+
+
+      $('#filtroMobile').on('input', function () {
+        const termo = $(this).val().toLowerCase();
+
+        const filtrados = dadosPessoas.filter(p => {
+          const textoCompleto = Object.values(p).join(' ').toLowerCase();
+          return textoCompleto.includes(termo);
+        });
+
+        gerarCardsMobile(filtrados);
+      });
+
+
+      if (window.innerWidth < 768) {
+        gerarCardsMobile(dadosPessoas);
+      }
+
     });
+  </script>
+
+  <script>
+
+
   </script>
 </body>
 
