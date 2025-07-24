@@ -1,131 +1,229 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
 
+<style>
+  /* ==========================================================================
+     1. DEFINIÇÃO DE CORES E TEMAS
+     ========================================================================== */
+  :root {
+    /* Cores Base */
+    --cor-cadastro: #166298;
+    /* Azul */
+    --cor-cadastro-hover: #192f51;
+    /* Azul Escuro */
+
+    --cor-edicao: #4e5aa6;
+    /* Roxo-azulado médio */
+    --cor-edicao-hover: #3c447f;
+    /* Roxo-azulado escuro */
+
+    --cor-sucesso: #1cc88a;
+    --cor-perigo: #e74a3b;
+    --cor-fundo-claro: #f8f9fc;
+    --cor-texto-escuro: #5a5c69;
+    --cor-borda-suave: #e3e6f0;
+
+    /* --- Variáveis de Tema Ativo (Padrão é Cadastro) --- */
+    --cor-primaria-ativa: var(--cor-cadastro);
+    --cor-hover-ativa: var(--cor-cadastro-hover);
+  }
+
+  /* --- SELETOR DE TEMA: Ativa o tema de edição --- */
+  .pagina-edicao {
+    --cor-primaria-ativa: var(--cor-edicao);
+    --cor-hover-ativa: var(--cor-edicao-hover);
+  }
+
+  /* ==========================================================================
+     2. ESTILOS DE FORMULÁRIO (Automáticos)
+     ========================================================================== */
+
+  /* O cabeçalho do card usa a cor ativa do tema */
+  .card-header.form-header {
+    background-color: var(--cor-fundo-claro);
+    border-bottom: 2px solid var(--cor-primaria-ativa);
+  }
+
+  .form-header .font-weight-bold {
+    color: var(--cor-primaria-ativa) !important;
+    font-size: 1.1rem;
+  }
+
+  /* Labels continuam com a cor secundária padrão */
+  form label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--cor-secundaria);
+  }
+
+  /* O foco dos campos usa a cor ativa do tema */
+  .form-control:focus {
+    border-color: var(--cor-primaria-ativa);
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--cor-primaria-ativa) 25%, transparent);
+  }
+
+  /* Subtítulos dentro do formulário */
+  form h6 {
+    margin-top: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--cor-borda-suave);
+    color: var(--cor-secundaria);
+    font-weight: 700;
+  }
+
+  /* ==========================================================================
+     3. BOTÃO PRINCIPAL (Salvar/Atualizar) (Automático)
+     ========================================================================== */
+  .btn-editar-custom {
+    /* Nova classe genérica para o botão */
+    background-color: var(--cor-primaria-ativa) !important;
+    border-color: var(--cor-primaria-ativa) !important;
+    color: white !important;
+    /* Roxo e Azul funcionam bem com texto branco */
+
+    padding: 10px 28px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .btn-editar-custom:hover {
+    background-color: var(--cor-hover-ativa) !important;
+    border-color: var(--cor-hover-ativa) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2) !important;
+  }
+</style>
+
 <th:block th:replace="~{fragments/head :: top}"></th:block>
-
-<div class="text-right mb-4">
-  <p class="text-muted small">Os campos marcados com <span class="text-danger">*</span> são obrigatórios.</p>
-</div>
-
-<div class="card shadow mb-4 rounded">
-  <div class="card-header py-3">
-    <h6 class="m-0 font-weight-bold text-warning">
-      <i class="fas fa-user-edit mr-2"></i> Editar Pessoa
-    </h6>
+<div class="pagina-edicao">
+  <div class="text-right mb-4">
+    <p class="text-muted small">Os campos marcados com <span class="text-danger">*</span> são obrigatórios.</p>
   </div>
 
-  <div class="card-body">
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+  <div class="card shadow mb-4 rounded">
+    <div class="card-header py-3 form-header">
+      <h6 class="m-0 font-weight-bold text-warning">
+        <i class="fas fa-user-edit mr-2"></i> Editar Pessoa
+      </h6>
+    </div>
 
-    <form th:action="@{|/pessoas/editar/${pessoaForm.id}|}" th:object="${pessoaForm}" method="post"
-      class="needs-validation" novalidate onsubmit="return showSweetAlert()">
-      <div class="form-row">
-        <div class="form-group col-md-2">
-          <label for="tipo">Tipo<span class="text-danger">*</span></label>
-          <select th:field="*{tipo}" id="tipo" class="form-control" onchange="toggleFields()" required>
-            <option value="">Selecione...</option>
-            <option value="MEDICO">Médico</option>
-            <option value="ADVOGADO">Advogado</option>
-            <option value="PACIENTE">Paciente</option>
-          </select>
-        </div>
-        <div class="form-group col-md-8">
-          <label>Nome<span class="text-danger">*</span></label>
-          <input type="text" th:field="*{nome}" class="form-control" required>
-        </div>
-        <div class="form-group col-md-2">
-          <label>Sexo<span class="text-danger">*</span></label>
-          <select th:field="*{sexo}" class="form-control" required>
-            <option value="MASCULINO">Masculino</option>
-            <option value="FEMININO">Feminino</option>
-            <option value="OUTRO">Outro</option>
-          </select>
-        </div>
-      </div>
+    <div class="card-body">
+      <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-      <div class="form-row">
-        <div class="form-group col-md-2">
-          <label>Data de Nascimento<span class="text-danger">*</span></label>
-          <input type="date" th:field="*{dataNascimento}" class="form-control" id="dataNascimentoInput" required>
-        </div>
-        <div class="form-group col-md-3">
-          <label>CPF<span class="text-danger">*</span></label>
-          <input type="text" th:field="*{cpf}" class="form-control" id="cpfInput" required>
-        </div>
-        <div class="form-group col-md-3">
-          <label>Identidade<span class="text-danger">*</span></label>
-          <input type="text" th:field="*{identidade}" class="form-control" id="identidadeInput" required>
-        </div>
-        <div class="form-group col-md-4" id="crm-field" style="display:none;">
-          <label>CRM</label>
-          <input type="text" th:field="*{crm}" class="form-control" id="crmInput">
-        </div>
-
-        <div class="form-group col-md-4" id="oab-field" style="display:none;">
-          <label>OAB</label>
-          <input type="text" th:field="*{oab}" class="form-control" id="oabInput">
-        </div>
-      </div>
-
-      <div class="form-row">
-
-
-
-      </div>
-
-      <hr>
-      <h6><i class="fas fa-map-marker-alt mr-2"></i> Endereço</h6>
-
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label>CEP</label>
-          <div class="input-group">
-            <input type="text" th:field="*{enderecos[0].cep}" id="cep" class="form-control">
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button" onclick="buscarCep()">
-                <i class="fas fa-search"></i>
-              </button>
-            </div>
+      <form th:action="@{|/pessoas/editar/${pessoaForm.id}|}" th:object="${pessoaForm}" method="post"
+        class="needs-validation" novalidate onsubmit="return showSweetAlert()">
+        <div class="form-row">
+          <div class="form-group col-md-2">
+            <label for="tipo">Tipo<span class="text-danger">*</span></label>
+            <select th:field="*{tipo}" id="tipo" class="form-control" onchange="toggleFields()" required>
+              <option value="">Selecione...</option>
+              <option value="MEDICO">Médico</option>
+              <option value="ADVOGADO">Advogado</option>
+              <option value="PACIENTE">Paciente</option>
+            </select>
+          </div>
+          <div class="form-group col-md-8">
+            <label>Nome<span class="text-danger">*</span></label>
+            <input type="text" th:field="*{nome}" class="form-control" required>
+          </div>
+          <div class="form-group col-md-2">
+            <label>Sexo<span class="text-danger">*</span></label>
+            <select th:field="*{sexo}" class="form-control" required>
+              <option value="MASCULINO">Masculino</option>
+              <option value="FEMININO">Feminino</option>
+              <option value="OUTRO">Outro</option>
+            </select>
           </div>
         </div>
 
-        <div class="form-group col-md-4">
-          <label>Logradouro</label>
-          <input type="text" th:field="*{enderecos[0].logradouro}" id="logradouro" class="form-control" readonly>
+        <div class="form-row">
+          <div class="form-group col-md-2">
+            <label>Data de Nascimento<span class="text-danger">*</span></label>
+            <input type="date" th:field="*{dataNascimento}" class="form-control" id="dataNascimentoInput" required>
+          </div>
+          <div class="form-group col-md-3">
+            <label>CPF<span class="text-danger">*</span></label>
+            <input type="text" th:field="*{cpf}" class="form-control" id="cpfInput" required>
+          </div>
+          <div class="form-group col-md-3">
+            <label>Identidade<span class="text-danger">*</span></label>
+            <input type="text" th:field="*{identidade}" class="form-control" id="identidadeInput" required>
+          </div>
+          <div class="form-group col-md-4" id="crm-field" style="display:none;">
+            <label>CRM</label>
+            <input type="text" th:field="*{crm}" class="form-control" id="crmInput">
+          </div>
+
+          <div class="form-group col-md-4" id="oab-field" style="display:none;">
+            <label>OAB</label>
+            <input type="text" th:field="*{oab}" class="form-control" id="oabInput">
+          </div>
         </div>
 
-        <div class="form-group col-md-2">
-          <label>Número</label>
-          <input type="text" th:field="*{enderecos[0].numero}" class="form-control">
+        <div class="form-row">
+
+
+
         </div>
 
-        <div class="form-group col-md-2">
-          <label>Complemento</label>
-          <input type="text" th:field="*{enderecos[0].complemento}" id="complemento" class="form-control">
-        </div>
-      </div>
+        <hr>
+        <h6><i class="fas fa-map-marker-alt mr-2"></i> Endereço</h6>
 
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label>Bairro</label>
-          <input type="text" th:field="*{enderecos[0].bairro}" id="bairro" class="form-control" readonly>
-        </div>
-        <div class="form-group col-md-4">
-          <label>Cidade</label>
-          <input type="text" th:field="*{enderecos[0].cidade}" id="cidade" class="form-control" readonly>
-        </div>
-        <div class="form-group col-md-4">
-          <label>Estado</label>
-          <input type="text" th:field="*{enderecos[0].estado}" id="estado" class="form-control" readonly>
-        </div>
-      </div>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label>CEP</label>
+            <div class="input-group">
+              <input type="text" th:field="*{enderecos[0].cep}" id="cep" class="form-control">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="buscarCep()">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+          </div>
 
-      <button type="submit" class="btn btn-warning mt-2 shadow-sm"> <i class="fas fa-save mr-1"></i> Atualizar
-      </button>
-    </form>
+          <div class="form-group col-md-4">
+            <label>Logradouro</label>
+            <input type="text" th:field="*{enderecos[0].logradouro}" id="logradouro" class="form-control" readonly>
+          </div>
+
+          <div class="form-group col-md-2">
+            <label>Número</label>
+            <input type="text" th:field="*{enderecos[0].numero}" class="form-control">
+          </div>
+
+          <div class="form-group col-md-2">
+            <label>Complemento</label>
+            <input type="text" th:field="*{enderecos[0].complemento}" id="complemento" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label>Bairro</label>
+            <input type="text" th:field="*{enderecos[0].bairro}" id="bairro" class="form-control" readonly>
+          </div>
+          <div class="form-group col-md-4">
+            <label>Cidade</label>
+            <input type="text" th:field="*{enderecos[0].cidade}" id="cidade" class="form-control" readonly>
+          </div>
+          <div class="form-group col-md-4">
+            <label>Estado</label>
+            <input type="text" th:field="*{enderecos[0].estado}" id="estado" class="form-control" readonly>
+          </div>
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary btn-editar-custom mt-2 shadow-sm"><i
+              class="fas fa-sync-alt mr-1"></i> Atualizar
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
-
 <th:block th:replace="~{fragments/foot :: bot}"></th:block>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

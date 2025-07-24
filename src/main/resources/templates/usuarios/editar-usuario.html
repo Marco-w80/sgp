@@ -4,75 +4,177 @@
 <head>
   <title>Editar Usuário</title>
   <th:block th:replace="~{fragments/head :: top}"></th:block>
+
+  <style>
+    /* ==========================================================================
+     1. DEFINIÇÃO DE CORES E TEMAS
+     ========================================================================== */
+    :root {
+      /* Cores Base */
+      --cor-cadastro: #166298;
+      /* Azul */
+      --cor-cadastro-hover: #192f51;
+      /* Azul Escuro */
+
+      --cor-edicao: #4e5aa6;
+      /* Roxo-azulado (Sua escolha) */
+      --cor-edicao-hover: #3c447f;
+      /* Roxo-azulado Escuro (Sua escolha) */
+
+      --cor-sucesso: #1cc88a;
+      --cor-perigo: #e74a3b;
+      --cor-fundo-claro: #f8f9fc;
+      --cor-texto-escuro: #5a5c69;
+      --cor-borda-suave: #e3e6f0;
+
+      /* --- Variáveis de Tema Ativo (Padrão é Cadastro) --- */
+      --cor-primaria-ativa: var(--cor-cadastro);
+      --cor-hover-ativa: var(--cor-cadastro-hover);
+    }
+
+    /* --- SELETOR DE TEMA: Ativa o tema de edição --- */
+    .pagina-edicao {
+      --cor-primaria-ativa: var(--cor-edicao);
+      --cor-hover-ativa: var(--cor-edicao-hover);
+    }
+
+    /* ==========================================================================
+     2. ESTILOS DE FORMULÁRIO (Automáticos)
+     ========================================================================== */
+    .card-header.form-header {
+      background-color: var(--cor-fundo-claro);
+      border-bottom: 2px solid var(--cor-primaria-ativa);
+    }
+
+    .form-header .font-weight-bold {
+      color: var(--cor-primaria-ativa) !important;
+      font-size: 1.1rem;
+    }
+
+    form label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--cor-texto-escuro);
+    }
+
+    .form-control:focus {
+      border-color: var(--cor-primaria-ativa);
+      box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--cor-primaria-ativa) 25%, transparent);
+    }
+
+    form hr {
+      /* Estilo para a linha divisória */
+      margin-top: 1.5rem !important;
+      margin-bottom: 1.5rem !important;
+    }
+
+    /* ==========================================================================
+     3. BOTÕES (Automático e Refinado)
+     ========================================================================== */
+
+    /* Botão Principal */
+    .btn-principal-custom {
+      background-color: var(--cor-primaria-ativa);
+      border-color: var(--cor-primaria-ativa);
+      color: white;
+      padding: 10px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-principal-custom:hover {
+      background-color: var(--cor-hover-ativa);
+      border-color: var(--cor-hover-ativa);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Botão Secundário */
+    .btn-secondary {
+      padding: 10px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+  </style>
+
 </head>
 
 <body>
 
   <div class="container-fluid mt-4">
-    <div class="row justify-content-center">
-      <div class="col-lg-6 col-md-8">
+    <div class="pagina-edicao">
+      <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
 
-        <div class="text-right mb-3">
-          <p class="text-muted small">Os campos marcados com <span class="text-danger">*</span> são obrigatórios.
-          </p>
-        </div>
-        <div class="card shadow mb-4 rounded">
-          <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">
-              <i class="fas fa-user-edit mr-2"></i> Editar Usuário
-            </h6>
+          <div class="text-right mb-3">
+            <p class="text-muted small">Os campos marcados com <span class="text-danger">*</span> são obrigatórios.
+            </p>
           </div>
 
-          <div class="card-body">
+          <div class="card shadow mb-4 rounded">
+            <div class="card-header py-3 form-header">
+              <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-user-edit mr-2"></i> Editar Usuário
+              </h6>
+            </div>
 
-            <form th:action="@{|/usuarios/editar/${usuario.id}|}" th:object="${usuario}" method="post"
-              class="needs-validation" novalidate onsubmit="return validateEditUserForm()">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <div class="card-body">
 
-              <div class="form-group">
-                <label for="nome">Nome<span class="text-danger">*</span>:</label>
-                <input type="text" class="form-control" id="nome" th:field="*{nome}" required minlength="3"
-                  placeholder="Digite o nome completo" />
-                <div class="invalid-feedback">
-                  Por favor, insira um nome com no mínimo 3 caracteres.
+              <form th:action="@{|/usuarios/editar/${usuario.id}|}" th:object="${usuario}" method="post"
+                class="needs-validation" novalidate onsubmit="return validateEditUserForm()">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                <div class="form-group">
+                  <label for="nome">Nome<span class="text-danger">*</span>:</label>
+                  <input type="text" class="form-control" id="nome" th:field="*{nome}" required minlength="3"
+                    placeholder="Digite o nome completo" />
+                  <div class="invalid-feedback">
+                    Por favor, insira um nome com no mínimo 3 caracteres.
+                  </div>
                 </div>
-              </div>
 
-              <div class="form-group">
-                <label for="email">Email<span class="text-danger">*</span>:</label>
-                <input type="email" class="form-control" id="email" th:field="*{email}" required
-                  placeholder="exemplo@dominio.com" />
-                <div class="invalid-feedback">
-                  Por favor, insira um e-mail válido.
+                <div class="form-group">
+                  <label for="email">Email<span class="text-danger">*</span>:</label>
+                  <input type="email" class="form-control" id="email" th:field="*{email}" required
+                    placeholder="exemplo@dominio.com" />
+                  <div class="invalid-feedback">
+                    Por favor, insira um e-mail válido.
+                  </div>
                 </div>
-              </div>
 
-              <div class="form-group">
-                <label for="senha">Nova Senha (deixe em branco para manter):</label>
-                <input type="password" class="form-control" id="senha" th:field="*{senha}"
-                  placeholder="Nova senha (opcional)" minlength="6" />
-                <div class="invalid-feedback">
-                  A senha deve ter no mínimo 6 caracteres.
+                <div class="form-group">
+                  <label for="senha">Nova Senha (deixe em branco para manter):</label>
+                  <input type="password" class="form-control" id="senha" th:field="*{senha}"
+                    placeholder="Nova senha (opcional)" minlength="6" />
+                  <div class="invalid-feedback">
+                    A senha deve ter no mínimo 6 caracteres.
+                  </div>
                 </div>
-              </div>
 
-              <div class="form-group">
-                <label for="confirmarSenha">Confirmar Nova Senha:</label>
-                <input type="password" class="form-control" id="confirmarSenha" placeholder="Confirme a nova senha"
-                  minlength="6" />
-                <div class="invalid-feedback">
-                  As senhas não coincidem ou não possuem no mínimo 6 caracteres.
+                <div class="form-group">
+                  <label for="confirmarSenha">Confirmar Nova Senha:</label>
+                  <input type="password" class="form-control" id="confirmarSenha" placeholder="Confirme a nova senha"
+                    minlength="6" />
+                  <div class="invalid-feedback">
+                    As senhas não coincidem ou não possuem no mínimo 6 caracteres.
+                  </div>
                 </div>
-              </div>
 
-              <hr class="mt-4 mb-4">
-              <button type="submit" class="btn btn-primary shadow-sm">
-                <i class="fas fa-save mr-1"></i> Atualizar
-              </button>
-              <a th:href="@{/usuarios/listar}" class="btn btn-secondary ml-2 shadow-sm">
-                <i class="fas fa-times-circle mr-1"></i> Cancelar
-              </a>
-            </form>
+                <hr class="mt-4 mb-4">
+                <button type="submit" class="btn btn-primary btn-principal-custom shadow-sm">
+                  <i class="fas fa-save mr-1"></i> Atualizar
+                </button>
+                <a th:href="@{/usuarios/listar}" class="btn btn-secondary ml-2 shadow-sm">
+                  <i class="fas fa-times-circle mr-1"></i> Cancelar
+                </a>
+              </form>
+            </div>
           </div>
         </div>
       </div>
