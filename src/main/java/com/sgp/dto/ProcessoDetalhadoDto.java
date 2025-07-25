@@ -3,8 +3,6 @@ package com.sgp.dto;
 import com.sgp.model.Processo;
 import com.sgp.model.ProcessoLog;
 import com.sgp.model.ProcessoProduto;
-import com.sgp.model.Produto;
-
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,13 +33,21 @@ public class ProcessoDetalhadoDto {
         this.obs = proc.getObs();
 
         this.paciente = new PessoaDto(proc.getPaciente());
-        this.advogado = new PessoaDto(proc.getAdvogado());
-        this.medico = new PessoaDto(proc.getMedico());
+        this.advogado = proc.getAdvogado() != null ? new PessoaDto(proc.getAdvogado()) : null;
+        this.medico = proc.getMedico()   != null ? new PessoaDto(proc.getMedico())   : null;
 
-        this.local = new LocalDto(proc.getLocal());
+        // Protege local nulo
+        if (proc.getLocal() != null) {
+            this.local = new LocalDto(proc.getLocal());
+        } else {
+            this.local = null;
+        }
 
-        this.itens = proc.getItens().stream().map(item -> new ItemDto(item)).collect(Collectors.toList());
-        this.logs = logs.stream().map(LogDto::new).collect(Collectors.toList());
+        this.itens = proc.getItens()
+                         .stream()
+                         .map(ItemDto::new)
+                         .collect(Collectors.toList());
+        this.logs  = logs.stream().map(LogDto::new).collect(Collectors.toList());
     }
 
     public static class PessoaDto {
@@ -69,25 +75,25 @@ public class ProcessoDetalhadoDto {
         public String localizacao;
 
         public LocalDto(com.sgp.model.Local local) {
-            this.comarca = local.getComarca();
+            this.comarca      = local.getComarca();
             this.localizacao = local.getLocalizacao();
         }
     }
 
-        public static class ItemDto {
+    public static class ItemDto {
         public String produto;
         public Integer quantidade;
         public String dataEnvio;
 
         public ItemDto(ProcessoProduto item) {
-            this.produto = item.getProduto() != null ? item.getProduto().getNomeItem() : "Produto não encontrado";
+            this.produto   = item.getProduto()   != null
+                            ? item.getProduto().getNomeItem()
+                            : "Produto não encontrado";
             this.quantidade = item.getQuantidade();
-            this.dataEnvio = item.getDataEnvio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            this.dataEnvio  = item.getDataEnvio()
+                               .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         }
     }
-
-
-
 
     public static class LogDto {
         public String campo;
@@ -96,10 +102,11 @@ public class ProcessoDetalhadoDto {
         public String data;
 
         public LogDto(ProcessoLog log) {
-            this.campo = log.getCampo();
+            this.campo       = log.getCampo();
             this.valorAntigo = log.getValorAntigo();
-            this.valorNovo = log.getValorNovo();
-            this.data = log.getDataAlteracao().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+            this.valorNovo   = log.getValorNovo();
+            this.data        = log.getDataAlteracao()
+                                   .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
         }
     }
 }
