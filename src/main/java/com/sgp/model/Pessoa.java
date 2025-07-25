@@ -1,89 +1,88 @@
-package com.sgp.model;
+    package com.sgp.model;
 
-import jakarta.persistence.*;
-import java.time.LocalDate;
-import java.util.List;
+    import jakarta.persistence.*;
+    import java.time.LocalDate;
+    import java.util.List;
 
-@Entity
-@Table(name = "pessoas")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "tipo_pessoa", discriminatorType = DiscriminatorType.STRING)
-public abstract class Pessoa {
+    @Entity
+    @Table(name = "pessoas")
+    @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+    @DiscriminatorColumn(name = "tipo_pessoa", discriminatorType = DiscriminatorType.STRING)
+    public abstract class Pessoa {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @Column(nullable = false)
-    private String nome;
+        @Column(nullable = false)
+        private String nome;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Sexo sexo;
+        @Enumerated(EnumType.STRING)
+        private Sexo sexo;
 
-    @Column(name = "data_nascimento", nullable = false)
-    private LocalDate dataNascimento;
+        @Column(name = "data_nascimento", nullable = true)
+        private LocalDate dataNascimento;
 
-    @Column(length = 14, unique = true, nullable = false)
-    private String cpf;
+        @Column(length = 14, nullable = true)
+        private String cpf;
 
-    @Column(nullable = false)
-    private String identidade;
+        @Column(nullable = true)
+        private String identidade;
 
-    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.List<Endereco> enderecos = new java.util.ArrayList<>();
+        @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, orphanRemoval = true)
+        private java.util.List<Endereco> enderecos = new java.util.ArrayList<>();
 
-    // Construtor padrão para JPA
-    protected Pessoa() {}
+        // Construtor padrão para JPA
+        protected Pessoa() {}
 
-    // Construtor para uso em código
-    protected Pessoa(String nome, Sexo sexo, LocalDate dataNascimento, String cpf, String identidade) {
-        this.nome = nome;
-        this.sexo = sexo;
-        this.dataNascimento = dataNascimento;
-        this.cpf = cpf;
-        this.identidade = identidade;
-    }
-
-    // Getters e setters padrão
-    public Long getId() { return id; }
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-    public Sexo getSexo() { return sexo; }
-    public void setSexo(Sexo sexo) { this.sexo = sexo; }
-    public LocalDate getDataNascimento() { return dataNascimento; }
-    public void setDataNascimento(LocalDate dataNascimento) { this.dataNascimento = dataNascimento; }
-    public String getCpf() { return cpf; }
-    public void setCpf(String cpf) { this.cpf = cpf; }
-    public String getIdentidade() { return identidade; }
-    public void setIdentidade(String identidade) { this.identidade = identidade; }
-
-    /**
-     * Retorna o tipo da pessoa (MEDICO, ADVOGADO ou PACIENTE)
-     */
-    @Transient
-    public String getTipo() {
-        return this.getClass().getSimpleName().toUpperCase();
-    }
-
-    /**
-     * Retorna o documento específico (CRM, OAB ou "-")
-     */
-    @Transient
-    public String getDocumentoEspecial() {
-        if (this instanceof Medico) {
-            return ((Medico) this).getCrm();
-        } else if (this instanceof Advogado) {
-            return ((Advogado) this).getOab();
+        // Construtor para uso em código
+        protected Pessoa(String nome, Sexo sexo, LocalDate dataNascimento, String cpf, String identidade) {
+            this.nome = nome;
+            this.sexo = sexo;
+            this.dataNascimento = dataNascimento;
+            this.cpf = cpf;
+            this.identidade = identidade;
         }
-        return "-";
-    }
-    
-    public List<Endereco> getEnderecos() {
-        return enderecos;
-    }
 
-    public void setEnderecos(List<Endereco> enderecos) {
-        this.enderecos = enderecos;
+        // Getters e setters padrão
+        public Long getId() { return id; }
+        public String getNome() { return nome; }
+        public void setNome(String nome) { this.nome = nome; }
+        public Sexo getSexo() { return sexo; }
+        public void setSexo(Sexo sexo) { this.sexo = sexo; }
+        public LocalDate getDataNascimento() { return dataNascimento; }
+        public void setDataNascimento(LocalDate dataNascimento) { this.dataNascimento = dataNascimento; }
+        public String getCpf() { return cpf; }
+        public void setCpf(String cpf) { this.cpf = cpf; }
+        public String getIdentidade() { return identidade; }
+        public void setIdentidade(String identidade) { this.identidade = identidade; }
+
+        /**
+         * Retorna o tipo da pessoa (MEDICO, ADVOGADO ou PACIENTE)
+         */
+        @Transient
+        public String getTipo() {
+            return this.getClass().getSimpleName().toUpperCase();
+        }
+
+        /**
+         * Retorna o documento específico (CRM, OAB ou "-")
+         */
+        @Transient
+        public String getDocumentoEspecial() {
+            if (this instanceof Medico) {
+                return ((Medico) this).getCrm();
+            } else if (this instanceof Advogado) {
+                return ((Advogado) this).getOab();
+            }
+            return "-";
+        }
+        
+        public List<Endereco> getEnderecos() {
+            return enderecos;
+        }
+
+        public void setEnderecos(List<Endereco> enderecos) {
+            this.enderecos = enderecos;
+        }
     }
-}
