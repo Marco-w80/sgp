@@ -18,16 +18,15 @@ public abstract class Pessoa {
     private String nome;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Sexo sexo;
 
-    @Column(name = "data_nascimento", nullable = false)
+    @Column(name = "data_nascimento", nullable = true)
     private LocalDate dataNascimento;
 
-    @Column(length = 14, unique = true, nullable = false)
+    @Column(length = 14, unique = true, nullable = true)
     private String cpf;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String identidade;
 
     @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, orphanRemoval = true)
