@@ -525,6 +525,8 @@
             "Procuração", "Decl. Insuficiência"
           ];
 
+          console.log("Raw dataInicio:", data.dataInicio);
+
           // Gera lista de logs com fallback
           const logsHtml = (data.logs || []).map(log => {
             let antigo = log.valorAntigo;

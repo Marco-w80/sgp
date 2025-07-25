@@ -28,7 +28,7 @@ public class ProcessoDetalhadoDto {
         this.id = proc.getId();
         this.numeroInterno = proc.getNumeroInterno();
         this.numeroProcesso = proc.getNumeroProcesso();
-        this.dataInicio = proc.getDataInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        this.dataInicio = proc.getDataInicio().toString(); // Isso retorna no formato ISO: "2025-07-25"
         this.status = proc.getStatus().toString();
         this.obs = proc.getObs();
 
