@@ -16,7 +16,7 @@ public class Processo {
     @Column(name = "numero_interno", nullable = false, unique = true)
     private String numeroInterno;
 
-    @Column(name = "numero_processo", nullable = false)
+    @Column(name = "numero_processo", nullable = true)
     private String numeroProcesso;
 
     @ManyToOne(optional = false)
