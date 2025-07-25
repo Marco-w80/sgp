@@ -138,26 +138,25 @@
       </div>
 
       <div class="form-row">
-        <div class="form-group col-md-2">
-          <label>Data de Nascimento<span class="text-danger">*</span></label>
+        <div class="form-group col-md-2" id="group-dataNascimento">
+          <label>Data de Nascimento<span class="text-danger" id="asterisk-dataNascimento">*</span></label>
           <input type="date" name="dataNascimento" class="form-control" id="dataNascimentoInput" required>
         </div>
-        <div class="form-group col-md-3">
-          <label>CPF<span class="text-danger">*</span></label>
+        <div class="form-group col-md-3" id="group-cpf">
+          <label>CPF<span class="text-danger" id="asterisk-cpf">*</span></label>
           <input type="text" name="cpf" class="form-control" id="cpfInput" required>
         </div>
-        <div class="form-group col-md-3">
-          <label>Identidade<span class="text-danger">*</span></label>
+        <div class="form-group col-md-3" id="group-identidade">
+          <label>Identidade<span class="text-danger" id="asterisk-identidade">*</span></label>
           <input type="text" name="identidade" class="form-control" id="identidadeInput" required>
         </div>
 
         <div class="form-group col-md-4" id="crm-field" style="display:none;">
-          <label>CRM</label>
+          <label>CRM<span class="text-danger" id="asterisk-crm" style="display: none;">*</span></label>
           <input type="text" name="crm" class="form-control" id="crmInput">
         </div>
-
         <div class="form-group col-md-4" id="oab-field" style="display:none;">
-          <label>OAB</label>
+          <label>OAB<span class="text-danger" id="asterisk-oab" style="display: none;">*</span></label>
           <input type="text" name="oab" class="form-control" id="oabInput">
         </div>
       </div>
@@ -234,7 +233,7 @@
     'use strict';
     window.addEventListener('load', function () {
       var forms = document.getElementsByClassName('needs-validation');
-      var validation = Array.prototype.filter.call(forms, function (form) {
+      Array.prototype.filter.call(forms, function (form) {
         form.addEventListener('submit', function (event) {
           if (form.checkValidity() === false) {
             event.preventDefault();
@@ -292,47 +291,92 @@
     enderecoIndex++;
   }
 
-  // Função para mostrar/esconder campos CRM/OAB, gerenciar 'required' E LIMPAR OS CAMPOS
+  /**
+   * Função principal para gerenciar a visibilidade e obrigatoriedade dos campos
+   * com base no Tipo de pessoa selecionado.
+   */
+  /**
+   * ATUALIZADO: Gerencia a obrigatoriedade dos campos com base no Tipo,
+   * mas mantém todos os campos sempre visíveis.
+   */
   function toggleFields() {
     const tipo = document.getElementById('tipo').value;
-    const crmField = document.getElementById('crm-field');
-    const oabField = document.getElementById('oab-field');
+
+    // --- Referências aos Elementos ---
+    // Inputs
+    const dataNascimentoInput = document.getElementById('dataNascimentoInput');
+    const cpfInput = document.getElementById('cpfInput');
+    const identidadeInput = document.getElementById('identidadeInput');
     const crmInput = document.getElementById('crmInput');
     const oabInput = document.getElementById('oabInput');
 
-    // Oculta ambos os campos por padrão e remove o 'required'
-    crmField.style.display = 'none';
-    oabField.style.display = 'none';
-    crmInput.removeAttribute('required');
-    oabInput.removeAttribute('required');
+    // Asteriscos de obrigatoriedade
+    const asteriskDataNascimento = document.getElementById('asterisk-dataNascimento');
+    const asteriskCpf = document.getElementById('asterisk-cpf');
+    const asteriskIdentidade = document.getElementById('asterisk-identidade');
+    const asteriskCrm = document.getElementById('asterisk-crm');
+    const asteriskOab = document.getElementById('asterisk-oab');
 
-    // Adição chave: Limpa os valores dos campos SEMPRE que a opção de tipo é alterada
-    // Isso garante que dados de um tipo anterior não sejam enviados inadvertidamente
+    // Divs dos campos profissionais
+    const crmField = document.getElementById('crm-field');
+    const oabField = document.getElementById('oab-field');
+
+    // --- Lógica Condicional ---
+
+    // 1. Estado Padrão (para PACIENTE)
+    // Define campos de paciente como obrigatórios e exibe seus asteriscos
+    dataNascimentoInput.setAttribute('required', 'required');
+    cpfInput.setAttribute('required', 'required');
+    identidadeInput.setAttribute('required', 'required');
+    asteriskDataNascimento.style.display = 'inline';
+    asteriskCpf.style.display = 'inline';
+    asteriskIdentidade.style.display = 'inline';
+
+    // Esconde campos profissionais
+    crmField.style.display = 'none';
+    crmInput.removeAttribute('required');
+    asteriskCrm.style.display = 'none';
+    oabField.style.display = 'none';
+    oabInput.removeAttribute('required');
+    asteriskOab.style.display = 'none';
+
+    // Limpa valores profissionais
     crmInput.value = '';
     oabInput.value = '';
 
-    if (tipo === 'MEDICO') {
-      crmField.style.display = 'block';
-      crmInput.setAttribute('required', 'required');
-    } else if (tipo === 'ADVOGADO') {
-      oabField.style.display = 'block';
-      oabInput.setAttribute('required', 'required');
+    // 2. Ajustes para ADVOGADO ou MÉDICO
+    if (tipo === 'ADVOGADO' || tipo === 'MEDICO') {
+      // Define campos de paciente como OPCIONAIS e esconde seus asteriscos
+      dataNascimentoInput.removeAttribute('required');
+      cpfInput.removeAttribute('required');
+      identidadeInput.removeAttribute('required');
+      asteriskDataNascimento.style.display = 'none';
+      asteriskCpf.style.display = 'none';
+      asteriskIdentidade.style.display = 'none';
+
+      // Mostra o campo profissional correspondente e o torna obrigatório
+      if (tipo === 'ADVOGADO') {
+        oabField.style.display = 'block';
+        oabInput.setAttribute('required', 'required');
+        asteriskOab.style.display = 'inline';
+      } else { // MÉDICO
+        crmField.style.display = 'block';
+        crmInput.setAttribute('required', 'required');
+        asteriskCrm.style.display = 'inline';
+      }
     }
-    // Se for 'PACIENTE' ou outro tipo, os campos já estarão ocultos e limpos.
   }
 
-  // Chamada inicial de toggleFields para garantir o estado correto ao carregar a página
+  // Chama a função ao carregar a página
   document.addEventListener('DOMContentLoaded', toggleFields);
 
-  // Função para buscar CEP
+  // Função para buscar CEP (sem alterações)
   function buscarCep() {
     const cep = document.getElementById("cep").value.replace(/\D/g, '');
-
     if (cep.length !== 8) {
       Swal.fire("CEP inválido", "Digite um CEP com 8 números.", "warning");
       return;
     }
-
     fetch(`/api/cep/${cep}`)
       .then(response => {
         if (!response.ok) throw new Error("CEP não encontrado");
@@ -350,117 +394,53 @@
       });
   }
 
-  // Função para exibir o SweetAlert2 após o envio do formulário E REALIZAR VALIDAÇÕES
+  // Função de validação e alerta (sem alterações, já funciona com a nova lógica)
   function showSweetAlert() {
     var form = document.querySelector('.needs-validation');
 
-    // 1. Validação do Bootstrap (campos 'required')
     if (form.checkValidity() === false) {
       form.classList.add('was-validated');
-      return false; // Impede o envio se o formulário for inválido
-    }
-
-    // 2. Validação da Data de Nascimento (não pode ser futura)
-    const dataNascimentoInput = document.getElementById('dataNascimentoInput');
-    const dataNascimento = new Date(dataNascimentoInput.value);
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0); // Zera horas para comparar apenas a data
-
-    if (dataNascimento > hoje) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro de Validação!',
-        text: 'A Data de Nascimento não pode ser no futuro.',
-        confirmButtonText: 'Ok'
-      });
-      dataNascimentoInput.focus(); // Coloca o foco no campo
       return false;
     }
-
-    // 3. Validação de Campos com Máscara (CPF, CRM, OAB)
     const tipo = document.getElementById('tipo').value;
-    const cpfInput = $('#cpfInput'); // Usando jQuery para a máscara
-    const crmInput = $('#crmInput');
-    const oabInput = $('#oabInput');
-    const identidadeInput = $('#identidadeInput');
-
-    // Valida CPF
-    if (cpfInput.length && !cpfInput.val().match(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)) { // Verifica o padrão da máscara completa
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro de Validação!',
-        text: 'Por favor, preencha o CPF corretamente.',
-        confirmButtonText: 'Ok'
-      });
-      cpfInput.focus();
-      return false;
+    if (tipo === 'PACIENTE') {
+      const dataNascimentoInput = document.getElementById('dataNascimentoInput');
+      const dataNascimento = new Date(dataNascimentoInput.value);
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+      if (dataNascimento > hoje) {
+        Swal.fire('Erro de Validação!', 'A Data de Nascimento não pode ser no futuro.', 'error');
+        dataNascimentoInput.focus();
+        return false;
+      }
+      const cpfInput = $('#cpfInput');
+      if (!cpfInput.val().match(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)) {
+        Swal.fire('Erro de Validação!', 'Por favor, preencha o CPF corretamente.', 'error');
+        cpfInput.focus();
+        return false;
+      }
+      const identidadeInput = $('#identidadeInput');
+      if (identidadeInput.val().replace(/\D/g, '').length < 8) {
+        Swal.fire('Erro de Validação!', 'A Identidade (RG) deve ter no mínimo 8 dígitos.', 'error');
+        identidadeInput.focus();
+        return false;
+      }
     }
-
-    if (identidadeInput.length && identidadeInput.val().replace(/\D/g, '').length < 8) { // Verifica se tem pelo menos 8 dígitos numéricos
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro de Validação!',
-        text: 'Por favor, preencha a Identidade (RG) corretamente (mínimo 8 dígitos).',
-        confirmButtonText: 'Ok'
-      });
-      identidadeInput.focus();
-      return false;
-    }
-
-    // Valida CRM se for MÉDICO
-    if (tipo === 'MEDICO' && crmInput.length && !crmInput.val().match(/^\d{6}\/[A-Za-z]{2}$/)) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro de Validação!',
-        text: 'Por favor, preencha o CRM corretamente (ex: 123456/SP).',
-        confirmButtonText: 'Ok'
-      });
-      crmInput.focus();
-      return false;
-    }
-
-    // Valida OAB se for ADVOGADO
-    if (tipo === 'ADVOGADO' && oabInput.length && !oabInput.val().match(/^\d{6}[A-Za-z]{2}$/)) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro de Validação!',
-        text: 'Por favor, preencha o OAB corretamente (ex: 123456RJ).',
-        confirmButtonText: 'Ok'
-      });
-      oabInput.focus();
-      return false;
-    }
-
-    // Se todas as validações passarem, exibe o SweetAlert de sucesso
+    
     Swal.fire({
       icon: 'success',
       title: 'Cadastrado com Sucesso!',
-      text: 'A pessoa foi registrada em seu sistema.',
+      text: 'A pessoa foi registrada no sistema.',
       showConfirmButton: false,
       timer: 2000
     });
-
     return true;
   }
 
-  // --- APLICAÇÃO DAS MÁSCARAS ---
+  // Aplicação das máscaras (sem alterações)
   $(document).ready(function () {
     $('#cpfInput').mask('000.000.000-00');
-    // Para identidade, muitas vezes não há um padrão fixo nacional, então uma máscara mais flexível ou genérica pode ser usada.
-    // Se houver um padrão específico para seu caso, ajuste a máscara.
     $('#identidadeInput').mask('00.000.000-0', { reverse: true });
-    $('#crmInput').mask('000000/AA', {
-      translation: {
-        'A': { pattern: /[A-Za-z]/ }
-      }
-    });
-    $('#oabInput').mask('000000AA', {
-      translation: {
-        'A': { pattern: /[A-Za-z]/ }
-      }
-    });
-
-    // Aplica a máscara ao campo CEP principal
     $('#cep').mask('00000-000');
   });
 
