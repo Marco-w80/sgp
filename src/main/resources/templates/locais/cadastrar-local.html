@@ -250,12 +250,6 @@
         isValid = false;
       }
 
-      const codigoValue = parseFloat(codigoInput.value);
-      if (isNaN(codigoValue) || codigoValue <= 0) {
-        codigoInput.classList.add('is-invalid');
-        isValid = false;
-      }
-
       if (!isValid) {
         Swal.fire({
           icon: 'error',

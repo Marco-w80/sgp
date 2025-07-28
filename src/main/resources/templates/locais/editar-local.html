@@ -168,9 +168,9 @@
               </div>
             </div>
 
-            <div class="form-group d-none">
+            <div class="form-group">
               <label for="codigo">Código:</label>
-              <input type="number" class="form-control" id="codigo" th:field="*{codigo}" required />
+              <input type="number" class="form-control" id="codigo" th:field="*{codigo}"/>
               <div class="invalid-feedback">
                 Por favor, insira o código.
               </div>
@@ -271,10 +271,6 @@
         numeroVaraInput.classList.add('is-invalid');
         isValid = false;
         errorMessage = 'Por favor, insira o número da vara.';
-      } else if (isNaN(codigoInput.value) || parseInt(codigoInput.value) <= 0) {
-        codigoInput.classList.add('is-invalid');
-        isValid = false;
-        errorMessage = 'O código deve ser um número válido maior que zero.';
       }
 
 
