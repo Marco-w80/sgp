@@ -219,11 +219,16 @@
             <td th:text="${proc.numeroInterno}"></td>
             <td th:text="${proc.numeroProcesso}"></td>
             <td th:text="${proc.paciente.nome}"></td>
-            <td th:text="${proc.advogado.nome}"></td>
-            <td th:text="${proc.medico.nome}"></td>
+            <!-- Advogado opcional -->
+            <td th:text="${proc.advogado != null ? proc.advogado.nome : '–'}"></td>
+            <!-- Médico opcional -->
+            <td th:text="${proc.medico != null ? proc.medico.nome : '–'}"></td>
             <td th:text="${#temporals.format(proc.dataInicio, 'dd/MM/yyyy')}"></td>
             <td th:text="${proc.status}"></td>
-            <td th:text="${proc.local.comarca + ' – ' + proc.local.localizacao}"></td>
+            <!-- Local opcional -->
+            <td th:text="${proc.local != null 
+                          ? proc.local.comarca + ' – ' + proc.local.localizacao 
+                          : '–'}"></td>
             <td>
               <ul class="mb-0 pl-3 text-left">
                 <li th:each="item : ${proc.itens}">
@@ -234,52 +239,44 @@
               </ul>
             </td>
             <td th:text="${proc.obs}"></td>
+
             <style>
               /* Ajuste para a célula da coluna de Ações */
               #tabelaProcessos td:nth-child(12) {
-                /* Seleciona especificamente a 12ª coluna (Ações) */
                 text-align: center;
-                /* Centraliza horizontalmente o conteúdo (botões) */
                 vertical-align: middle;
-                /* Centraliza verticalmente o conteúdo (botões) */
                 white-space: nowrap;
-                /* Evita que os botões quebrem linha, se houver espaço */
-                /* Remova ou comente as propriedades flexbox que estavam aqui se você tinha antes:
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       height: 100%;
-    */
               }
-
-              /* Mantenha os estilos para os botões circulares, eles ainda usam flexbox internamente */
               .btn-circle {
                 width: 35px;
                 height: 35px;
                 padding: 0;
                 border-radius: 50%;
                 display: inline-flex;
-                /* Use inline-flex para que eles se comportem como inline-block mas ainda usem flexbox internamente */
                 align-items: center;
                 justify-content: center;
                 flex-shrink: 0;
               }
-
-              /* O me-1 (ou mr-1) já está no HTML e é suficiente para o espaçamento */
             </style>
+
             <td>
-              <a th:href="@{/processos/editar/{id}(id=${proc.id})}" class="btn btn-circle btn-sm btn-secondary me-1"
+              <a th:href="@{/processos/editar/{id}(id=${proc.id})}"
+                class="btn btn-circle btn-sm btn-secondary me-1"
                 title="Editar">
                 <i class="fas fa-edit"></i>
               </a>
-              <button class="btn btn-circle btn-sm btn-info" data-toggle="modal" data-target="#modalVerProcesso"
-                th:attr="data-id=${proc.id}" title="Ver Detalhes">
+              <button class="btn btn-circle btn-sm btn-info"
+                      data-toggle="modal"
+                      data-target="#modalVerProcesso"
+                      th:attr="data-id=${proc.id}"
+                      title="Ver Detalhes">
                 <i class="fas fa-eye"></i>
               </button>
             </td>
           </tr>
         </tbody>
       </table>
+
     </div>
   </div>
 </div>
@@ -491,7 +488,7 @@
       pageLength: 10,
       lengthMenu: [5, 10, 25, 50],
       columnDefs: [
-        { orderable: false, targets: [9, 10, 11] } // Índices das colunas (Produtos, Obs, Ações)
+        { orderable: false, targets: [9, 10, 11] } // Produtos, Obs, Ações
       ]
     });
 
@@ -501,76 +498,89 @@
       const modalBody = document.getElementById('conteudoProcesso');
       modalBody.innerHTML = "<p class='text-muted'>Buscando informações...</p>";
 
+      // Função auxiliar para fallback “–”
+      function safe(val) {
+        return (val !== null && val !== undefined && val !== '') ? val : '–';
+      }
+
+      // Formata datas ou retorna “–”
+      function formatDate(dateString) {
+        if (!dateString) return '–';
+        try {
+          return new Date(dateString)
+                   .toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        } catch {
+          return 'Data Inválida';
+        }
+      }
+
       fetch(`/api/processos/${procId}/detalhes`)
         .then(res => {
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
+          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
           return res.json();
         })
         .then(data => {
-          const formatDate = (dateString) => {
-            if (!dateString) return '–';
-            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-            try {
-              const date = new Date(dateString);
-              return new Date(date).toLocaleDateString('pt-BR', options);
-            } catch (error) {
-              console.error("Erro ao formatar data:", dateString, error);
-              return 'Data Inválida';
-            }
-          };
-
           const camposBooleanos = [
-            "CPF Anexado", "Comp. Residência", "Comp. Renda", "Procuração", "Decl. Insuficiência"
+            "CPF Anexado", "Comp. Residência", "Comp. Renda",
+            "Procuração", "Decl. Insuficiência"
           ];
 
-          const logsHtml = data.logs.map(log => {
-          let valorAntigo = log.valorAntigo;
-          let valorNovo = log.valorNovo;
+          console.log("Raw dataInicio:", data.dataInicio);
 
-          if (camposBooleanos.includes(log.campo)) {
-            valorAntigo = log.valorAntigo === "true" ? "Anexado" : "Não anexado";
-            valorNovo = log.valorNovo === "true" ? "Anexado" : "Não anexado";
-          }
-          // Apenas use log.data direto!
-          return `<li><strong>${log.campo}</strong>: <span>${valorAntigo}</span> &rarr; <span>${valorNovo}</span> (${log.data || '–'})</li>`;
-        }).join('');
+          // Gera lista de logs com fallback
+          const logsHtml = (data.logs || []).map(log => {
+            let antigo = log.valorAntigo;
+            let novo   = log.valorNovo;
+            if (camposBooleanos.includes(log.campo)) {
+              antigo = (log.valorAntigo === "true" ? "Anexado" : "Não anexado");
+              novo   = (log.valorNovo   === "true" ? "Anexado" : "Não anexado");
+            }
+            return `<li><strong>${safe(log.campo)}</strong>: 
+                      <span>${safe(antigo)}</span> → <span>${safe(novo)}</span> 
+                      (${safe(log.data)})
+                    </li>`;
+          }).join('') || '<li>Nenhum log de alteração.</li>';
 
+          // Gera lista de produtos com fallback
+          const produtosHtml = (data.itens || []).map(item =>
+            `<li>${safe(item.produto)} – Qtd: ${safe(item.quantidade)} – Enviado: ${formatDate(item.dataEnvio)}</li>`
+          ).join('') || '<li>Nenhum produto associado.</li>';
 
-          const produtosHtml = data.itens.map(item => 
-            `<li>${item.produto} &ndash; Qtd: ${item.quantidade} &ndash; Enviado: ${item.dataEnvio || '–'}</li>`
-          ).join('');
-
-          let html = `
-                        <p><strong>Interno:</strong> ${data.numeroInterno || '–'}</p>
-                        <p><strong>Processo:</strong> ${data.numeroProcesso || '–'}</p>
-                        <p><strong>Paciente:</strong> ${data.paciente ? `${data.paciente.nome} - CPF: ${data.paciente.cpf || '–'}` : '–'}</p>
-                        <p><strong>Advogado:</strong> ${data.advogado ? `${data.advogado.nome} - OAB: ${data.advogado.oab || '–'}` : '–'}</p>
-                        <p><strong>Médico:</strong> ${data.medico ? `${data.medico.nome} - CRM: ${data.medico.crm || '–'}` : '–'}</p>
-                        <p><strong>Status:</strong> ${data.status || '–'}</p>
-                        <p><strong>Data Início:</strong> ${formatDate(data.dataInicio)}</p>
-                        <p><strong>Local:</strong> ${data.local ? `${data.local.comarca} – ${data.local.localizacao}` : '–'}</p>
-                        <p><strong>Observações:</strong> ${data.obs || '–'}</p>
-
-                        <hr>
-                        <h5><i class="fas fa-file-alt"></i> Detalhes Adicionais:</h5> <ul>${produtosHtml || '<li>Nenhum produto associado.</li>'}</ul>
-
-                        <hr>
-                        <h5><i class="fas fa-list-ul"></i> Histórico de Alterações:</h5> <div class="logs-container">
-                            <ul>${logsHtml || '<li>Nenhum log de alteração.</li>'}</ul>
-                        </div>
-                    `;
-
-          document.getElementById('conteudoProcesso').innerHTML = html;
+          // Monta o HTML do modal
+          const html = `
+            <p><strong>Interno:</strong> ${safe(data.numeroInterno)}</p>
+            <p><strong>Processo:</strong> ${safe(data.numeroProcesso)}</p>
+            <p><strong>Paciente:</strong> ${data.paciente
+              ? `${safe(data.paciente.nome)} - CPF: ${safe(data.paciente.cpf)}`
+              : '–'}</p>
+            <p><strong>Advogado:</strong> ${data.advogado
+              ? `${safe(data.advogado.nome)} - OAB: ${safe(data.advogado.oab)}`
+              : '–'}</p>
+            <p><strong>Médico:</strong> ${data.medico
+              ? `${safe(data.medico.nome)} - CRM: ${safe(data.medico.crm)}`
+              : '–'}</p>
+            <p><strong>Status:</strong> ${safe(data.status)}</p>
+            <p><strong>Data Início:</strong> ${formatDate(data.dataInicio)}</p>
+            <p><strong>Local:</strong> ${data.local
+              ? `${safe(data.local.comarca)} – ${safe(data.local.localizacao)}`
+              : '–'}</p>
+            <p><strong>Observações:</strong> ${safe(data.obs)}</p>
+            <hr>
+            <h5><i class="fas fa-file-alt"></i> Detalhes Adicionais:</h5>
+            <ul>${produtosHtml}</ul>
+            <hr>
+            <h5><i class="fas fa-list-ul"></i> Histórico de Alterações:</h5>
+            <div class="logs-container"><ul>${logsHtml}</ul></div>
+          `;
+          modalBody.innerHTML = html;
         })
         .catch(err => {
-          document.getElementById('conteudoProcesso').innerHTML =
-            "<div class='alert alert-danger'>Erro ao carregar dados do processo. Por favor, tente novamente.</div>";
-          console.error("Erro ao buscar detalhes do processo:", err);
+          modalBody.innerHTML = "<div class='alert alert-danger'>Erro ao carregar dados do processo. Por favor, tente novamente.</div>";
+          console.error("Erro ao buscar detalhes:", err);
         });
     });
   });
 </script>
+
 
 </html>

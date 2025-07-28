@@ -13,29 +13,44 @@ public class Processo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // obrigatório: número interno
     @Column(name = "numero_interno", nullable = false, unique = true)
     private String numeroInterno;
 
+    // opcional: número do processo
     @Column(name = "numero_processo", nullable = true)
     private String numeroProcesso;
 
+    // obrigatório: paciente
     @ManyToOne(optional = false)
-    @JoinColumn(name = "paciente_id")
+    @JoinColumn(name = "paciente_id", nullable = false)
     private Paciente paciente;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "advogado_id")
+    // opcional: advogado
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "advogado_id", nullable = true)
     private Advogado advogado;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "medico_id")
+    // opcional: médico
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "medico_id", nullable = true)
     private Medico medico;
 
-    @ManyToOne
-    @JoinColumn(name = "doenca_id")
+    // opcional: hospital
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "hospital_id", nullable = true)
+    private Hospital hospital;
+
+    // obrigatório: doença
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "doenca_id", nullable = false)
     private Doenca doenca;
 
-    
+    // opcional: local
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "local_id", nullable = true)
+    private Local local;
+
     @Column(name = "data_inicio", nullable = false)
     private LocalDate dataInicio;
 
@@ -61,41 +76,28 @@ public class Processo {
     @Column(nullable = false)
     private StatusProcesso status;
 
+    // opcional: tipo de hospital
     @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
     private TipoHospital tipoHospital;
 
-    // **Somente** um-para-muitos para a tabela de junção com dados extras
     @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProcessoProduto> itens = new ArrayList<>();
-
-    @ManyToOne
-    private Hospital hospital;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "local_id")
-    private Local local;
 
     @Column(columnDefinition = "TEXT")
     private String obs;
 
     public Processo() {}
 
+    // construtor apenas com campos obrigatórios
     public Processo(String numeroInterno,
-                    String numeroProcesso,
                     Paciente paciente,
-                    Advogado advogado,
-                    Medico medico,
-                    Local local,
                     LocalDate dataInicio,
                     StatusProcesso status) {
-        this.numeroInterno  = numeroInterno;
-        this.numeroProcesso = numeroProcesso;
-        this.paciente       = paciente;
-        this.advogado       = advogado;
-        this.medico         = medico;
-        this.local          = local;
-        this.dataInicio     = dataInicio;
-        this.status         = status;
+        this.numeroInterno = numeroInterno;
+        this.paciente      = paciente;
+        this.dataInicio    = dataInicio;
+        this.status        = status;
     }
 
     // método ajustado para receber quantidade também
@@ -111,6 +113,7 @@ public class Processo {
     // ----- getters & setters -----
 
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getNumeroInterno() { return numeroInterno; }
     public void setNumeroInterno(String numeroInterno) { this.numeroInterno = numeroInterno; }
@@ -127,70 +130,70 @@ public class Processo {
     public Medico getMedico() { return medico; }
     public void setMedico(Medico medico) { this.medico = medico; }
 
+    public Hospital getHospital() { return hospital; }
+    public void setHospital(Hospital hospital) { this.hospital = hospital; }
+
+    public Doenca getDoenca() { return doenca; }
+    public void setDoenca(Doenca doenca) { this.doenca = doenca; }
+
+    public Local getLocal() { return local; }
+    public void setLocal(Local local) { this.local = local; }
+
     public LocalDate getDataInicio() { return dataInicio; }
     public void setDataInicio(LocalDate dataInicio) { this.dataInicio = dataInicio; }
 
     public StatusProcesso getStatus() { return status; }
     public void setStatus(StatusProcesso status) { this.status = status; }
 
-    public Local getLocal() { return local; }
-    public void setLocal(Local local) { this.local = local; }
+    public TipoHospital getTipoHospital() { return tipoHospital; }
+    public void setTipoHospital(TipoHospital tipoHospital) { this.tipoHospital = tipoHospital; }
 
-    public String getObs() { return obs; }
-    public void setObs(String obs) { this.obs = obs; }
+    public List<ProcessoLog> getLogs() { return logs; }
+    public void setLogs(List<ProcessoLog> logs) { this.logs = logs; }
 
     public List<ProcessoProduto> getItens() { return itens; }
     public void setItens(List<ProcessoProduto> itens) { this.itens = itens; }
 
-     public boolean isCpfAnexado() { return cpfAnexado; }
-    public void setCpfAnexado(boolean cpfAnexado) { this.cpfAnexado = cpfAnexado; }
+    public String getObs() { return obs; }
+    public void setObs(String obs) { this.obs = obs; }
 
-    public boolean isCompResidenciaAnexado() { return compResidenciaAnexado; }
-    public void setCompResidenciaAnexado(boolean compResidenciaAnexado) { this.compResidenciaAnexado = compResidenciaAnexado; }
-
-    public boolean isCompRendaAnexado() { return compRendaAnexado; }
-    public void setCompRendaAnexado(boolean compRendaAnexado) { this.compRendaAnexado = compRendaAnexado; }
-
-    public boolean isProcuracaoAnexado() { return procuracaoAnexado; }
-    public void setProcuracaoAnexado(boolean procuracaoAnexado) { this.procuracaoAnexado = procuracaoAnexado; }
-
-    public boolean isDeclaracaoInsuficienciaAnexado() { return declaracaoInsuficienciaAnexado; }
-    public void setDeclaracaoInsuficienciaAnexado(boolean declaracaoInsuficienciaAnexado) { this.declaracaoInsuficienciaAnexado = declaracaoInsuficienciaAnexado; }
-
-    public TipoHospital getTipoHospital() {
-        return tipoHospital;
+    public boolean isCpfAnexado() {
+        return cpfAnexado;
     }
 
-    public void setTipoHospital(TipoHospital tipoHospital) {
-        this.tipoHospital = tipoHospital;
+    public void setCpfAnexado(boolean cpfAnexado) {
+        this.cpfAnexado = cpfAnexado;
     }
 
-    public Doenca getDoenca() {
-        return doenca;
+    public boolean isCompResidenciaAnexado() {
+        return compResidenciaAnexado;
     }
 
-    public Hospital getHospital() {
-        return hospital;
+    public void setCompResidenciaAnexado(boolean compResidenciaAnexado) {
+        this.compResidenciaAnexado = compResidenciaAnexado;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public boolean isCompRendaAnexado() {
+        return compRendaAnexado;
     }
 
-    public void setDoenca(Doenca doenca) {
-        this.doenca = doenca;
+    public void setCompRendaAnexado(boolean compRendaAnexado) {
+        this.compRendaAnexado = compRendaAnexado;
     }
 
-    public void setHospital(Hospital hospital) {
-        this.hospital = hospital;
+    public boolean isProcuracaoAnexado() {
+        return procuracaoAnexado;
     }
 
-    public List<ProcessoLog> getLogs() {
-        return logs;
+    public void setProcuracaoAnexado(boolean procuracaoAnexado) {
+        this.procuracaoAnexado = procuracaoAnexado;
     }
 
-    public void setLogs(List<ProcessoLog> logs) {
-        this.logs = logs;
+    public boolean isDeclaracaoInsuficienciaAnexado() {
+        return declaracaoInsuficienciaAnexado;
     }
-    
+
+    public void setDeclaracaoInsuficienciaAnexado(boolean declaracaoInsuficienciaAnexado) {
+        this.declaracaoInsuficienciaAnexado = declaracaoInsuficienciaAnexado;
+    }
 }
