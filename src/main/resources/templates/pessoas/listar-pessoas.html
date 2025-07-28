@@ -114,6 +114,7 @@
     .table-container {
       border-radius: 0 0 0.75rem 0.75rem !important;
       overflow: hidden !important;
+      /* Mantido para garantir que o container respeite o border-radius */
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
       background-color: #fff !important;
     }
@@ -122,11 +123,9 @@
       border: 1px solid var(--cor-borda-suave) !important;
       width: 100% !important;
       border-collapse: separate !important;
-      /* necessário para border-radius funcionar */
       border-spacing: 0 !important;
       border-radius: 0.75rem !important;
       overflow: hidden !important;
-      /* mantém o conteúdo dentro dos cantos */
       background-color: #fff !important;
     }
 
@@ -162,6 +161,9 @@
       border-bottom: 2px solid var(--cor-borda-suave) !important;
       border-top: none !important;
       background-color: var(--cor-fundo-claro) !important;
+
+      /* [NOVO] Adicionado para evitar que a tabela estoure a tela */
+      word-break: break-word;
     }
 
     .table td {
@@ -183,10 +185,13 @@
       transition: background-color 0.2s ease-in-out !important;
     }
 
+    /* A classe .truncate continua útil para células específicas do corpo da tabela */
     .truncate {
       white-space: nowrap !important;
       overflow: hidden !important;
       text-overflow: ellipsis !important;
+      max-width: 200px;
+      /* É bom definir um max-width aqui também */
     }
 
     /* ==========================================================================
@@ -284,7 +289,6 @@
       margin-top: 0.75rem;
       text-align: right;
     }
-    
   </style>
 </head>
 
@@ -468,6 +472,26 @@
       if (window.innerWidth < 768) {
         gerarCardsMobile(dadosPessoas);
       }
+
+      function ajustarVisualizacao() {
+        if (window.innerWidth < 768) {
+          $('#tabela-origem').hide();
+          $('#cardsContainer').show();
+          // Gera os cards se eles ainda não foram gerados
+          if ($('#cardsContainer').is(':empty')) {
+            gerarCardsMobile(dadosPessoas);
+          }
+        } else {
+          $('#tabela-origem').show();
+          $('#cardsContainer').hide();
+        }
+      }
+
+      // Adiciona um listener para o evento de redimensionamento da janela
+      $(window).on('resize', ajustarVisualizacao);
+
+      // Chama a função na carga inicial da página
+      ajustarVisualizacao();
 
     });
   </script>
