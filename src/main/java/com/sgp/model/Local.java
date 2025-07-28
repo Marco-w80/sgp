@@ -22,7 +22,7 @@ public class Local {
     @Column(name = "numero_vara", nullable = false)
     private String numeroVara;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer codigo;
 
     @Column(nullable = false)
