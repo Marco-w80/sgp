@@ -23,7 +23,8 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "site/home";
+        // return "site/home";
+        return "login";
     }
 
     @GetMapping("/intranet")
