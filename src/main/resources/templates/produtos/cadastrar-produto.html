@@ -116,43 +116,54 @@
       <fieldset class="form-group border p-3 rounded">
         <legend class="w-auto px-2">Dados Principais</legend>
         <div class="form-row">
-          <div class="form-group col-md-2">
-            <label for="codigo">Código<span class="text-danger">*</span>:</label>
-            <input type="text" class="form-control" id="codigo" th:field="*{codigo}" required />
-            <div class="invalid-feedback">
-              Por favor, insira o código do produto.
+          <div class="row col-md-12">
+            <div class="form-group col-md-2">
+              <label for="codigo">Código<span class="text-danger">*</span>:</label>
+              <input type="text" class="form-control" id="codigo" th:field="*{codigo}" required />
+              <div class="invalid-feedback">
+                Por favor, insira o código do produto.
+              </div>
             </div>
           </div>
-          <div class="form-group col-md-4">
-            <label for="nomeItem">Nome do Item<span class="text-danger">*</span>:</label>
-            <input type="text" class="form-control" id="nomeItem" th:field="*{nomeItem}" required />
-            <div class="invalid-feedback">
-              Por favor, insira o nome do item.
+          <div class="row col-md-12">
+            <div class="form-group col-md-4">
+              <label for="nomeItem">Nome Comercial<span class="text-danger">*</span>:</label>
+              <input type="text" class="form-control" id="nomeItem" th:field="*{nomeItem}" required />
+              <div class="invalid-feedback">
+                Por favor, insira o nome do item.
+              </div>
             </div>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="unidadeMedida">Unidade Medida<span class="text-danger">*</span>:</label>
-            <input type="text" class="form-control" id="unidadeMedida" th:field="*{unidadeMedida}" required />
-            <div class="invalid-feedback">
-              Por favor, insira a unidade de medida.
+            <div class="form-group col-md-3">
+              <label for="principioAtivo">Principio Ativo<span class="text-danger">*</span>:</label>
+              <input type="text" class="form-control" id="principioAtivo" required />
+              <div class="invalid-feedback">
+                Por favor, insira o principio ativo do item.
+              </div>
             </div>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="siglaUnidade">Sigla Unidade<span class="text-danger">*</span>:</label>
-            <input type="text" class="form-control" id="siglaUnidade" th:field="*{siglaUnidade}" required
-              maxlength="2" />
-            <div class="invalid-feedback">
-              A sigla da unidade deve conter exatamente 2 caracteres.
+            <div class="form-group col-md-2">
+              <label for="unidadeMedida">Unidade Medida<span class="text-danger">*</span>:</label>
+              <input type="text" class="form-control" id="unidadeMedida" th:field="*{unidadeMedida}" required />
+              <div class="invalid-feedback">
+                Por favor, insira a unidade de medida.
+              </div>
             </div>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="grupo">Grupo<span class="text-danger">*</span>:</label>
-            <select class="form-control" id="grupo" th:field="*{grupo}" required>
-              <option value="">Selecione...</option>
-              <option th:each="g : ${grupos}" th:value="${g}" th:text="${g}"></option>
-            </select>
-            <div class="invalid-feedback">
-              Por favor, selecione um grupo.
+            <div class="form-group col-md-1">
+              <label for="siglaUnidade">Sigla (UN)<span class="text-danger">*</span>:</label>
+              <input type="text" class="form-control" id="siglaUnidade" th:field="*{siglaUnidade}" required
+                maxlength="2" />
+              <div class="invalid-feedback">
+                A sigla da unidade deve conter exatamente 2 caracteres.
+              </div>
+            </div>
+            <div class="form-group col-md-2">
+              <label for="grupo">Grupo<span class="text-danger">*</span>:</label>
+              <select class="form-control" id="grupo" th:field="*{grupo}" required>
+                <option value="">Selecione...</option>
+                <option th:each="g : ${grupos}" th:value="${g}" th:text="${g}"></option>
+              </select>
+              <div class="invalid-feedback">
+                Por favor, selecione um grupo.
+              </div>
             </div>
           </div>
         </div>
