@@ -148,12 +148,15 @@
                 </div>
               </div>
               <div class="form-group col-md-3">
-                <label for="principioAtivo">Principio Ativo<span class="text-danger">*</span>:</label>
-                <input type="text" class="form-control" id="principioAtivo"  required />
-                <div class="invalid-feedback">
-                  Por favor, insira o nome do item.
+                  <label for="principioAtivo">Princípio Ativo<span class="text-danger">*</span>:</label>
+                    <input type="text" 
+                          class="form-control" 
+                          id="principioAtivo" 
+                          name="nomeprincipio"
+                          th:value="${produto.nomeprincipio}" 
+                          required />
+                        <div class="invalid-feedback">Por favor, insira o nome do princípio ativo.</div>
                 </div>
-              </div>
               <div class="form-group col-md-2">
                 <label for="unidadeMedida">Unidade Medida<span class="text-danger">*</span>:</label>
                 <input type="text" class="form-control" id="unidadeMedida" th:field="*{unidadeMedida}" required />
