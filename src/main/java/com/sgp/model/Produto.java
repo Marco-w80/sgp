@@ -18,6 +18,9 @@ public class Produto {
     @Column(name = "nome_item", nullable = false)
     private String nomeItem;
 
+    @Column(name = "principio_ativo", nullable = true)
+    private String nomeprincipio;
+
     @Column(name = "unidade_medida", nullable = false)
     private String unidadeMedida;
 
@@ -41,13 +44,14 @@ public class Produto {
     public Produto() { }
 
     public Produto(String codigo, String nomeItem, String unidadeMedida, String siglaUnidade,
-                GrupoProduto grupo, LocalDate dataCadastro) {
+                GrupoProduto grupo, LocalDate dataCadastro, String nomeprincipio) {
         this.codigo = codigo;
         this.nomeItem = nomeItem;
         this.unidadeMedida = unidadeMedida;
         this.siglaUnidade = siglaUnidade;
         this.grupo = grupo;
         this.dataCadastro = dataCadastro;
+        this.nomeprincipio = nomeprincipio;
     }
 
     // Getters e setters
@@ -70,4 +74,17 @@ public class Produto {
     public void setFabricante(String fabricante) { this.fabricante = fabricante; }
     public String getModelo() { return modelo; }
     public void setModelo(String modelo) { this.modelo = modelo; }
+
+    public String getNomeprincipio() {
+        return nomeprincipio;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setNomeprincipio(String nomeprincipio) {
+        this.nomeprincipio = nomeprincipio;
+    }
+    
 }
