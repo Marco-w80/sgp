@@ -189,8 +189,6 @@
     border-color: var(--cor-edicao);
     color: white;
   }
-
-  
 </style>
 
 <head th:replace="~{fragments/head :: top}"></head>
@@ -210,37 +208,37 @@
           <legend class="w-auto px-2">Dados do Processo</legend>
           <div class="form-row">
             <div class="form-group col-md-3">
-              <label for="numeroInterno">Número Interno</label>
+              <label for="numeroInterno">Número Interno<span class="text-danger">*</span></label>
               <input type="text" class="form-control" name="numeroInterno" readonly required
                 th:value="${processo.numeroInterno}">
             </div>
             <div class="form-group col-md-5">
-              <label for="numeroProcesso">Número Processo</label>
+              <label for="numeroProcesso">Número Processo<span class="text-danger">*</span></label>
               <input type="text" class="form-control" name="numeroProcesso" required
                 th:value="${processo.numeroProcesso}">
             </div>
             <div class="form-group col-md-2">
-              <label for="dataInicio">Data Início</label>
+              <label for="dataInicio">Data Início<span class="text-danger">*</span></label>
               <input type="date" class="form-control" name="dataInicio" required th:value="${processo.dataInicio}">
             </div>
             <div class="form-group col-md-2">
-              <label for="status">Status</label>
+              <label for="status">Status<span class="text-danger">*</span></label>
               <select class="form-control" name="status" required>
                 <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"
                   th:selected="${processo.status == s}"></option>
               </select>
             </div>
-           <div class="form-group col-md-12">
-            <label for="localId">Local do Processo</label>
-            <select class="form-control select2" name="localId" required
-                    data-placeholder="Selecione um local">
-              <!-- placeholder normal do Select2 -->
-              <option value=""></option>
-              <!-- opções reais -->
-              <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca + ' – ' + l.localizacao}"th:selected="${processo.local != null and processo.local.id == l.id}">
-              </option>
-            </select>
-          </div>
+            <div class="form-group col-md-12">
+              <label for="localId">Local do Processo</label>
+              <select class="form-control select2" name="localId" data-placeholder="Selecione um local">
+                <!-- placeholder normal do Select2 -->
+                <option value=""></option>
+                <!-- opções reais -->
+                <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca + ' – ' + l.localizacao}"
+                  th:selected="${processo.local != null and processo.local.id == l.id}">
+                </option>
+              </select>
+            </div>
 
           </div>
         </fieldset>
@@ -250,14 +248,14 @@
           <legend class="w-auto px-2">Dados do Paciente</legend>
           <div class="form-row">
             <div class="form-group col-md-6">
-              <label for="pacienteId">Paciente</label>
+              <label for="pacienteId">Paciente<span class="text-danger">*</span></label>
               <select class="form-control" id="pacienteId" name="pacienteId" required>
                 <option th:each="p : ${pacientes}" th:value="${p.id}" th:text="${p.nome}"
                   th:selected="${processo.paciente.id == p.id}"></option>
               </select>
             </div>
             <div class="form-group col-md-6">
-              <label>CPF do Paciente</label>
+              <label>CPF do Paciente<span class="text-danger">*</span></label>
               <input type="text" class="form-control" id="cpfPaciente" readonly th:value="${processo.paciente.cpf}">
             </div>
           </div>
@@ -269,17 +267,17 @@
           <div class="form-row">
             <div class="form-group col-md-6">
               <label for="advogadoId">Advogado</label>
-              <select class="form-control select2" id="advogadoId" name="advogadoId" required data-placeholder="Selecione um advogado">
+              <select class="form-control select2" id="advogadoId" name="advogadoId"
+                data-placeholder="Selecione um advogado">
                 <option value=""></option>
-                <option th:each="a : ${advogados}"
-                        th:value="${a.id}"
-                        th:text="${a.nome}"
-                        th:selected="${processo.advogado != null and processo.advogado.id == a.id}"></option>
+                <option th:each="a : ${advogados}" th:value="${a.id}" th:text="${a.nome}"
+                  th:selected="${processo.advogado != null and processo.advogado.id == a.id}"></option>
               </select>
             </div>
             <div class="form-group col-md-6">
               <label>OAB do Advogado</label>
-              <input type="text" class="form-control" id="oabAdvogado" readonly th:value="${processo.advogado != null ? processo.advogado.oab : ''}">
+              <input type="text" class="form-control" id="oabAdvogado" readonly
+                th:value="${processo.advogado != null ? processo.advogado.oab : ''}">
             </div>
           </div>
         </fieldset>
@@ -287,42 +285,44 @@
 
         <!-- MÉDICO -->
         <fieldset class="form-group border p-3 mt-4">
-            <legend class="w-auto px-2">Dados Médicos e Hospitalares</legend>
+          <legend class="w-auto px-2">Dados Médicos e Hospitalares</legend>
 
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="medicoId">Médico</label>
-                <select
-                  class="form-control select2" id="medicoId" name="medicoId" requireddata-placeholder="Selecione um médico">
-                  <option value=""></option>
-                  <option th:each="m : ${medicos}" th:value="${m.id}" th:text="${m.nome}" th:selected="${processo.medico != null and processo.medico.id == m.id}"
-                  ></option>
-                </select>
-              </div>
-              <div class="form-group col-md-6">
-                <label for="crmMedico">CRM do Médico</label>
-                <input type="text" class="form-control" id="crmMedico" readonly th:value="${processo.medico != null ? processo.medico.crm : ''}" >
-              </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="medicoId">Médico</label>
+              <select class="form-control select2" id="medicoId" name="medicoId" data-placeholder="Selecione um médico">
+                <option value=""></option>
+                <option th:each="m : ${medicos}" th:value="${m.id}" th:text="${m.nome}"
+                  th:selected="${processo.medico != null and processo.medico.id == m.id}"></option>
+              </select>
             </div>
+            <div class="form-group col-md-6">
+              <label for="crmMedico">CRM do Médico</label>
+              <input type="text" class="form-control" id="crmMedico" readonly
+                th:value="${processo.medico != null ? processo.medico.crm : ''}">
+            </div>
+          </div>
 
-            <div class="form-row mt-3">
-              <div class="form-group col-md-6">
-                <label for="hospitalInput">Hospital</label>
-                <input
-                  type="text" class="form-control" id="hospitalInput" name="hospitalNome" th:value="${processo.hospital != null ? processo.hospital.nome : ''}" autocomplete="off">
-                <input
-                  type="hidden" id="hospitalId" name="hospitalId" th:value="${processo.hospital != null ? processo.hospital.id : ''}">
-                <div id="autocompleteHospital" class="list-group mt-1"></div>
-              </div>
-              <div class="form-group col-md-6">
-                <label for="tipoHospital">Tipo de Hospital</label>
-                <select class="form-control select2" id="tipoHospital" name="tipoHospital" data-placeholder="Selecione o tipo">
-                  <option value=""></option>
-                  <option th:each="tipo : ${tiposHospital}" th:value="${tipo}" th:text="${tipo}" th:selected="${processo.tipoHospital == tipo}"></option>
-                </select>
-              </div>
+          <div class="form-row mt-3">
+            <div class="form-group col-md-6">
+              <label for="hospitalInput">Hospital</label>
+              <input type="text" class="form-control" id="hospitalInput" name="hospitalNome"
+                th:value="${processo.hospital != null ? processo.hospital.nome : ''}" autocomplete="off">
+              <input type="hidden" id="hospitalId" name="hospitalId"
+                th:value="${processo.hospital != null ? processo.hospital.id : ''}">
+              <div id="autocompleteHospital" class="list-group mt-1"></div>
             </div>
-          </fieldset>
+            <div class="form-group col-md-6">
+              <label for="tipoHospital">Tipo de Hospital</label>
+              <select class="form-control select2" id="tipoHospital" name="tipoHospital"
+                data-placeholder="Selecione o tipo">
+                <option value=""></option>
+                <option th:each="tipo : ${tiposHospital}" th:value="${tipo}" th:text="${tipo}"
+                  th:selected="${processo.tipoHospital == tipo}"></option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
 
 
         <!-- DOENÇA -->
@@ -330,7 +330,7 @@
           <legend class="w-auto px-2">Detalhes da Doença</legend>
           <div class="form-row">
             <div class="form-group col-md-6">
-              <label>Localização da Doença</label>
+              <label>Localização da Doença<span class="text-danger">*</span></label>
               <select class="form-control" id="grupoDoenca" name="grupoDoencaId" required>
                 <option value="">Selecione</option>
                 <option th:each="g : ${gruposDoenca}" th:value="${g.id}" th:text="${g.nome}"
@@ -338,7 +338,7 @@
               </select>
             </div>
             <div class="form-group col-md-6">
-              <label>Tipo de Tumor</label>
+              <label>Tipo de Tumor<span class="text-danger">*</span></label>
               <select class="form-control" id="doenca" name="doencaId" required
                 th:attr="data-selected-id=${processo.doenca != null ? processo.doenca.id : ''}">
                 <option value="">Selecione</option>
@@ -612,10 +612,14 @@
       let form = this;
       let camposValidos = true;
 
+      // Limpa marcações anteriores
+      $(form).find('input[required], select[required]').removeClass('is-invalid');
+
       // Verifica cada input/select com o atributo 'required'
       $(form).find('input[required], select[required]').each(function () {
         if ($(this).val() === "" || $(this).val() === null) {
           camposValidos = false;
+          $(this).addClass('is-invalid');
         }
       });
 
@@ -631,8 +635,8 @@
           confirmButtonColor: '#4e73df'
         });
       }
-      // Se 'camposValidos' for true, o formulário será enviado normalmente.
     });
+
 
   });
 
