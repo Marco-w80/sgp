@@ -1,469 +1,770 @@
-<!-- src/main/resources/templates/intranet/dashboard.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      lang="pt-br">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="pt-br">
 
-  <!-- Topo / layout -->
+<head>
   <th:block th:replace="~{fragments/head :: top}"></th:block>
 
-  <div class="container-fluid">
-    <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
+  <style>
+    /* ================================================================== */
+    /* SEÇÃO 1: TEMA GLOBAL E VARIÁVEIS DE COR                            */
+    /* ================================================================== */
+    :root {
+      --cor-primaria: #166298;
+      --cor-secundaria: #192f51;
+      --cor-fundo-claro: #f8f9fc;
+      --cor-texto-escuro: #5a5c69;
+      --cor-borda-suave: #e3e6f0;
+      --cor-perigo: #e74a3b;
+      --cor-sucesso: #1cc88a;
+      --cor-aviso: #F0AD4E;
+    }
 
-    <!-- Cards -->
-    <div class="d-flex flex-nowrap overflow-auto pb-2" style="gap: 1rem;">
+    /* ================================================================== */
+    /* SEÇÃO 2: ESTILOS DE COMPONENTES PRINCIPAIS                         */
+    /* ================================================================== */
 
-      <!-- Card resumo pendências -->
-      <div class="card border-left-warning shadow py-2 px-3 flex-shrink-0" style="min-width: 220px;">
-        <div class="card-body p-2">
-          <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-            Processos pendentes de documentos
-          </div>
-          <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${totalPendentes}">0</div>
-        </div>
-      </div>
+    /* --- Cards de Gráficos e Tabelas --- */
+    .card.shadow {
+      border: 1px solid var(--cor-borda-suave);
+      box-shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .10) !important;
+    }
 
-      <!-- Cards por Status -->
-      <div class="card shadow py-2 px-3 flex-shrink-0"
-           style="min-width: 220px;"
-           th:each="entry : ${statusCounts}"
-           th:classappend="${statusCss[entry.key]} ?: 'border-left-secondary'">
-        <div class="card-body p-2">
-          <div class="text-xs font-weight-bold text-uppercase mb-1"
-               th:text="${entry.key}">STATUS</div>
-          <div class="h5 mb-0 font-weight-bold text-gray-800"
-               th:text="${entry.value}">0</div>
-        </div>
-      </div>
+    /* --- Títulos dos Gráficos --- */
+    .text-theme-primary {
+      color: var(--cor-primaria) !important;
+    }
 
-      <!-- Cards Lead Time -->
-      <div class="card border-left-primary shadow py-2 px-3 flex-shrink-0" style="min-width: 220px;">
-        <div class="card-body p-2">
-          <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Lead Time (média)</div>
-          <div class="h5 mb-0 font-weight-bold text-gray-800"
-               th:text="${leadResumo != null} ? ${leadResumo.mediaDias} + ' dias' : '-'">-</div>
-        </div>
-      </div>
-      <div class="card border-left-info shadow py-2 px-3 flex-shrink-0" style="min-width: 220px;">
-        <div class="card-body p-2">
-          <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Lead Time (P50)</div>
-          <div class="h5 mb-0 font-weight-bold text-gray-800"
-               th:text="${leadResumo != null} ? ${leadResumo.p50} + ' dias' : '-'">-</div>
-        </div>
-      </div>
-      <div class="card border-left-danger shadow py-2 px-3 flex-shrink-0" style="min-width: 220px;">
-        <div class="card-body p-2">
-          <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Lead Time (P90)</div>
-          <div class="h5 mb-0 font-weight-bold text-gray-800"
-               th:text="${leadResumo != null} ? ${leadResumo.p90} + ' dias' : '-'">-</div>
-        </div>
-      </div>
+    /* --- Cards de KPI (Indicadores) --- */
+    .kpi-card {
+      border: 1px solid var(--cor-borda-suave);
+    }
 
-    </div>
+    .kpi-card .card-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 0.5rem;
+    }
 
-    <!-- ==== GRÁFICOS ==== -->
-    <div class="row">
-      <!-- Novos Processos (linha) -->
-      <div class="col-xl-6 col-lg-12 mb-4">
-        <div class="card shadow">
-          <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Novos processos por mês</h6></div>
-          <div class="card-body"><div id="chartNovos" style="height: 280px;"></div></div>
-        </div>
-      </div>
+    .kpi-card .kpi-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      transition: transform 0.2s ease-in-out;
+    }
 
-      <!-- Perfil do Paciente (Sexo) -->
-      <div class="col-xl-6 col-lg-12 mb-4">
-        <div class="card shadow">
-          <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Perfil do Paciente (Sexo)</h6>
-          </div>
-          <div class="card-body">
-            <div id="chartPerfilGenero" style="height: 280px;"></div>
-          </div>
-        </div>
-      </div>
+    .kpi-card:hover .kpi-icon {
+      transform: scale(1.1);
+    }
 
-      <!-- Média de idade por sexo -->
-      <div class="col-xl-6 col-lg-12 mb-4">
-        <div class="card shadow">
-          <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Média de Idade por Sexo</h6>
-          </div>
-          <div class="card-body">
-            <div id="chartIdadeSexo" style="height: 280px"></div>
-          </div>
-        </div>
-      </div>
+    .kpi-card .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--cor-secundaria);
+    }
 
-      <!-- Documentação completa (donut) -->
-      <div class="col-xl-6 col-lg-12 mb-4">
-        <div class="card shadow">
-          <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Documentação Completa</h6></div>
-          <div class="card-body"><div id="chartDoc" style="height: 280px;"></div></div>
-        </div>
-      </div>
+    .kpi-card .kpi-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      text-align: center;
+    }
 
-      <!-- Distribuição por Tipo de Hospital -->
-      <div class="col-xl-6 col-lg-12 mb-4">
-        <div class="card shadow">
-          <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Distribuição por Tipo de Hospital</h6></div>
-          <div class="card-body"><div id="chartTipoHospital" style="height: 280px;"></div></div>
-        </div>
-      </div>
+    /* Cores temáticas para os KPIs */
+    .kpi-card.card-theme-primary .kpi-icon,
+    .kpi-card.card-theme-primary .kpi-title {
+      color: var(--cor-primaria);
+    }
 
-      <!-- Top Doenças -->
-      <div class="col-xl-6 col-lg-12 mb-4">
-        <div class="card shadow">
-          <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Top Doenças</h6></div>
-          <div class="card-body"><div id="chartTopDoencas" style="height: 280px;"></div></div>
-        </div>
-      </div>
+    .kpi-card.card-theme-success .kpi-icon,
+    .kpi-card.card-theme-success .kpi-title {
+      color: var(--cor-sucesso);
+    }
 
-      <!-- Lead Time médio por Doença -->
-      <div class="col-xl-6 col-lg-12 mb-4">
-        <div class="card shadow">
-          <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Lead Time médio por Doença</h6></div>
-          <div class="card-body"><div id="chartLeadDoenca" style="height: 280px;"></div></div>
-        </div>
-      </div>
+    .kpi-card.card-theme-danger .kpi-icon,
+    .kpi-card.card-theme-danger .kpi-title {
+      color: var(--cor-perigo);
+    }
 
-      <!-- Produtividade por Advogado -->
-      <div class="col-xl-6 col-lg-12 mb-4">
-        <div class="card shadow">
-          <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Produtividade por Advogado</h6></div>
-          <div class="card-body"><div id="chartProdAdv" style="height: 280px;"></div></div>
-        </div>
-      </div>
+    .kpi-card.card-theme-warning .kpi-icon,
+    .kpi-card.card-theme-warning .kpi-title {
+      color: var(--cor-aviso);
+    }
 
-      <!-- Consumo Mensal Total -->
-      <div class="col-xl-6 col-lg-12 mb-4">
-        <div class="card shadow">
-          <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Consumo Mensal (todos produtos)</h6></div>
-          <div class="card-body"><div id="chartConsumoMensal" style="height: 280px;"></div></div>
-        </div>
-      </div>
+    .kpi-card.card-theme-secondary .kpi-icon,
+    .kpi-card.card-theme-secondary .kpi-title {
+      color: var(--cor-texto-escuro);
+    }
 
-      <!-- Top Produtos (quantidade total) -->
-      <div class="col-xl-6 col-lg-12 mb-4">
-        <div class="card shadow">
-          <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Top Produtos por Quantidade</h6></div>
-          <div class="card-body"><div id="chartTopProdutos" style="height: 280px;"></div></div>
-        </div>
-      </div>
-    </div>
+    /* --- Helpers de Layout --- */
+    .overview-chart-container {
+      height: 45vh;
+      padding: 1rem;
+    }
 
-    <!-- Tabela de pendências -->
-    <div class="card shadow mb-4">
-      <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Pendências de Documentação a partir de 7 dias</h6>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table id="tabelaPendencias" class="table table-bordered" width="100%" cellspacing="0">
-            <thead>
-              <tr>
-                <th>Paciente</th>
-                <th>Número Processo</th>
-                <th>Documentos Faltando</th>
-                <th>Dias aguardando</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:if="${#lists.isEmpty(pendencias)}">
-                <td colspan="5" class="text-center text-muted">
-                  Nenhum processo com pendência para o critério selecionado.
-                </td>
-              </tr>
-              <tr th:each="pendencia : ${pendencias}">
-                <td th:text="${pendencia.processo.paciente.nome}">Fulano</td>
-                <td th:text="${pendencia.processo.numeroInterno}">PROC-001</td>
-                <td>
-                  <ul class="mb-0">
-                    <li th:each="doc : ${pendencia.documentosFaltando}" th:text="${doc}">CPF</li>
-                  </ul>
-                </td>
-                <td><span th:text="${pendencia.diasAguardando} + ' dias'">5 dias</span></td>
-                <td>
-                  <div class="btn-group btn-group-sm ms-2">
-                    <a th:href="@{/processos/editar/{id}(id=${pendencia.processo.id})}"
-                       class="btn btn-circle btn-sm btn-secondary me-1" title="Editar">
-                      <i class="fas fa-edit"></i>
-                    </a>
-                    <button type="button" class="btn btn-circle btn-sm btn-info"
-                            data-toggle="modal" data-target="#modalVerProcesso"
-                            th:attr="data-id=${pendencia.processo.id}" title="Ver Detalhes">
-                      <i class="fas fa-eye"></i>
-                    </button>
+    .scrollable-table-body {
+      max-height: 40vh;
+      overflow-y: auto;
+    }
+
+    /* ================================================================== */
+    /* SEÇÃO 3: NAVEGAÇÃO DO DASHBOARD                                    */
+    /* ================================================================== */
+    #tv-mode-btn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 1050;
+    }
+
+    .dashboard-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--cor-borda-suave);
+      margin-bottom: 1.5rem;
+    }
+
+    .dashboard-nav-btn {
+      padding: 0.75rem 1.25rem;
+      border: none;
+      background-color: transparent;
+      color: var(--cor-texto-escuro);
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .dashboard-nav-btn:hover {
+      background-color: #f1f3f8;
+      color: var(--cor-primaria);
+    }
+
+    .dashboard-nav-btn.active {
+      color: var(--cor-primaria);
+      border-bottom-color: var(--cor-primaria);
+    }
+
+    /* ================================================================== */
+    /* SEÇÃO 4: MODO APRESENTAÇÃO (TV)                                    */
+    /* ================================================================== */
+
+    /* --- Estrutura e Animação --- */
+    .dashboard-page {
+      display: none;
+      width: 100%;
+      animation: fadeIn 0.6s;
+    }
+
+    .dashboard-page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* --- Ativação do Modo TV --- */
+    body.tv-mode {
+      background-color: var(--cor-secundaria) !important;
+      color: #e3e6f0 !important;
+      overflow: hidden;
+    }
+
+    body.tv-mode #content-wrapper {
+      overflow-y: hidden !important;
+      /* Força a remoção do scroll vertical */
+    }
+
+    body.tv-mode #accordionSidebar,
+    body.tv-mode #content-wrapper>#content>nav.navbar,
+    body.tv-mode footer,
+    body.tv-mode #tv-mode-btn,
+    body.tv-mode .dashboard-nav {
+      display: none !important;
+    }
+
+    body.tv-mode .container-fluid {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.tv-mode #presentation-wrapper {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* --- Título da Apresentação --- */
+    body.tv-mode #presentation-title {
+      background-color: var(--cor-primaria);
+      color: white !important;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      display: inline-block;
+      font-size: 1.5rem;
+      margin-bottom: 1rem !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.4s ease;
+    }
+
+    body.tv-mode #presentation-title::before {
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      content: "\f080";
+      /* Ícone de gráfico de barras */
+      margin-right: 0.75rem;
+    }
+
+    body.tv-mode .container-fluid>h1#presentation-title {
+      display: block;
+      text-align: center;
+    }
+
+    /* --- Controles Manuais (Setas e Pontos) --- */
+    #presentation-controls {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1100;
+      pointer-events: none;
+    }
+
+    body.tv-mode #presentation-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .presentation-nav-btn {
+      pointer-events: all;
+      background-color: rgba(0, 0, 0, 0.2);
+      border: none;
+      color: white;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      width: 50px;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.2;
+      transition: all 0.2s ease-in-out;
+      margin: 0 1rem;
+      border-radius: 8px;
+    }
+
+    .presentation-nav-btn:hover {
+      background-color: rgba(0, 0, 0, 0.5);
+      opacity: 1;
+    }
+
+    #pagination-dots {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      gap: 0.75rem;
+      z-index: 1051;
+    }
+
+    .pagination-dot {
+      width: 12px;
+      height: 12px;
+      background-color: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .pagination-dot.active {
+      background-color: white;
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+
+<body id="page-top">
+  <div id="presentation-controls">
+    <button id="prev-slide-btn" class="presentation-nav-btn" title="Anterior (←)">&lt;</button>
+    <button id="next-slide-btn" class="presentation-nav-btn" title="Próximo (→)">&gt;</button>
+  </div>
+  <div id="wrapper">
+    <div id="content-wrapper" class="d-flex flex-column pb-5">
+      <div id="content">
+
+        <div class="container-fluid pt-4">
+
+          <button id="tv-mode-btn" class="btn btn-primary btn-circle shadow mr-5" title="Entrar em Modo Apresentação">
+            <i class="fas fa-tv"></i>
+          </button>
+
+          <h1 id="presentation-title" class="h3 text-gray-800">Dashboard</h1>
+
+          <nav class="dashboard-nav">
+          </nav>
+
+          <div id="presentation-wrapper">
+            <div class="dashboard-page" data-title="Visão Geral">
+              <div class="row">
+                <div class="col-xl-2 col-md-6 mb-4">
+                  <div class="card kpi-card card-theme-warning h-100">
+                    <div class="card-body">
+                      <i class="fas fa-file-invoice kpi-icon"></i>
+                      <div class="kpi-value" th:text="${totalPendentes}">0</div>
+                      <div class="kpi-title">Processos pendentes</div>
+                    </div>
                   </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+
+                <div class="col-xl-6 col-md-6">
+                  <div class="row">
+                    <div class="col-md-3 mb-4" th:each="entry : ${statusCounts}">
+                      <div class="card kpi-card h-100"
+                        th:classappend="${statusCss[entry.key]} ?: 'card-theme-secondary'">
+                        <div class="card-body">
+                          <i class="fas fa-tasks kpi-icon"></i>
+                          <div class="kpi-value" th:text="${entry.value}">0</div>
+                          <div class="kpi-title" th:text="${entry.key}">STATUS</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-2 col-md-6 mb-4">
+                  <div class="card kpi-card card-theme-primary h-100">
+                    <div class="card-body">
+                      <i class="fas fa-hourglass-half kpi-icon"></i>
+                      <div class="kpi-value" th:text="${leadResumo != null} ? ${leadResumo.mediaDias} : '-'">-</div>
+                      <div class="kpi-title">Lead Time (dias)</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-2 col-md-6 mb-4">
+                  <div class="card kpi-card card-theme-danger h-100">
+                    <div class="card-body">
+                      <i class="fas fa-calendar-times kpi-icon"></i>
+                      <div class="kpi-value" th:text="${leadResumo != null} ? ${leadResumo.p90} : '-'">-</div>
+                      <div class="kpi-title">Lead Time P90 (dias)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mt-4">
+                <div class="col-12">
+                  <div class="card shadow">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-chart-line mr-2"></i>Novos
+                        processos por mês</h6>
+                    </div>
+                    <div class="card-body overview-chart-container">
+                      <div id="chartNovos" style="height: 100%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dashboard-page" data-title="Análise de Processos">
+              <div class="row">
+                <div class="col-xl-6 col-lg-12 mb-4">
+                  <div class="card shadow">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i
+                          class="fas fa-check-circle mr-2"></i>Documentação Completa</h6>
+                    </div>
+                    <div class="card-body">
+                      <div id="chartDoc" style="height: 280px;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-12 mb-4">
+                  <div class="card shadow">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-gavel mr-2"></i>Produtividade
+                        por Advogado</h6>
+                    </div>
+                    <div class="card-body">
+                      <div id="chartProdAdv" style="height: 280px;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-12 col-lg-12 mb-4">
+                  <div class="card shadow">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-hourglass-half mr-2"></i>Lead
+                        Time médio por Doença</h6>
+                    </div>
+                    <div class="card-body">
+                      <div id="chartLeadDoenca" style="height: 280px;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dashboard-page" data-title="Perfil dos Pacientes">
+              <div class="row">
+                <div class="col-xl-6 col-lg-12 mb-4">
+                  <div class="card shadow">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-venus-mars mr-2"></i>Perfil
+                        do Paciente (Sexo)</h6>
+                    </div>
+                    <div class="card-body">
+                      <div id="chartPerfilGenero" style="height: 280px;"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-6 col-lg-12 mb-4">
+                  <div class="card shadow">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-birthday-cake mr-2"></i>Média
+                        de Idade por Sexo</h6>
+                    </div>
+                    <div class="card-body">
+                      <div id="chartIdadeSexo" style="height: 280px"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-6 col-lg-12 mb-4">
+                  <div class="card shadow">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-virus mr-2"></i>Top Doenças
+                      </h6>
+                    </div>
+                    <div class="card-body">
+                      <div id="chartTopDoencas" style="height: 280px;"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-6 col-lg-12 mb-4">
+                  <div class="card shadow">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i
+                          class="fas fa-hospital mr-2"></i>Distribuição por Tipo de Hospital</h6>
+                    </div>
+                    <div class="card-body">
+                      <div id="chartTipoHospital" style="height: 280px;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dashboard-page" data-title="Produtos e Pendências">
+              <div class="row">
+                <div class="col-xl-6 col-lg-12 mb-4">
+                  <div class="card shadow">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-pills mr-2"></i>Consumo
+                        Mensal (todos produtos)</h6>
+                    </div>
+                    <div class="card-body">
+                      <div id="chartConsumoMensal" style="height: 280px;"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-6 col-lg-12 mb-4">
+                  <div class="card shadow">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-sort-amount-up mr-2"></i>Top
+                        Produtos por Quantidade</h6>
+                    </div>
+                    <div class="card-body">
+                      <div id="chartTopProdutos" style="height: 280px;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mt-4">
+                <div class="col-12">
+                  <div class="card shadow mb-4 w-100">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-warning"><i
+                          class="fas fa-exclamation-triangle mr-2"></i>Pendências de Documentação</h6>
+                    </div>
+                    <div class="card-body scrollable-table-body">
+                      <div class="table-responsive">
+                        <table id="tabelaPendencias" class="table table-bordered" width="100%" cellspacing="0">
+                          <thead>
+                            <tr>
+                              <th>Paciente</th>
+                              <th>Número Processo</th>
+                              <th>Documentos Faltando</th>
+                              <th>Dias aguardando</th>
+                              <th>Ações</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr th:if="${#lists.isEmpty(pendencias)}">
+                              <td colspan="5" class="text-center text-muted">Nenhum processo com pendência.</td>
+                            </tr>
+                            <tr th:each="pendencia : ${pendencias}">
+                              <td th:text="${pendencia.processo.paciente.nome}">Fulano</td>
+                              <td th:text="${pendencia.processo.numeroInterno}">PROC-001</td>
+                              <td>
+                                <ul class="mb-0 pl-3">
+                                  <li th:each="doc : ${pendencia.documentosFaltando}" th:text="${doc}">CPF</li>
+                                </ul>
+                              </td>
+                              <td><span th:text="${pendencia.diasAguardando} + ' dias'">5 dias</span></td>
+                              <td>
+                                <div class="btn-group btn-group-sm">
+                                  <a th:href="@{/processos/editar/{id}(id=${pendencia.processo.id})}"
+                                    class="btn btn-circle btn-sm btn-secondary" title="Editar"><i
+                                      class="fas fa-edit"></i></a>
+                                  <button type="button" class="btn btn-circle btn-sm btn-info ml-1" data-toggle="modal"
+                                    data-target="#modalVerProcesso" th:attr="data-id=${pendencia.processo.id}"
+                                    title="Ver Detalhes"><i class="fas fa-eye"></i></button>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="pagination-dots"></div>
+
         </div>
       </div>
+
+
     </div>
+    <th:block th:replace="~{fragments/foot :: bot}"></th:block>
+  </div>
 
-  </div><!-- /container-fluid -->
 
-  <!-- Modal Ver Processo (mantido) -->
-  <!-- ... -->
-
-  <!-- Rodapé + scripts -->
-  <th:block th:replace="~{fragments/foot :: bot}"></th:block>
-
-  <!-- Highcharts (core) -->
   <script src="https://code.highcharts.com/highcharts.js"></script>
-  <!-- (opcional) módulos úteis -->
   <script src="https://code.highcharts.com/modules/accessibility.js"></script>
   <script src="https://code.highcharts.com/modules/exporting.js"></script>
   <script src="https://code.highcharts.com/modules/export-data.js"></script>
 
-  <!-- DataTables + Modal JS existente -->
-  <!-- ... -->
-
-  <!-- ==== JS dos Gráficos (Highcharts) ==== -->
   <script th:inline="javascript">
-  /*<![CDATA[*/
+    /*<![CDATA[*/
 
-  // Dados vindos do server
-  const serieNovos         = /*[[${serieNovos}]]*/ null;
-  const docResumo          = /*[[${docResumo}]]*/ null;
-  const distTipoHospital   = /*[[${distTipoHospital}]]*/ {};
-  const topDoencas         = /*[[${topDoencas}]]*/ [];
-  const leadTimeDoenca     = /*[[${leadTimeDoenca}]]*/ [];
-  const prodAdvogado       = /*[[${prodAdvogado}]]*/ [];
-  const consumoMensalTotal = /*[[${consumoMensalTotal}]]*/ null;
-  const consumoProdutos    = /*[[${consumoProdutos}]]*/ [];
-  const distGenero         = /*[[${distGenero}]]*/ {};
-  const idadePorSexo       = /*[[${idadePorSexo}]]*/ null;
+    // =========================================================================
+    // SEÇÃO 1: DADOS GLOBAIS E CONFIGURAÇÕES (SEM ALTERAÇÕES)
+    // =========================================================================
+    // ... seu código de dados e configurações Highcharts continua o mesmo ...
+    const serieNovos = /*[[${serieNovos}]]*/ null;
+    const docResumo = /*[[${docResumo}]]*/ null;
+    const distTipoHospital = /*[[${distTipoHospital}]]*/ {};
+    const topDoencas = /*[[${topDoencas}]]*/[];
+    const leadTimeDoenca = /*[[${leadTimeDoenca}]]*/[];
+    const prodAdvogado = /*[[${prodAdvogado}]]*/[];
+    const consumoMensalTotal = /*[[${consumoMensalTotal}]]*/ null;
+    const consumoProdutos = /*[[${consumoProdutos}]]*/[];
+    const distGenero = /*[[${distGenero}]]*/ {};
+    const idadePorSexo = /*[[${idadePorSexo}]]*/ null;
 
+    const safe = (v, d) => (v === null || v === undefined) ? d : v;
+    const minhaPaletaHighcharts = ['#166298', '#1cc88a', '#F0AD4E', '#e74a3b', '#5a5c69', '#192f51'];
 
+    Highcharts.setOptions({
+      lang: { shortMonths: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], weekdays: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'] },
+      colors: minhaPaletaHighcharts,
+      chart: { backgroundColor: 'transparent', style: { fontFamily: 'Nunito, sans-serif' } },
+      credits: { enabled: false },
+      legend: { enabled: false },
+      yAxis: { title: { text: null } },
+      xAxis: { title: { text: null } },
+      plotOptions: { series: { borderWidth: 0, dataLabels: { style: { textOutline: 'none' } } } }
+    });
 
-  const safe = (v, d) => (v === null || v === undefined) ? d : v;
+    // =========================================================================
+    // SEÇÃO 2: CONTROLADOR DA NAVEGAÇÃO E MODO APRESENTAÇÃO (VERSÃO FINAL)
+    // =========================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      const pages = document.querySelectorAll('.dashboard-page');
+      const tvModeBtn = document.getElementById('tv-mode-btn');
+      const presentationTitle = document.getElementById('presentation-title');
+      const navContainer = document.querySelector('.dashboard-nav');
+      const paginationDotsContainer = document.getElementById('pagination-dots');
+      const prevSlideBtn = document.getElementById('prev-slide-btn');
+      const nextSlideBtn = document.getElementById('next-slide-btn');
 
-// Localização (opcional, deixa meses/dias em pt-BR)
-Highcharts.setOptions({
-  lang: {
-    shortMonths: ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'],
-    months: ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'],
-    weekdays: ['domingo','segunda','terça','quarta','quinta','sexta','sábado']
-  }
-});
+      let currentPageIndex = 0;
+      let slideshowInterval = null;
+      const SLIDESHOW_DELAY = 15000;
 
-// ===== Novos Processos (linha)
-(function(){
-  const cats = safe(serieNovos?.categorias, []); // ['2024-01','2024-02',...]
-  const vals = safe(serieNovos?.valores,   []);  // [10, 12, ...]
+      // 1. Criar a navegação e os pontos
+      pages.forEach((page, index) => {
+        const navBtn = document.createElement('button');
+        navBtn.className = 'dashboard-nav-btn';
+        navBtn.textContent = page.dataset.title || `Página ${index + 1}`;
+        navBtn.dataset.index = index;
+        navContainer.appendChild(navBtn);
 
-  // Converte 'YYYY-MM' -> [Date.UTC(YYYY, MM-1, 1), valor]
-  const data = cats.map((ym, i) => {
-    const [yyyy, mm] = String(ym).split('-').map(Number);
-    return [Date.UTC(yyyy, (mm || 1) - 1, 1), Number(vals[i] || 0)];
-  });
+        const dot = document.createElement('div');
+        dot.className = 'pagination-dot';
+        dot.dataset.index = index;
+        paginationDotsContainer.appendChild(dot);
+      });
 
-  Highcharts.chart('chartNovos', {
-    chart: { type: 'line' },
-    title: null,
-    xAxis: {
-      type: 'datetime',
-      // força marcação mensal:
-      tickInterval: 30 * 24 * 3600 * 1000, // ~1 mês
-      dateTimeLabelFormats: { month: '%b %Y', year: '%Y' }
-    },
-    yAxis: {
-      title: { text: null },
-      allowDecimals: false,
-      min: 0
-    },
-    tooltip: { xDateFormat: '%b %Y', shared: false },
-    plotOptions: {
-      series: {
-        dataLabels: {
-          enabled: true,
-          formatter: function(){ return this.y; }
-        },
-        marker: { enabled: true }
+      const navButtons = document.querySelectorAll('.dashboard-nav-btn');
+      const dots = document.querySelectorAll('.pagination-dot');
+
+      // 2. Função principal para mostrar uma página (COM ATUALIZAÇÃO DO TÍTULO)
+      function showPage(index) {
+        const newIndex = parseInt(index);
+        if (isNaN(newIndex) || newIndex >= pages.length || newIndex < 0) return;
+
+        pages[currentPageIndex].classList.remove('active');
+        navButtons[currentPageIndex].classList.remove('active');
+        dots[currentPageIndex].classList.remove('active');
+
+        currentPageIndex = newIndex;
+
+        const newPage = pages[currentPageIndex];
+        newPage.classList.add('active');
+        navButtons[currentPageIndex].classList.add('active');
+        dots[currentPageIndex].classList.add('active');
+
+        // ⭐ ATUALIZAÇÃO PRINCIPAL: Garante que o título mude a cada slide
+        presentationTitle.textContent = newPage.dataset.title || 'Dashboard';
+
+        window.dispatchEvent(new Event('resize'));
       }
-    },
-    series: [{
-      name: safe(serieNovos?.label, 'Novos processos'),
-      data
-    }],
-    credits: { enabled: false },
-    legend: { enabled: true }
-  });
-})();
 
-  // ===== Documentação Completa (donut)
-  (function(){
-    const completos = safe(docResumo?.completos, 0);
-    const total     = safe(docResumo?.total, 0);
-    const pend      = Math.max(total - completos, 0);
+      // 3. Lógica do Slideshow
+      const startSlideshow = () => slideshowInterval = slideshowInterval || setInterval(nextPage, SLIDESHOW_DELAY);
+      const stopSlideshow = () => { clearInterval(slideshowInterval); slideshowInterval = null; };
+      const resetSlideshowTimer = () => {
+        stopSlideshow();
+        startSlideshow();
+      };
 
-    Highcharts.chart('chartDoc', {
-      chart: { type: 'pie' },
-      title: null,
-      plotOptions: {
-        pie: {
-          innerSize: '60%',
-          dataLabels: { enabled: true, format: '{point.name}: {point.y}' }
+      // 4. Funções de navegação
+      const nextPage = () => showPage((currentPageIndex + 1) % pages.length);
+      const prevPage = () => showPage((currentPageIndex - 1 + pages.length) % pages.length);
+
+      // 5. Event Listeners
+      navContainer.addEventListener('click', (e) => {
+        if (e.target.matches('.dashboard-nav-btn')) {
+          showPage(e.target.dataset.index);
         }
-      },
-      series: [{
-        name: 'Processos',
-        data: [
-          { name: 'Completos', y: completos },
-          { name: 'Pendentes', y: pend }
-        ]
-      }],
-      credits: { enabled: false }
+      });
+
+      tvModeBtn.addEventListener('click', () => {
+        document.body.classList.add('tv-mode');
+        // Garante que o título da página atual seja exibido ao entrar no modo TV
+        presentationTitle.textContent = pages[currentPageIndex].dataset.title;
+        startSlideshow();
+      });
+
+      prevSlideBtn.addEventListener('click', () => { prevPage(); resetSlideshowTimer(); });
+      nextSlideBtn.addEventListener('click', () => { nextPage(); resetSlideshowTimer(); });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.body.classList.contains('tv-mode')) {
+          document.body.classList.remove('tv-mode');
+          presentationTitle.textContent = 'Dashboard'; // Restaura título original
+          stopSlideshow();
+        }
+        if (document.body.classList.contains('tv-mode')) {
+          if (e.key === 'ArrowRight') { nextPage(); resetSlideshowTimer(); }
+          if (e.key === 'ArrowLeft') { prevPage(); resetSlideshowTimer(); }
+        }
+      });
+
+      // 6. Inicialização
+      showPage(0);
     });
-  })();
 
-  // ===== Distribuição por Tipo de Hospital (coluna)
-  (function(){
-    const labels = Object.keys(distTipoHospital || {});
-    const data   = Object.values(distTipoHospital || {});
-    Highcharts.chart('chartTipoHospital', {
-      chart: { type: 'column' },
-      title: null,
-      xAxis: { categories: labels, crosshair: true },
-      yAxis: { title: { text: 'Processos' } },
-      series: [{ name: 'Processos', data }],
-      credits: { enabled: false },
-      legend: { enabled: false }
+    // =========================================================================
+    // INICIALIZAÇÃO DE TODOS OS GRÁFICOS
+    // =========================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Novos Processos (linha)
+      (function () {
+        const cats = safe(serieNovos?.categorias, []); const vals = safe(serieNovos?.valores, []);
+        const data = cats.map((ym, i) => { const [yyyy, mm] = String(ym).split('-').map(Number); return [Date.UTC(yyyy, (mm || 1) - 1, 1), Number(vals[i] || 0)]; });
+        Highcharts.chart('chartNovos', { chart: { type: 'line' }, title: null, xAxis: { type: 'datetime', tickInterval: 30 * 24 * 3600 * 1000, dateTimeLabelFormats: { month: '%b %Y', year: '%Y' } }, yAxis: { allowDecimals: false, min: 0 }, tooltip: { xDateFormat: '%b %Y', shared: false }, plotOptions: { series: { dataLabels: { enabled: true, formatter: function () { return this.y; } }, marker: { enabled: true } } }, series: [{ name: safe(serieNovos?.label, 'Novos processos'), data }], legend: { enabled: true } });
+      })();
+
+      // Documentação Completa (donut)
+      (function () {
+        const completos = safe(docResumo?.completos, 0); const total = safe(docResumo?.total, 0); const pend = Math.max(total - completos, 0);
+        Highcharts.chart('chartDoc', { chart: { type: 'pie' }, title: null, plotOptions: { pie: { innerSize: '60%', dataLabels: { enabled: true, format: '{point.name}: {point.y} ({point.percentage:.1f}%)' } } }, series: [{ name: 'Processos', data: [{ name: 'Completos', y: completos }, { name: 'Pendentes', y: pend }] }] });
+      })();
+
+      // Perfil do Paciente (Sexo)
+      (function () {
+        const map = distGenero || {}; const data = Object.entries(map).map(([k, v]) => ({ name: k, y: Number(v) || 0 }));
+        Highcharts.chart('chartPerfilGenero', { chart: { type: 'pie' }, title: null, plotOptions: { pie: { innerSize: '50%', dataLabels: { enabled: true, format: '{point.name}: {point.y}' } } }, series: [{ name: 'Pacientes', data }], legend: { enabled: true } });
+      })();
+
+      // Média de Idade por Sexo
+      (function () {
+        const cats = safe(idadePorSexo?.categorias, []); const vals = safe(idadePorSexo?.valores, []); const qts = safe(idadePorSexo?.qtde, []);
+        Highcharts.chart('chartIdadeSexo', { chart: { type: 'column' }, title: null, xAxis: { categories: cats, crosshair: true }, yAxis: { min: 0, allowDecimals: false }, tooltip: { shared: false, formatter: function () { const idx = this.point.index; const qtd = qts[idx] ?? 0; return `<b>${this.x}</b><br/>Média: <b>${this.y}</b> anos<br/>Qtde: ${qtd}`; } }, plotOptions: { column: { dataLabels: { enabled: true, formatter() { return this.y; } } } }, series: [{ name: safe(idadePorSexo?.label, 'Média de idade'), data: vals }] });
+      })();
+
+      // Distribuição por Tipo de Hospital
+      (function () {
+        const labels = Object.keys(distTipoHospital || {}); const data = Object.values(distTipoHospital || {});
+        Highcharts.chart('chartTipoHospital', { chart: { type: 'column' }, title: null, xAxis: { categories: labels, crosshair: true }, yAxis: { title: { text: 'Processos' } }, series: [{ name: 'Processos', data }] });
+      })();
+
+      // Top Doenças
+      (function () {
+        const labels = (topDoencas || []).map(d => d.doenca); const data = (topDoencas || []).map(d => d.total);
+        Highcharts.chart('chartTopDoencas', { chart: { type: 'bar' }, title: null, xAxis: { categories: labels }, yAxis: { title: { text: 'Processos' } }, series: [{ name: 'Processos', data }] });
+      })();
+
+      // Lead Time médio por Doença
+      (function () {
+        const labels = (leadTimeDoenca || []).map(d => d.doenca); const data = (leadTimeDoenca || []).map(d => d.mediaDias);
+        Highcharts.chart('chartLeadDoenca', { chart: { type: 'column' }, title: null, xAxis: { categories: labels }, yAxis: { title: { text: 'Dias' } }, series: [{ name: 'Dias', data }] });
+      })();
+
+      // Produtividade por Advogado
+      (function () {
+        const labels = (prodAdvogado || []).map(d => d.advogado || '(sem)'); const data = (prodAdvogado || []).map(d => d.qtde);
+        Highcharts.chart('chartProdAdv', { chart: { type: 'bar' }, title: null, xAxis: { categories: labels }, yAxis: { title: { text: '# Processos' } }, series: [{ name: '# Processos', data }] });
+      })();
+
+      // Consumo Mensal Total
+      (function () {
+        const labels = safe(consumoMensalTotal?.categorias, []); const data = safe(consumoMensalTotal?.valores, []);
+        Highcharts.chart('chartConsumoMensal', { chart: { type: 'line' }, title: null, xAxis: { categories: labels }, yAxis: { title: { text: 'Quantidade' } }, series: [{ name: 'Quantidade', data }] });
+      })();
+
+      // Top Produtos
+      (function () {
+        const labels = (consumoProdutos || []).map(d => d.produto); const data = (consumoProdutos || []).map(d => d.quantidade);
+        Highcharts.chart('chartTopProdutos', { chart: { type: 'bar' }, title: null, xAxis: { categories: labels }, yAxis: { title: { text: 'Quantidade' } }, series: [{ name: 'Quantidade', data }] });
+      })();
     });
-  })();
 
-  // ===== Top Doenças (barra horizontal)
-  (function(){
-    const labels = (topDoencas || []).map(d => d.doenca);
-    const data   = (topDoencas || []).map(d => d.total);
-    Highcharts.chart('chartTopDoencas', {
-      chart: { type: 'bar' },
-      title: null,
-      xAxis: { categories: labels },
-      yAxis: { title: { text: 'Processos' } },
-      series: [{ name: 'Processos', data }],
-      credits: { enabled: false },
-      legend: { enabled: false }
-    });
-  })();
-
-  // ===== Lead Time médio por Doença (coluna)
-  (function(){
-    const labels = (leadTimeDoenca || []).map(d => d.doenca);
-    const data   = (leadTimeDoenca || []).map(d => d.mediaDias);
-    Highcharts.chart('chartLeadDoenca', {
-      chart: { type: 'column' },
-      title: null,
-      xAxis: { categories: labels },
-      yAxis: { title: { text: 'Dias' } },
-      series: [{ name: 'Dias', data }],
-      credits: { enabled: false },
-      legend: { enabled: false }
-    });
-  })();
-
-  // ===== Produtividade por Advogado (barra horizontal por quantidade)
-  (function(){
-    const labels = (prodAdvogado || []).map(d => d.advogado || '(sem)');
-    const data   = (prodAdvogado || []).map(d => d.qtde);
-    Highcharts.chart('chartProdAdv', {
-      chart: { type: 'bar' },
-      title: null,
-      xAxis: { categories: labels },
-      yAxis: { title: { text: '# Processos' } },
-      series: [{ name: '# Processos', data }],
-      credits: { enabled: false },
-      legend: { enabled: false }
-    });
-  })();
-
-  // ===== Consumo Mensal Total (linha)
-  (function(){
-    const labels = safe(consumoMensalTotal?.categorias, []);
-    const data   = safe(consumoMensalTotal?.valores, []);
-    Highcharts.chart('chartConsumoMensal', {
-      chart: { type: 'line' },
-      title: null,
-      xAxis: { categories: labels },
-      yAxis: { title: { text: 'Quantidade' } },
-      series: [{ name: 'Quantidade', data }],
-      credits: { enabled: false }
-    });
-  })();
-
-  // ===== Top Produtos (barra horizontal)
-  (function(){
-    const labels = (consumoProdutos || []).map(d => d.produto);
-    const data   = (consumoProdutos || []).map(d => d.quantidade);
-    Highcharts.chart('chartTopProdutos', {
-      chart: { type: 'bar' },
-      title: null,
-      xAxis: { categories: labels },
-      yAxis: { title: { text: 'Quantidade' } },
-      series: [{ name: 'Quantidade', data }],
-      credits: { enabled: false },
-      legend: { enabled: false }
-    });
-  })();
-
-  // ===== Perfil do Paciente (Sexo)
-(function(){
-  const map = distGenero || {};
-  const data = Object.entries(map).map(([k, v]) => ({ name: k, y: Number(v) || 0 }));
-
-  Highcharts.chart('chartPerfilGenero', {
-    chart: { type: 'pie' },
-    title: null,
-    plotOptions: {
-      pie: {
-        innerSize: '50%', // deixe 0% se preferir pizza comum
-        dataLabels: { enabled: true, format: '{point.name}: {point.y}' }
-      }
-    },
-    series: [{
-      name: 'Pacientes',
-      data
-    }],
-    credits: { enabled: false },
-    legend: { enabled: true }
-  });
-})();
-
-
-// ===== Gráfico: Média de Idade por Sexo (coluna)
-(function(){
-  const cats = safe(idadePorSexo?.categorias, []);
-  const vals = safe(idadePorSexo?.valores, []);
-  const qts  = safe(idadePorSexo?.qtde, []);
-
-  Highcharts.chart('chartIdadeSexo', {
-    chart: { type: 'column' },
-    title: null,
-    xAxis: { categories: cats, crosshair: true },
-    yAxis: { min: 0, title: { text: null }, allowDecimals: false },
-    tooltip: {
-      shared: false,
-      formatter: function(){
-        const idx = this.point.index;
-        const qtd = qts[idx] ?? 0;
-        return `<b>${this.x}</b><br/>Média: <b>${this.y}</b> anos<br/>Qtde: ${qtd}`;
-      }
-    },
-    plotOptions: {
-      column: { dataLabels: { enabled: true, formatter(){ return this.y; } } }
-    },
-    series: [{ name: safe(idadePorSexo?.label, 'Média de idade'), data: vals }],
-    credits: { enabled: false },
-    legend: { enabled: false }
-  });
-})();
-
-
-  /*]]>*/
+    /*]]>*/
   </script>
+</body>
 
 </html>
