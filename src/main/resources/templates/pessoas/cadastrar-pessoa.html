@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
 
-
 <style>
   /* ==========================================================================
        1. ESTILOS GERAIS E VARIÁVEIS (Pode ir para um arquivo global depois)
@@ -168,7 +167,7 @@
         <div class="form-group col-md-4">
           <label>CEP</label>
           <div class="input-group">
-            <input type="text" class="form-control" th:field="*{enderecos[0].cep}" id="cep">
+            <input type="text" name="enderecos[0].cep" th:value="*{enderecos[0].cep}" class="form-control" id="cep">
             <div class="input-group-append">
               <button class="btn btn-outline-secondary" type="button" onclick="buscarCep()">
                 <i class="fas fa-search"></i>
@@ -179,34 +178,41 @@
 
         <div class="form-group col-md-4">
           <label>Logradouro</label>
-          <input type="text" th:field="*{enderecos[0].logradouro}" class="form-control" id="logradouro" readonly>
+          <input type="text" name="enderecos[0].logradouro" th:value="*{enderecos[0].logradouro}" class="form-control"
+            id="logradouro" readonly>
         </div>
 
         <div class="form-group col-md-2">
           <label>Número</label>
-          <input type="text" th:field="*{enderecos[0].numero}" class="form-control">
+          <input type="text" name="enderecos[0].numero" th:value="*{enderecos[0].numero}" class="form-control"
+            id="numero">
         </div>
 
         <div class="form-group col-md-2">
           <label>Complemento</label>
-          <input type="text" th:field="*{enderecos[0].complemento}" class="form-control" id="complemento">
+          <input type="text" name="enderecos[0].complemento" th:value="*{enderecos[0].complemento}" class="form-control"
+            id="complemento">
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group col-md-4">
           <label>Bairro</label>
-          <input type="text" th:field="*{enderecos[0].bairro}" class="form-control" id="bairro" readonly>
+          <input type="text" name="enderecos[0].bairro" th:value="*{enderecos[0].bairro}" class="form-control"
+            id="bairro" readonly>
         </div>
         <div class="form-group col-md-4">
           <label>Cidade</label>
-          <input type="text" th:field="*{enderecos[0].cidade}" class="form-control" id="cidade" readonly>
+          <input type="text" name="enderecos[0].cidade" th:value="*{enderecos[0].cidade}" class="form-control"
+            id="cidade" readonly>
         </div>
         <div class="form-group col-md-4">
           <label>Estado</label>
-          <input type="text" th:field="*{enderecos[0].estado}" class="form-control" id="estado" readonly>
+          <input type="text" name="enderecos[0].estado" th:value="*{enderecos[0].estado}" class="form-control"
+            id="estado" readonly>
         </div>
       </div>
+
       <div class="text-center">
         <button type="submit" class="btn btn-primary btn-salvar-custom mt-3 shadow-sm">
           <i class="fas fa-save mr-1"></i> Salvar
@@ -370,27 +376,103 @@
   // Chama a função ao carregar a página
   document.addEventListener('DOMContentLoaded', toggleFields);
 
-  // Função para buscar CEP (sem alterações)
+  /*<![CDATA[*/
+
+  // --- INÍCIO DAS FUNÇÕES AUXILIARES PARA ENDEREÇO ---
+
+  // Pega a referência dos campos de endereço uma única vez para melhor performance
+  const camposEndereco = [
+    document.getElementById("logradouro"),
+    document.getElementById("bairro"),
+    document.getElementById("cidade"),
+    document.getElementById("estado")
+  ];
+
+  /**
+   * Bloqueia ou desbloqueia os campos de endereço.
+   * @param {boolean} bloquear - True para bloquear (readonly), false para desbloquear.
+   * @param {string} placeholder - Texto a ser exibido nos campos quando bloqueados.
+   */
+  function controlarCamposEndereco(bloquear, placeholder = '') {
+    camposEndereco.forEach(campo => {
+      campo.readOnly = bloquear;
+      campo.placeholder = placeholder;
+      if (bloquear) {
+        campo.value = ''; // Limpa o campo ao bloquear
+      }
+    });
+  }
+
+  // --- FIM DAS FUNÇÕES AUXILIARES ---
+
+  /**
+ * VERSÃO FINAL: Busca o CEP. Se encontrar, preenche e MANTÉM os campos bloqueados.
+ * Se falhar, avisa o usuário e LIBERA os campos para preenchimento manual.
+ */
   function buscarCep() {
-    const cep = document.getElementById("cep").value.replace(/\D/g, '');
+    // Referências aos elementos do formulário
+    const cepInput = document.getElementById("cep");
+    const logradouroInput = document.getElementById("logradouro");
+    const bairroInput = document.getElementById("bairro");
+    const cidadeInput = document.getElementById("cidade");
+    const estadoInput = document.getElementById("estado");
+    const complementoInput = document.getElementById("complemento");
+    const numeroInput = document.getElementById("numero");
+
+    // Lista de campos que serão bloqueados/desbloqueados
+    const camposControlados = [logradouroInput, bairroInput, cidadeInput, estadoInput];
+
+    // Função interna para gerenciar o estado dos campos
+    function controlarCampos(bloquear, placeholder = '') {
+      camposControlados.forEach(campo => {
+        campo.readOnly = bloquear;
+        campo.placeholder = placeholder;
+        if (bloquear) {
+          campo.value = ''; // Limpa os campos ao iniciar a busca
+        }
+      });
+      complementoInput.value = '';
+    }
+
+    const cep = cepInput.value.replace(/\D/g, '');
+
     if (cep.length !== 8) {
-      Swal.fire("CEP inválido", "Digite um CEP com 8 números.", "warning");
+      Swal.fire("CEP inválido", "Por favor, digite um CEP com 8 números.", "warning");
       return;
     }
+
+    // 1. Bloqueia os campos e mostra feedback "Buscando..."
+    controlarCampos(true, "Buscando...");
+
     fetch(`/api/cep/${cep}`)
       .then(response => {
-        if (!response.ok) throw new Error("CEP não encontrado");
+        if (!response.ok) {
+          throw new Error("CEP não encontrado ou inválido.");
+        }
         return response.json();
       })
       .then(data => {
-        document.getElementById("logradouro").value = data.logradouro || '';
-        document.getElementById("bairro").value = data.bairro || '';
-        document.getElementById("cidade").value = data.localidade || '';
-        document.getElementById("estado").value = data.uf || '';
-        document.getElementById("complemento").value = data.complemento || '';
+        // 2. SUCESSO: Preenche os campos. Eles continuarão bloqueados (readonly).
+        logradouroInput.value = data.logradouro || '';
+        bairroInput.value = data.bairro || '';
+        cidadeInput.value = data.localidade || '';
+        estadoInput.value = data.uf || '';
+        complementoInput.value = data.complemento || '';
+
+        // Foca no campo "Número" para o próximo passo do usuário
+        numeroInput.focus();
       })
       .catch(error => {
-        Swal.fire("Erro", "Não foi possível buscar o CEP.", "error");
+        // 3. ERRO: Avisa o usuário sobre a falha.
+        console.error("Erro ao buscar CEP:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'CEP não encontrado',
+          text: 'Não foi possível localizar o endereço. Por favor, preencha os campos manualmente.'
+        });
+
+        // E AGORA, DESBLOQUEIA OS CAMPOS PARA EDIÇÃO MANUAL.
+        controlarCampos(false); // <--- A MUDANÇA ESTÁ AQUI!
       });
   }
 
@@ -426,7 +508,7 @@
         return false;
       }
     }
-    
+
     Swal.fire({
       icon: 'success',
       title: 'Cadastrado com Sucesso!',
@@ -442,6 +524,25 @@
     $('#cpfInput').mask('000.000.000-00');
     $('#identidadeInput').mask('00.000.000-0', { reverse: true });
     $('#cep').mask('00000-000');
+
+    // --- INÍCIO DA NOVA LÓGICA PARA O "ENTER" NO CEP ---
+
+    // 1. Pega a referência do campo de input do CEP.
+    const cepInput = document.getElementById('cep');
+
+    // 2. Adiciona um "ouvinte" para a tecla pressionada 'keydown'.
+    cepInput.addEventListener('keydown', function (event) {
+
+      // 3. Verifica se a tecla pressionada foi 'Enter'.
+      if (event.key === 'Enter') {
+
+        // 4. PREVINE a ação padrão do navegador (que seria submeter o formulário).
+        event.preventDefault();
+
+        // 5. CHAMA a sua função de busca de CEP no lugar.
+        buscarCep();
+      }
+    });
   });
 
 </script>

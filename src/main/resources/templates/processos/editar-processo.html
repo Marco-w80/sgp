@@ -191,7 +191,8 @@
   }
 </style>
 
-<head th:replace="~{fragments/head :: top}"></head>
+<head th:replace="~{fragments/head :: top}">
+</head>
 
 <div class="pagina-edicao">
   <div class="card shadow mb-4">
@@ -426,14 +427,19 @@
           <textarea class="form-control" name="obs" rows="3" th:text="${processo.obs}"></textarea>
         </fieldset>
 
-        <div class="mt-4">
-          <button type="submit" class="btn btn-success">
-            <i class="fas fa-save mr-2"></i>Salvar Alterações
-          </button>
+        <div class="mt-4 d-flex justify-content-between">
+          <div>
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-save mr-2"></i>Salvar Alterações
+            </button>
+            <a th:href="@{/processos/listar}" class="btn btn-secondary ml-2">
+              <i class="fas fa-times-circle mr-2"></i>Cancelar
+            </a>
+          </div>
 
-          <a th:href="@{/processos/listar}" class="btn btn-secondary ml-2">
-            <i class="fas fa-times-circle mr-2"></i>Cancelar
-          </a>
+          <button type="button" id="btn-excluir" class="btn btn-danger" th:data-processo-id="${processo.id}">
+            <i class="fas fa-trash-alt mr-2"></i>Excluir Processo
+          </button>
         </div>
       </form>
     </div>
@@ -635,6 +641,68 @@
           confirmButtonColor: '#4e73df'
         });
       }
+    });
+
+    // --- AÇÃO PARA O BOTÃO DE EXCLUIR ---
+    $('#btn-excluir').on('click', function () {
+      const processoId = $(this).data('processo-id'); // Pega o ID do atributo data-
+      const urlExcluir = `/processos/excluir/${processoId}`;
+      const urlListagem = '/processos/listar'; // URL para onde redirecionar após o sucesso
+
+      Swal.fire({
+        title: 'Você tem certeza?',
+        text: "Esta ação não poderá ser revertida! Todos os dados do processo serão apagados.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, quero excluir!',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Pega o token e o nome do header dos meta tags que você adicionou
+          const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+          const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+          // Se o usuário confirmou, faz a requisição AJAX para o backend
+          fetch(urlExcluir, {
+            method: 'DELETE',
+            headers: {
+              // Adiciona o cabeçalho CSRF dinamicamente aqui
+              [header]: token
+            }
+          })
+            .then(response => {
+              // ... o resto do seu código .then() e .catch() continua igual ...
+              if (response.ok) {
+                Swal.fire(
+                  'Excluído!',
+                  'O processo foi excluído com sucesso.',
+                  'success'
+                ).then(() => {
+                  window.location.href = urlListagem;
+                });
+              } else {
+                // Tenta ler a resposta como texto para dar mais detalhes do erro 403
+                response.text().then(text => {
+                  console.error("Erro do servidor:", text); // Log para o console
+                  Swal.fire(
+                    'Erro!',
+                    `Não foi possível excluir o processo. Detalhe: ${response.statusText}`,
+                    'error'
+                  );
+                });
+              }
+            })
+            .catch(error => {
+              Swal.fire(
+                'Erro!',
+                `Não foi possível excluir o processo. Detalhe: ${error.message}`,
+                'error'
+              );
+            });
+        }
+      });
     });
 
 
