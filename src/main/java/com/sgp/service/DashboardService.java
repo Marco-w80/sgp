@@ -7,6 +7,7 @@ import com.sgp.repository.ProcessoProdutoRepository;
 import com.sgp.repository.ProcessoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,8 +51,30 @@ public class DashboardService {
         return map;
     }
 
+    public Map<String, Long> contarPorStatusFormatado(LocalDate de, LocalDate ate) {
+        var rows = (de == null && ate == null)
+                ? processoRepository.contarPorStatus()
+                : processoRepository.contarPorStatusPeriodo(de, ate);
+
+        Map<String, Long> out = new LinkedHashMap<>();
+        for (StatusProcesso st : StatusProcesso.values()) {
+            out.put(st.name().replace('_', ' '), 0L);
+        }
+
+        for (var row : rows) {
+            String key = row.getStatus() == null ? "SEM STATUS" : row.getStatus().replace('_', ' ');
+            out.merge(key, row.getTotal(), Long::sum);
+        }
+
+        return out;
+    }
+
     public List<DTOs.ProcessoPendenteDTO> listarPendencias(int diasMinimos) {
-        return processoRepository.pendenciasDocumento(diasMinimos).stream()
+        return listarPendencias(diasMinimos, null, null);
+    }
+
+    public List<DTOs.ProcessoPendenteDTO> listarPendencias(int diasMinimos, LocalDate de, LocalDate ate) {
+        return processoRepository.pendenciasDocumento(diasMinimos, de, ate).stream()
                 .map(arr -> new DTOs.ProcessoPendenteDTO(
                         ((Number) arr[0]).longValue(),
                         (String)  arr[1],
@@ -67,14 +90,30 @@ public class DashboardService {
 
     // ========== KPIs / Séries ==========
     public DTOs.DocumentacaoResumoDTO documentacaoResumo() {
-        long total = processoRepository.totalProcessos();
-        long completos = processoRepository.totalProcessosCompletos();
+        return documentacaoResumo(null, null);
+    }
+
+    public DTOs.DocumentacaoResumoDTO documentacaoResumo(LocalDate de, LocalDate ate) {
+        long total = (de == null && ate == null)
+                ? processoRepository.totalProcessos()
+                : processoRepository.totalProcessosPeriodo(de, ate);
+
+        long completos = (de == null && ate == null)
+                ? processoRepository.totalProcessosCompletos()
+                : processoRepository.totalProcessosCompletosPeriodo(de, ate);
+
         double pct = total == 0 ? 0.0 : (100.0 * completos / (double) total);
         return new DTOs.DocumentacaoResumoDTO(completos, total, round2(pct));
     }
 
     public DTOs.SerieDTO novosProcessosPorMes() {
-        var data = processoRepository.novosPorMes();
+        return novosProcessosPorMes(null, null);
+    }
+
+    public DTOs.SerieDTO novosProcessosPorMes(LocalDate de, LocalDate ate) {
+        var data = (de == null && ate == null)
+                ? processoRepository.novosPorMes()
+                : processoRepository.novosPorMesPeriodo(de, ate);
 
         List<String> categorias = data.stream()
                 .map(Projections.SerieMensalProjection::getAnoMes)
@@ -90,7 +129,15 @@ public class DashboardService {
     }
 
     public Map<String, Long> distribuicaoTipoHospital() {
-        return processoRepository.distribuicaoPorTipoHospital().stream()
+        return distribuicaoTipoHospital(null, null);
+    }
+
+    public Map<String, Long> distribuicaoTipoHospital(LocalDate de, LocalDate ate) {
+        var rows = (de == null && ate == null)
+                ? processoRepository.distribuicaoPorTipoHospital()
+                : processoRepository.distribuicaoPorTipoHospitalPeriodo(de, ate);
+
+        return rows.stream()
                 .collect(Collectors.toMap(
                         Projections.ChaveValorLongProjection::getNome,
                         Projections.ChaveValorLongProjection::getTotal,
@@ -100,54 +147,94 @@ public class DashboardService {
     }
 
     public List<Map<String, Object>> topDoencas() {
-    return processoRepository.topDoencas().stream()
-            .map(p -> {
-                Map<String, Object> m = new LinkedHashMap<>();
-                m.put("doenca", p.getNome());
-                m.put("total", p.getTotal());
-                return m;
-            })
-            .toList();
-}
+        return topDoencas(null, null);
+    }
 
-public List<Map<String, Object>> leadTimeMedioPorDoenca() {
-    return processoRepository.leadTimeMedioPorDoenca().stream()
-            .map(p -> {
-                Map<String, Object> m = new LinkedHashMap<>();
-                m.put("doenca", p.getNome());
-                m.put("mediaDias", round2(p.getMediaDias() == null ? 0.0 : p.getMediaDias()));
-                m.put("qtde", p.getQtde());
-                return m;
-            })
-            .toList();
-}
+    public List<Map<String, Object>> topDoencas(LocalDate de, LocalDate ate) {
+        var rows = (de == null && ate == null)
+                ? processoRepository.topDoencas()
+                : processoRepository.topDoencasPeriodo(de, ate);
 
-public List<Map<String, Object>> produtividadePorAdvogado() {
-    return processoRepository.produtividadePorAdvogado().stream()
-            .map(p -> {
-                Map<String, Object> m = new LinkedHashMap<>();
-                m.put("advogado", p.getNome());
-                m.put("mediaDias", round2(p.getMediaDias() == null ? 0.0 : p.getMediaDias()));
-                m.put("qtde", p.getQtde());
-                return m;
-            })
-            .toList();
-}
+        return rows.stream()
+                .map(p -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("doenca", p.getNome());
+                    m.put("total", p.getTotal());
+                    return m;
+                })
+                .toList();
+    }
 
-public List<Map<String, Object>> consumoTotalPorProduto() {
-    return processoProdutoRepository.consumoTotalPorProduto().stream()
-            .map(p -> {
-                Map<String, Object> m = new LinkedHashMap<>();
-                m.put("produto", p.getProduto());
-                m.put("quantidade", p.getQuantidadeTotal());
-                return m;
-            })
-            .toList();
-}
+    public List<Map<String, Object>> leadTimeMedioPorDoenca() {
+        return leadTimeMedioPorDoenca(null, null);
+    }
+
+    public List<Map<String, Object>> leadTimeMedioPorDoenca(LocalDate de, LocalDate ate) {
+        var rows = (de == null && ate == null)
+                ? processoRepository.leadTimeMedioPorDoenca()
+                : processoRepository.leadTimeMedioPorDoencaPeriodo(de, ate);
+
+        return rows.stream()
+                .map(p -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("doenca", p.getNome());
+                    m.put("mediaDias", round2(p.getMediaDias() == null ? 0.0 : p.getMediaDias()));
+                    m.put("qtde", p.getQtde());
+                    return m;
+                })
+                .toList();
+    }
+
+    public List<Map<String, Object>> produtividadePorAdvogado() {
+        return produtividadePorAdvogado(null, null);
+    }
+
+    public List<Map<String, Object>> produtividadePorAdvogado(LocalDate de, LocalDate ate) {
+        var rows = (de == null && ate == null)
+                ? processoRepository.produtividadePorAdvogado()
+                : processoRepository.produtividadePorAdvogadoPeriodo(de, ate);
+
+        return rows.stream()
+                .map(p -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("advogado", p.getNome());
+                    m.put("mediaDias", round2(p.getMediaDias() == null ? 0.0 : p.getMediaDias()));
+                    m.put("qtde", p.getQtde());
+                    return m;
+                })
+                .toList();
+    }
+
+    public List<Map<String, Object>> consumoTotalPorProduto() {
+        return consumoTotalPorProduto(null, null);
+    }
+
+    public List<Map<String, Object>> consumoTotalPorProduto(LocalDate de, LocalDate ate) {
+        var rows = (de == null && ate == null)
+                ? processoProdutoRepository.consumoTotalPorProduto()
+                : processoProdutoRepository.consumoTotalPorProdutoPeriodo(de, ate);
+
+        return rows.stream()
+                .map(p -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("produto", p.getProduto());
+                    m.put("quantidade", p.getQuantidadeTotal());
+                    return m;
+                })
+                .toList();
+    }
 
 
     public DTOs.LeadTimeResumoDTO leadTimeResumo() {
-        var lts = processoRepository.leadTimePorProcesso().stream()
+        return leadTimeResumo(null, null);
+    }
+
+    public DTOs.LeadTimeResumoDTO leadTimeResumo(LocalDate de, LocalDate ate) {
+        var rows = (de == null && ate == null)
+                ? processoRepository.leadTimePorProcesso()
+                : processoRepository.leadTimePorProcessoPeriodo(de, ate);
+
+        var lts = rows.stream()
                 .map(Projections.LeadTimeProjection::getLeadTimeDias)
                 .filter(Objects::nonNull)
                 .sorted()
@@ -163,7 +250,13 @@ public List<Map<String, Object>> consumoTotalPorProduto() {
 
     // Série mensal de consumo (agregado total)
     public DTOs.SerieDTO consumoMensalTotal() {
-        var rows = processoProdutoRepository.consumoMensalPorProduto();
+        return consumoMensalTotal(null, null);
+    }
+
+    public DTOs.SerieDTO consumoMensalTotal(LocalDate de, LocalDate ate) {
+        var rows = (de == null && ate == null)
+                ? processoProdutoRepository.consumoMensalPorProduto()
+                : processoProdutoRepository.consumoMensalPorProdutoPeriodo(de, ate);
 
         // Pivot simples: mês -> soma total
         Map<String, Long> porMes = new LinkedHashMap<>();
@@ -181,56 +274,69 @@ public List<Map<String, Object>> consumoTotalPorProduto() {
         return new DTOs.SerieDTO("Consumo total (todos produtos)", meses, valores);
     }
 
-public Map<String, Long> perfilGenero() {
-    var rows = processoRepository.distribuicaoPorSexoPaciente();
-    Map<String, Long> out = new LinkedHashMap<>();
-    for (var r : rows) {
-        String k = r.getNome();
-        if (k == null || k.isBlank()) k = "DESCONHECIDO";
-        // Normalização extra (se um dia entrar algo fora do enum)
-        String keyNorm = switch (k.trim().toUpperCase()) {
-            case "M", "MASCULINO" -> "Masculino";
-            case "F", "FEMININO"  -> "Feminino";
-            default -> k;
+    public Map<String, Long> perfilGenero() {
+        return perfilGenero(null, null);
+    }
+
+    public Map<String, Long> perfilGenero(LocalDate de, LocalDate ate) {
+        var rows = (de == null && ate == null)
+                ? processoRepository.distribuicaoPorSexoPaciente()
+                : processoRepository.distribuicaoPorSexoPacientePeriodo(de, ate);
+
+        Map<String, Long> out = new LinkedHashMap<>();
+        for (var r : rows) {
+            String k = r.getNome();
+            if (k == null || k.isBlank()) k = "DESCONHECIDO";
+            String keyNorm = switch (k.trim().toUpperCase()) {
+                case "M", "MASCULINO" -> "Masculino";
+                case "F", "FEMININO" -> "Feminino";
+                default -> k;
+            };
+            out.merge(keyNorm, r.getTotal(), Long::sum);
+        }
+        return out;
+    }
+
+    public Map<String, Object> mediaIdadePorSexo() {
+        return mediaIdadePorSexo(null, null);
+    }
+
+    public Map<String, Object> mediaIdadePorSexo(LocalDate de, LocalDate ate) {
+        var bruto = (de == null && ate == null)
+                ? processoRepository.mediaIdadePorSexo()
+                : processoRepository.mediaIdadePorSexoPeriodo(de, ate);
+
+        List<String> categorias = new ArrayList<>();
+        List<Number> valores = new ArrayList<>();
+        List<Number> qts = new ArrayList<>();
+
+        java.util.function.Function<String, String> label = s -> {
+            if ("MASCULINO".equalsIgnoreCase(s)) return "Masculino";
+            if ("FEMININO".equalsIgnoreCase(s)) return "Feminino";
+            return "Não informado";
         };
-        out.merge(keyNorm, r.getTotal(), Long::sum);
-    }
-    return out;
-}
 
-///Idade projeção
-public Map<String, Object> mediaIdadePorSexo() {
-    var bruto = processoRepository.mediaIdadePorSexo();
+        var ordem = List.of("MASCULINO", "FEMININO", "NAO_INFORMADO");
+        var map = new LinkedHashMap<String, Projections.SexoMediaIdadeProjection>();
+        for (var it : bruto) map.put(it.getSexo(), it);
 
-    // Ordena por label amigável para manter M/F/Não informado
-    List<String> categorias = new java.util.ArrayList<>();
-    List<Number> valores = new java.util.ArrayList<>();
-    List<Number> qts     = new java.util.ArrayList<>();
+        for (var sx : ordem) {
+            var it = map.getOrDefault(sx, null);
+            categorias.add(label.apply(sx));
+            valores.add(it != null && it.getMedia() != null ? Math.round(it.getMedia() * 10.0) / 10.0 : 0);
+            qts.add(it != null ? it.getQtde() : 0);
+        }
 
-    java.util.function.Function<String,String> label = s -> {
-        if ("MASCULINO".equalsIgnoreCase(s)) return "Masculino";
-        if ("FEMININO".equalsIgnoreCase(s))  return "Feminino";
-        return "Não informado";
-    };
-
-    // Garante ordem: M, F, Não informado
-    var ordem = java.util.List.of("MASCULINO","FEMININO","NAO_INFORMADO");
-    var map = new java.util.LinkedHashMap<String, Projections.SexoMediaIdadeProjection>();
-    for (var it : bruto) map.put(it.getSexo(), it);
-
-    for (var sx : ordem) {
-        var it = map.getOrDefault(sx, null);
-        categorias.add(label.apply(sx));
-        valores.add(it != null && it.getMedia()!=null ? Math.round(it.getMedia()*10.0)/10.0 : 0);
-        qts.add(it != null ? it.getQtde() : 0);
+        return Map.of(
+                "categorias", categorias,
+                "valores", valores,
+                "qtde", qts,
+                "label", "Média de idade"
+        );
     }
 
-    return Map.of(
-        "categorias", categorias,
-        "valores", valores,
-        "qtde", qts,
-        "label", "Média de idade"
-    );
-}
+    public List<Integer> anosDisponiveis() {
+        return processoRepository.anosComProcessos();
+    }
 
 }

@@ -67,6 +67,16 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
     @Query("select p.status as status, count(p) as total from Processo p group by p.status")
     List<Projections.StatusCountProjection> contarPorStatus();
 
+    @Query("""
+           select p.status as status, count(p) as total
+           from Processo p
+           where (:de is null or p.dataInicio >= :de)
+             and (:ate is null or p.dataInicio <= :ate)
+           group by p.status
+           """)
+    List<Projections.StatusCountProjection> contarPorStatusPeriodo(@Param("de") LocalDate de,
+                                                                   @Param("ate") LocalDate ate);
+
     // Novos processos por mês (YYYY-MM)
     @Query("""
            select function('date_format', p.dataInicio, '%Y-%m') as anoMes,
@@ -77,9 +87,31 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
            """)
     List<Projections.SerieMensalProjection> novosPorMes();
 
+    @Query("""
+           select function('date_format', p.dataInicio, '%Y-%m') as anoMes,
+                  count(p) as valor
+           from Processo p
+           where (:de is null or p.dataInicio >= :de)
+             and (:ate is null or p.dataInicio <= :ate)
+           group by function('date_format', p.dataInicio, '%Y-%m')
+           order by function('date_format', p.dataInicio, '%Y-%m')
+           """)
+    List<Projections.SerieMensalProjection> novosPorMesPeriodo(@Param("de") LocalDate de,
+                                                                @Param("ate") LocalDate ate);
+
     // Distribuição por TipoHospital
     @Query("select cast(p.tipoHospital as string) as nome, count(p) as total from Processo p group by p.tipoHospital")
     List<Projections.ChaveValorLongProjection> distribuicaoPorTipoHospital();
+
+    @Query("""
+           select cast(p.tipoHospital as string) as nome, count(p) as total
+           from Processo p
+           where (:de is null or p.dataInicio >= :de)
+             and (:ate is null or p.dataInicio <= :ate)
+           group by p.tipoHospital
+           """)
+    List<Projections.ChaveValorLongProjection> distribuicaoPorTipoHospitalPeriodo(@Param("de") LocalDate de,
+                                                                                   @Param("ate") LocalDate ate);
 
     // Top doenças por volume (sem LIMIT aqui; limite na Service)
     @Query("""
@@ -91,6 +123,18 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
            """)
     List<Projections.ChaveValorLongProjection> topDoencas();
 
+    @Query("""
+           select d.nome as nome, count(p) as total
+           from Processo p
+           join p.doenca d
+           where (:de is null or p.dataInicio >= :de)
+             and (:ate is null or p.dataInicio <= :ate)
+           group by d.nome
+           order by count(p) desc
+           """)
+    List<Projections.ChaveValorLongProjection> topDoencasPeriodo(@Param("de") LocalDate de,
+                                                                 @Param("ate") LocalDate ate);
+
     // Lead time por processo (dias até o 1º envio)
 @Query("""
        select p.id as processoId,
@@ -101,6 +145,19 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
        where exists (select 1 from ProcessoProduto ppX where ppX.processo = p)
        """)
 List<Projections.LeadTimeProjection> leadTimePorProcesso();
+
+@Query("""
+       select p.id as processoId,
+              timestampdiff(day, p.dataInicio,
+                 (select min(pp.dataEnvio) from ProcessoProduto pp where pp.processo = p)
+              ) as leadTimeDias
+       from Processo p
+       where exists (select 1 from ProcessoProduto ppX where ppX.processo = p)
+         and (:de is null or p.dataInicio >= :de)
+         and (:ate is null or p.dataInicio <= :ate)
+       """)
+List<Projections.LeadTimeProjection> leadTimePorProcessoPeriodo(@Param("de") LocalDate de,
+                                                                @Param("ate") LocalDate ate);
 
 // Lead time médio por doença
 @Query("""
@@ -119,6 +176,25 @@ List<Projections.LeadTimeProjection> leadTimePorProcesso();
        """)
 List<Projections.LeadTimeMedioProjection> leadTimeMedioPorDoenca();
 
+@Query("""
+       select d.nome as nome,
+              avg(
+                 timestampdiff(day, p.dataInicio,
+                   (select min(pp.dataEnvio) from ProcessoProduto pp where pp.processo = p)
+                 )
+              ) as mediaDias,
+              count(p) as qtde
+       from Processo p
+       join p.doenca d
+       where exists (select 1 from ProcessoProduto ppX where ppX.processo = p)
+         and (:de is null or p.dataInicio >= :de)
+         and (:ate is null or p.dataInicio <= :ate)
+       group by d.nome
+       order by mediaDias
+       """)
+List<Projections.LeadTimeMedioProjection> leadTimeMedioPorDoencaPeriodo(@Param("de") LocalDate de,
+                                                                        @Param("ate") LocalDate ate);
+
 // Produtividade por advogado (volume & lead time)
 @Query("""
        select coalesce(a.nome, '(sem advogado)') as nome,
@@ -135,6 +211,25 @@ List<Projections.LeadTimeMedioProjection> leadTimeMedioPorDoenca();
        order by qtde desc
        """)
 List<Projections.LeadTimeMedioProjection> produtividadePorAdvogado();
+
+@Query("""
+       select coalesce(a.nome, '(sem advogado)') as nome,
+              avg(
+                 timestampdiff(day, p.dataInicio,
+                   (select min(pp.dataEnvio) from ProcessoProduto pp where pp.processo = p)
+                 )
+              ) as mediaDias,
+              count(p) as qtde
+       from Processo p
+       left join p.advogado a
+       where exists (select 1 from ProcessoProduto ppX where ppX.processo = p)
+         and (:de is null or p.dataInicio >= :de)
+         and (:ate is null or p.dataInicio <= :ate)
+       group by a.nome
+       order by qtde desc
+       """)
+List<Projections.LeadTimeMedioProjection> produtividadePorAdvogadoPeriodo(@Param("de") LocalDate de,
+                                                                          @Param("ate") LocalDate ate);
 
 
     // Pendências de documentos há N dias+ (nativa OK)
@@ -155,14 +250,26 @@ List<Projections.LeadTimeMedioProjection> produtividadePorAdvogado();
                and p.comp_renda_anexado
                and p.procuracao_anexado
                and p.declaracao_insuficiencia_anexado)
+          and (:de is null or p.data_inicio >= :de)
+          and (:ate is null or p.data_inicio <= :ate)
           and datediff(curdate(), p.data_inicio) >= :dias
         order by diasDesdeInicio desc
         """, nativeQuery = true)
-    List<Object[]> pendenciasDocumento(@Param("dias") int dias);
+    List<Object[]> pendenciasDocumento(@Param("dias") int dias,
+                                       @Param("de") LocalDate de,
+                                       @Param("ate") LocalDate ate);
 
     // Totais para % documentação completa
     @Query("select count(p) from Processo p")
     long totalProcessos();
+
+    @Query("""
+           select count(p) from Processo p
+           where (:de is null or p.dataInicio >= :de)
+             and (:ate is null or p.dataInicio <= :ate)
+           """)
+    long totalProcessosPeriodo(@Param("de") LocalDate de,
+                               @Param("ate") LocalDate ate);
 
     @Query("""
            select count(p) from Processo p
@@ -173,6 +280,19 @@ List<Projections.LeadTimeMedioProjection> produtividadePorAdvogado();
              and p.declaracaoInsuficienciaAnexado = true
            """)
     long totalProcessosCompletos();
+
+    @Query("""
+           select count(p) from Processo p
+           where p.cpfAnexado = true
+             and p.compResidenciaAnexado = true
+             and p.compRendaAnexado = true
+             and p.procuracaoAnexado = true
+             and p.declaracaoInsuficienciaAnexado = true
+             and (:de is null or p.dataInicio >= :de)
+             and (:ate is null or p.dataInicio <= :ate)
+           """)
+    long totalProcessosCompletosPeriodo(@Param("de") LocalDate de,
+                                        @Param("ate") LocalDate ate);
 
     // Distribuição por sexo do paciente
 // Distribuição por sexo do(a) paciente (JPQL + enum)
@@ -197,6 +317,30 @@ List<Projections.LeadTimeMedioProjection> produtividadePorAdvogado();
        """)
 List<Projections.ChaveValorLongProjection> distribuicaoPorSexoPaciente();
 
+@Query("""
+       select
+         case
+           when pac.sexo is null then 'DESCONHECIDO'
+           when pac.sexo = com.sgp.model.Sexo.MASCULINO then 'Masculino'
+           when pac.sexo = com.sgp.model.Sexo.FEMININO  then 'Feminino'
+           else cast(pac.sexo as string)
+         end as nome,
+         count(proc) as total
+       from Processo proc
+       join proc.paciente pac
+       where (:de is null or proc.dataInicio >= :de)
+         and (:ate is null or proc.dataInicio <= :ate)
+       group by
+         case
+           when pac.sexo is null then 'DESCONHECIDO'
+           when pac.sexo = com.sgp.model.Sexo.MASCULINO then 'Masculino'
+           when pac.sexo = com.sgp.model.Sexo.FEMININO  then 'Feminino'
+           else cast(pac.sexo as string)
+         end
+       """)
+List<Projections.ChaveValorLongProjection> distribuicaoPorSexoPacientePeriodo(@Param("de") LocalDate de,
+                                                                               @Param("ate") LocalDate ate);
+
 
 
 
@@ -210,6 +354,28 @@ List<Projections.ChaveValorLongProjection> distribuicaoPorSexoPaciente();
        group by pac.sexo
        """)
 List<Projections.SexoMediaIdadeProjection> mediaIdadePorSexo();
+
+@Query("""
+       select cast(coalesce(pac.sexo, 'NAO_INFORMADO') as string) as sexo,
+              avg( timestampdiff(year, pac.dataNascimento, current date) ) as media,
+              count(pac.id) as qtde
+       from Processo pr
+       join pr.paciente pac
+       where pac.dataNascimento is not null
+         and (:de is null or pr.dataInicio >= :de)
+         and (:ate is null or pr.dataInicio <= :ate)
+       group by pac.sexo
+       """)
+List<Projections.SexoMediaIdadeProjection> mediaIdadePorSexoPeriodo(@Param("de") LocalDate de,
+                                                                    @Param("ate") LocalDate ate);
+
+    @Query("""
+           select distinct year(p.dataInicio)
+           from Processo p
+           where p.dataInicio is not null
+           order by year(p.dataInicio) desc
+           """)
+    List<Integer> anosComProcessos();
 
 
 

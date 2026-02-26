@@ -294,6 +294,22 @@
       background-color: white;
       transform: scale(1.2);
     }
+
+    .dashboard-filter-bar {
+      border: 1px solid var(--cor-borda-suave);
+      border-radius: 0.5rem;
+      background: #fff;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .dashboard-resumo {
+      border-left: 4px solid var(--cor-primaria);
+      background: #f8f9fc;
+      padding: .9rem 1rem;
+      border-radius: .35rem;
+      margin-bottom: 1rem;
+    }
   </style>
 </head>
 
@@ -313,6 +329,75 @@
           </button>
 
           <h1 id="presentation-title" class="h3 text-gray-800">Dashboard</h1>
+
+          <form class="dashboard-filter-bar" method="get" th:action="@{/intranet}">
+            <div class="form-row align-items-end">
+              <div class="col-md-3 mb-2">
+                <label class="small font-weight-bold mb-1">Anos (multiselect)</label>
+                <select id="filtroAnos" name="anos" class="form-control form-control-sm" multiple size="4">
+                  <option th:each="anoItem : ${anosDisponiveis}" th:value="${anoItem}" th:text="${anoItem}"
+                    th:selected="${anosSelecionados != null and #lists.contains(anosSelecionados, anoItem)}">2026</option>
+                </select>
+              </div>
+
+              <div class="col-md-2 mb-2">
+                <label class="small font-weight-bold mb-1">Trimestre</label>
+                <select id="filtroTrimestre" name="trimestre" class="form-control form-control-sm">
+                  <option value="">Ano inteiro</option>
+                  <option value="1" th:selected="${trimestreSelecionado == 1}">1º tri (Jan-Mar)</option>
+                  <option value="2" th:selected="${trimestreSelecionado == 2}">2º tri (Abr-Jun)</option>
+                  <option value="3" th:selected="${trimestreSelecionado == 3}">3º tri (Jul-Set)</option>
+                  <option value="4" th:selected="${trimestreSelecionado == 4}">4º tri (Out-Dez)</option>
+                </select>
+              </div>
+
+              <div class="col-md-2 mb-2">
+                <label class="small font-weight-bold mb-1">Mês (opcional)</label>
+                <select id="filtroMes" name="mes" class="form-control form-control-sm">
+                  <option value="">Todos os meses</option>
+                  <option value="1" th:selected="${mesSelecionado == 1}">Janeiro</option>
+                  <option value="2" th:selected="${mesSelecionado == 2}">Fevereiro</option>
+                  <option value="3" th:selected="${mesSelecionado == 3}">Março</option>
+                  <option value="4" th:selected="${mesSelecionado == 4}">Abril</option>
+                  <option value="5" th:selected="${mesSelecionado == 5}">Maio</option>
+                  <option value="6" th:selected="${mesSelecionado == 6}">Junho</option>
+                  <option value="7" th:selected="${mesSelecionado == 7}">Julho</option>
+                  <option value="8" th:selected="${mesSelecionado == 8}">Agosto</option>
+                  <option value="9" th:selected="${mesSelecionado == 9}">Setembro</option>
+                  <option value="10" th:selected="${mesSelecionado == 10}">Outubro</option>
+                  <option value="11" th:selected="${mesSelecionado == 11}">Novembro</option>
+                  <option value="12" th:selected="${mesSelecionado == 12}">Dezembro</option>
+                </select>
+              </div>
+
+              <div class="col-md-2 mb-2">
+                <label class="small font-weight-bold mb-1">Pendências (dias+)</label>
+                <input type="number" min="0" name="dias" th:value="${diasMinimos}" class="form-control form-control-sm">
+              </div>
+
+              <div class="col-md-4 mb-2 text-md-right">
+                <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-filter mr-1"></i>Aplicar
+                  filtros</button>
+                <a th:href="@{/intranet}" class="btn btn-sm btn-outline-secondary ml-1">Limpar</a>
+              </div>
+
+              <div class="col-12">
+                <small class="text-muted">Dica: segure <strong>Ctrl</strong> para selecionar mais de um ano. Com mais
+                  de um ano, trimestre/mês ficam desativados.</small>
+              </div>
+
+            </div>
+          </form>
+
+          <!-- <div class="dashboard-resumo">
+            <div class="font-weight-bold text-theme-primary" th:text="'Painel de acompanhamento • ' + ${periodoDescricao}">
+              Painel de acompanhamento</div>
+            <div class="small text-muted">
+              Indicadores para comprovar ao médico a evolução dos processos monitorados.
+              <strong th:text="${processosEmAndamento}">0</strong> em andamento e
+              <strong class="text-success" th:text="${processosGanhos}">0</strong> ganhos no período.
+            </div>
+          </div> -->
 
           <nav class="dashboard-nav">
           </nav>
@@ -608,6 +693,9 @@
       const paginationDotsContainer = document.getElementById('pagination-dots');
       const prevSlideBtn = document.getElementById('prev-slide-btn');
       const nextSlideBtn = document.getElementById('next-slide-btn');
+      const filtroAnos = document.getElementById('filtroAnos');
+      const filtroTrimestre = document.getElementById('filtroTrimestre');
+      const filtroMes = document.getElementById('filtroMes');
 
       let currentPageIndex = 0;
       let slideshowInterval = null;
@@ -694,6 +782,38 @@
       });
 
       // 6. Inicialização
+      const atualizarRegraAnos = () => {
+        if (!filtroAnos || !filtroTrimestre || !filtroMes) return;
+        const anosSelecionados = Array.from(filtroAnos.selectedOptions || []);
+        const multiAno = anosSelecionados.length > 1;
+
+        filtroTrimestre.disabled = multiAno;
+        filtroMes.disabled = multiAno;
+
+        if (multiAno) {
+          filtroTrimestre.value = '';
+          filtroMes.value = '';
+        }
+      };
+
+      if (filtroTrimestre && filtroMes) {
+        filtroTrimestre.addEventListener('change', () => {
+          if (filtroTrimestre.value) {
+            filtroMes.value = '';
+          }
+        });
+        filtroMes.addEventListener('change', () => {
+          if (filtroMes.value) {
+            filtroTrimestre.value = '';
+          }
+        });
+      }
+
+      if (filtroAnos) {
+        filtroAnos.addEventListener('change', atualizarRegraAnos);
+        atualizarRegraAnos();
+      }
+
       showPage(0);
     });
 

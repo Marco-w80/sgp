@@ -38,15 +38,23 @@ public class ProcessoService {
     private ProcessoExcluidoRepository processoExcluidoRepository;
 
     public List<ProcessoPendenteDTO> listarProcessosComDocumentacaoPendenteComMinDias(int diasMinimos) {
+        return listarProcessosComDocumentacaoPendenteComMinDias(diasMinimos, null, null);
+    }
+
+    public List<ProcessoPendenteDTO> listarProcessosComDocumentacaoPendenteComMinDias(int diasMinimos,
+                                                                                        LocalDate de,
+                                                                                        LocalDate ate) {
         LocalDate hoje = LocalDate.now();
 
         return processoRepository.findAll().stream()
-                .filter(this::temPendenciaDocumento) // método auxiliar abaixo
+                .filter(this::temPendenciaDocumento)
+                .filter(p -> de == null || !p.getDataInicio().isBefore(de))
+                .filter(p -> ate == null || !p.getDataInicio().isAfter(ate))
                 .map(p -> {
                     long dias = ChronoUnit.DAYS.between(p.getDataInicio(), hoje);
                     return new AbstractMap.SimpleEntry<>(p, dias);
                 })
-                .filter(e -> e.getValue() >= diasMinimos) // AQUI é o filtro correto
+                .filter(e -> e.getValue() >= diasMinimos)
                 .map(e -> new ProcessoPendenteDTO(
                         e.getKey(),
                         documentosFaltando(e.getKey()),
