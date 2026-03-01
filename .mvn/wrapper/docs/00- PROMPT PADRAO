@@ -1,0 +1,90 @@
+# ✅ SGP (Sistema Grupo Prod) — Tarefa de Implementação
+
+## 0) Contexto do Sistema
+Sistema interno nacional (Java 17 + Spring Boot 3.5 + Thymeleaf + MySQL AWS RDS).
+Pilares: Operacional (processos) + BI (/intranet com Highcharts).
+Deploy em Linux (hosting).
+Regras importantes:
+- Não alterar backend sem necessidade
+- Evitar mudanças amplas fora do escopo
+- Manter consistência com padrões atuais do projeto
+- Toda mudança relevante precisa ser registrada no CHANGELOG.md e docs
+
+---
+
+## 1) Objetivo da Tarefa (1 frase)
+<<DESCREVER EM 1 FRASE O QUE PRECISA>>
+
+---
+
+## 2) Escopo (o que entra)
+- <<ITEM 1>>
+- <<ITEM 2>>
+- <<ITEM 3>>
+
+---
+
+## 3) Fora de Escopo (o que NÃO fazer)
+- Não refatorar código que não for necessário
+- Não mudar layout global / tema sem eu pedir
+- Não alterar regras de status/documentos/itens do processo, exceto o que estiver no escopo
+- Não alterar schema existente além do que for explicitamente solicitado
+
+---
+
+## 4) Regras de Negócio / Comportamento esperado
+- <<REGRAS / VALIDAÇÕES / CÁLCULOS>>
+- <<EXEMPLOS DE COMO DEVE FUNCIONAR>>
+
+---
+
+## 5) Alterações Técnicas Esperadas
+### Backend
+- Controllers a mexer: <<...>>
+- Services a mexer/criar: <<...>>
+- Repositories a mexer/criar: <<...>>
+- Models/Entities a mexer/criar: <<...>>
+- DTOs/Projections (se necessário): <<...>>
+
+### Frontend (Thymeleaf)
+- Páginas a mexer/criar: <<...>>
+- Componentes/Fragmentos: <<...>>
+- Campos/Formulários: <<...>>
+- JS (Highcharts ou outro): <<...>>
+
+### Banco de dados
+- Migração: criar/alterar tabela <<...>>
+- Índices/constraints (se aplicável): <<...>>
+
+---
+
+## 6) Critérios de Aceite (checklist)
+- [ ] Feature funciona ponta-a-ponta (criar/editar/listar/visualizar conforme escopo)
+- [ ] Validações e erros tratados (mensagens claras)
+- [ ] Não quebrou BI (/intranet) e nem o relatório existente
+- [ ] Código compila e endpoints funcionam
+- [ ] Atualizou documentação e changelog
+
+---
+
+## 7) Entregáveis obrigatórios
+Ao finalizar, entregar:
+1) Lista de arquivos alterados/criados
+2) Resumo do que foi feito (curto)
+3) Passos de teste manual (3 a 8 passos)
+4) Observações/decisões técnicas
+
+---
+
+## 8) Documentação (OBRIGATÓRIO)
+Atualizar sempre:
+- /CHANGELOG.md  ✅
+- /docs/03-MODULOS-E-FLUXOS.md (se afetar fluxo/módulo) ✅
+- /docs/05-BANCO-DE-DADOS.md (se afetar entidades/tabelas) ✅
+- /docs/04-ROTAS-E-ENDPOINTS.md (se criar/alterar rotas) ✅
+- /docs/06-DADOS-E-INDICADORES.md (se mexer em BI/indicadores) ✅
+
+---
+
+## 9) Minha Tarefa (detalhada)
+<<COLE AQUI A DESCRIÇÃO COMPLETA DA TAREFA>>
