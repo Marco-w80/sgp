@@ -275,6 +275,7 @@
               <th class="text-center">Advogado</th>
               <th class="text-center">Médico</th>
               <th class="text-center">Local</th>
+              <th class="text-center">Deferimentos</th>
               <th class="text-center" data-orderable="false">CPF</th>
               <th class="text-center" data-orderable="false">Resid.</th>
               <th class="text-center" data-orderable="false">Renda</th>
@@ -293,6 +294,20 @@
               <td th:text="${proc.advogado != null ? proc.advogado.nome : ''}"></td>
               <td th:text="${proc.medico != null ? proc.medico.nome : ''}"></td>
               <td th:text="${proc.local != null ? proc.local.comarca : ''}"></td>
+              <td class="text-left" style="white-space: normal; min-width: 260px;">
+                <ul class="mb-0 pl-3" th:if="${not #lists.isEmpty(proc.deferimentos)}">
+                  <li th:each="def : ${proc.deferimentos}">
+                    <span th:text="${'#' + def.numeroDeferimento + ' - '}"></span>
+                    <span th:if="${def.tipo != null}"
+                      th:text="${def.tipo == T(com.sgp.model.TipoDeferimento).GRUPO_PROD ? 'Grupo Prod' : 'Juiz'}"></span>
+                    <span th:unless="${def.tipo != null}">-</span>
+                    <span th:text="${' (' + (def.dataDeferimento != null ? #temporals.format(def.dataDeferimento, 'dd/MM/yyyy') : '-') + '): '}"></span>
+                    <span th:if="${def.mensagem != null and !#strings.isEmpty(#strings.trim(def.mensagem))}" th:text="${def.mensagem}"></span>
+                    <span th:unless="${def.mensagem != null and !#strings.isEmpty(#strings.trim(def.mensagem))}">-</span>
+                  </li>
+                </ul>
+                <span th:if="${#lists.isEmpty(proc.deferimentos)}">-</span>
+              </td>
               <td>
                 <i class="fas fa-check-circle text-success" th:if="${proc.cpfAnexado}"></i>
                 <i class="fas fa-times-circle text-danger" th:unless="${proc.cpfAnexado}"></i>
@@ -315,7 +330,7 @@
               </td>
             </tr>
             <tr th:if="${#lists.isEmpty(processos)}">
-              <td colspan="14" class="text-center">Nenhum processo encontrado com os filtros aplicados.</td>
+              <td colspan="15" class="text-center">Nenhum processo encontrado com os filtros aplicados.</td>
             </tr>
           </tbody>
         </table>
@@ -337,7 +352,7 @@
         ordering: true,
         searching: true,
         columnDefs: [
-          { orderable: false, targets: [9, 10, 11, 12, 13] }
+          { orderable: false, targets: [9, 10, 11, 12, 13, 14] }
         ],
         autoWidth: false,
         scrollX: true

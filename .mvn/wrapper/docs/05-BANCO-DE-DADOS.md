@@ -11,6 +11,7 @@ Banco utilizado: **MySQL (AWS RDS)**.
 
 Núcleo do sistema:
 - **processos** (`Processo`) — entidade central
+- **deferimentos** (`Deferimento`) — histórico de deferimentos por processo
 - **pessoas** (`Pessoa` + subclasses `Paciente`, `Advogado`, `Medico`) — cadastro polimórfico
 - **produtos** (`Produto`) — itens/medicamentos
 - **processo_produtos** (`ProcessoProduto`) — itens enviados por processo (produto, data, quantidade)
@@ -50,6 +51,7 @@ Campos:
 Relacionamentos:
 - 1:N com `processo_produtos` (itens) — cascade + orphanRemoval
 - 1:N com `processo_logs` (logs) — cascade + orphanRemoval (fetch LAZY)
+- 1:N com `deferimentos` (histórico) — cascade + orphanRemoval
 
 Cuidados:
 - Alterar enum `StatusProcesso` impacta: dashboard, relatórios, filtros e contagens.
@@ -57,7 +59,27 @@ Cuidados:
 
 ---
 
-### 2) `processo_produtos` — Itens do Processo
+### 2) `deferimentos` — Histórico de Deferimentos
+**Tabela:** `deferimentos`
+
+Campos:
+- `id` (PK, bigint, auto increment)
+- `processo_id` (FK -> `processos.id`, NOT NULL)
+- `numero_deferimento` (int, NOT NULL)
+- `mensagem` (TEXT, NOT NULL)
+- `tipo` (varchar enum, NOT NULL) — `TipoDeferimento` (`GRUPO_PROD`, `JUIZ`)
+- `data_registro` (datetime, NOT NULL)
+
+Restrições:
+- `UNIQUE (processo_id, numero_deferimento)`
+
+Regras:
+- `numero_deferimento` é sequencial por processo (gerado no backend: `max + 1`).
+- Não pode haver dois deferimentos com mesmo número para o mesmo processo.
+
+---
+
+### 3) `processo_produtos` — Itens do Processo
 **Tabela:** `processo_produtos`
 
 Campos:
@@ -76,7 +98,7 @@ Cuidados:
 
 ---
 
-### 3) `processo_logs` — Auditoria de Alterações
+### 4) `processo_logs` — Auditoria de Alterações
 **Tabela:** `processo_logs`
 
 Campos:
@@ -92,7 +114,7 @@ Objetivo:
 
 ---
 
-### 4) `processos_excluidos` — Arquivo Morto / Histórico de Exclusões
+### 5) `processos_excluidos` — Arquivo Morto / Histórico de Exclusões
 **Tabela:** `processos_excluidos`
 
 Campos:
@@ -120,7 +142,7 @@ Cuidados:
 
 ---
 
-### 5) `pessoas` — Pessoa (Herança SINGLE_TABLE)
+### 6) `pessoas` — Pessoa (Herança SINGLE_TABLE)
 **Tabela:** `pessoas` (`@Table(name="pessoas")`)
 
 Estratégia:
@@ -150,7 +172,7 @@ Cuidados:
 
 ---
 
-### 6) `enderecos` — Endereço
+### 7) `enderecos` — Endereço
 **Tabela:** `enderecos`
 
 Campos:
@@ -163,7 +185,7 @@ Cuidados:
 
 ---
 
-### 7) `produtos` — Produto
+### 8) `produtos` — Produto
 **Tabela:** `produtos`
 
 Campos:
@@ -184,7 +206,7 @@ Cuidados:
 
 ---
 
-### 8) `locais` — Local (Fórum)
+### 9) `locais` — Local (Fórum)
 **Tabela:** `locais`
 
 Campos:
@@ -202,7 +224,7 @@ Uso:
 
 ---
 
-### 9) `hospital` (ou equivalente) — Hospital
+### 10) `hospital` (ou equivalente) — Hospital
 **Tabela:** (não definida por @Table; provável `hospital` ou `hospital`/`hospitals` dependendo da naming strategy)
 
 Campos:
@@ -218,7 +240,7 @@ Uso:
 
 ---
 
-### 10) `doenca` e `grupo_doenca` (ou equivalente)
+### 11) `doenca` e `grupo_doenca` (ou equivalente)
 **Tabela `Doenca`:** (não definida por @Table; provável `doenca`/`doencas`)
 - `id` (PK)
 - `nome`
@@ -233,7 +255,7 @@ Uso:
 
 ---
 
-### 11) `usuarios` — Usuário do Sistema
+### 12) `usuarios` — Usuário do Sistema
 **Tabela:** (não definida por @Table; provável `usuario`/`usuarios`)
 
 Campos:
@@ -248,7 +270,7 @@ Cuidados:
 
 ---
 
-### 12) `maintenance_log` — Log de Manutenção
+### 13) `maintenance_log` — Log de Manutenção
 **Tabela:** `maintenance_log`
 
 Campos:
@@ -274,6 +296,7 @@ Uso:
 - `Sexo`: MASCULINO, FEMININO, OUTRO
 - `GrupoProduto`: MEDICAMENTOS, OUTROS
 - `MaintenanceType`: CORRECTIVE, PREVENTIVE, UPDATE, OTHER
+- `TipoDeferimento`: GRUPO_PROD, JUIZ
 - `Usuario.PerfilUsuario`: ADMIN, USUARIO
 
 ---

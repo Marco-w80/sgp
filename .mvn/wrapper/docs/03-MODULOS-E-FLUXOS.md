@@ -204,6 +204,21 @@ Regras e comportamento:
   - existe `ProcessoLogService.logIfChanged(...)` (exemplo aplicado ao campo Advogado)
   - objetivo: registrar mudanças relevantes em `processo_logs`
 
+#### Histórico de Deferimentos (novo)
+- Cada processo agora possui **histórico de deferimentos** (`1:N`).
+- Fluxo na tela de edição:
+  - Exibe lista dos deferimentos já registrados.
+  - Botão **Adicionar Deferimento** abre formulário com:
+    - `tipo`: Grupo Prod / Juiz
+    - `mensagem`
+  - O `numeroDeferimento` é gerado automaticamente no backend ao salvar.
+- Regras:
+  - Numeração sequencial por processo.
+  - Não permite duplicidade de número no mesmo processo (restrição única no banco).
+- Escopo atual:
+  - Integrado à edição de processo e relatório simples de processo.
+  - **Não integrado ao dashboard/BI** nesta etapa.
+
 ---
 
 ### 5.4) Excluir processo
@@ -233,6 +248,7 @@ Filtros:
 Retorno:
 - lista filtrada + total
 - repassa filtros via ParamWrapper para manter o form preenchido
+- inclui lista simples de deferimentos por processo (sem filtros específicos de deferimento)
 
 ---
 

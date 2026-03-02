@@ -72,6 +72,10 @@ public class Processo {
     @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProcessoLog> logs = new ArrayList<>();
 
+    @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("numeroDeferimento ASC")
+    private List<Deferimento> deferimentos = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusProcesso status;
@@ -108,6 +112,11 @@ public class Processo {
 
     public void clearItems() {
         itens.clear();
+    }
+
+    public void addDeferimento(Deferimento deferimento) {
+        deferimento.setProcesso(this);
+        deferimentos.add(deferimento);
     }
 
     // ----- getters & setters -----
@@ -150,6 +159,9 @@ public class Processo {
 
     public List<ProcessoLog> getLogs() { return logs; }
     public void setLogs(List<ProcessoLog> logs) { this.logs = logs; }
+
+    public List<Deferimento> getDeferimentos() { return deferimentos; }
+    public void setDeferimentos(List<Deferimento> deferimentos) { this.deferimentos = deferimentos; }
 
     public List<ProcessoProduto> getItens() { return itens; }
     public void setItens(List<ProcessoProduto> itens) { this.itens = itens; }

@@ -14,13 +14,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -45,6 +43,8 @@ public class ProcessoController {
     private ProcessoLogService processoLogService;
     @Autowired
     private ProcessoService processoService;
+    @Autowired
+    private DeferimentoRepository deferimentoRepository;
 
     @GetMapping("/cadastrar")
     public String showCreateForm(Model model) {
@@ -180,7 +180,19 @@ public class ProcessoController {
     public String showEditForm(@PathVariable Long id, Model model) {
         Processo proc = processoRepository.findById(id).orElseThrow();
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        List<Map<String, String>> deferimentosView = proc.getDeferimentos().stream()
+                .map(def -> Map.of(
+                        "numero", def.getNumeroDeferimento() != null ? String.valueOf(def.getNumeroDeferimento()) : "-",
+                        "tipo", def.getTipo() == null ? "-" : (def.getTipo() == TipoDeferimento.GRUPO_PROD ? "Grupo Prod" : "Juiz"),
+                        "mensagem", (def.getMensagem() == null || def.getMensagem().trim().isEmpty()) ? "-" : def.getMensagem(),
+                        "dataDeferimento", def.getDataDeferimento() != null ? def.getDataDeferimento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "-",
+                        "dataRegistro", def.getDataRegistro() != null ? def.getDataRegistro().format(formatter) : "-"
+                ))
+                .collect(Collectors.toList());
+
         model.addAttribute("processo", proc);
+        model.addAttribute("deferimentosView", deferimentosView);
 
         model.addAttribute("pacientes", pessoaRepository.findAll().stream()
                 .filter(p -> p instanceof Paciente).map(p -> (Paciente) p).collect(Collectors.toList()));
@@ -198,6 +210,7 @@ public class ProcessoController {
         model.addAttribute("doencas", doencaRepository.findAll());
 
         model.addAttribute("tiposHospital", TipoHospital.values());
+        model.addAttribute("tipoDeferimentoValues", TipoDeferimento.values());
 
         System.out.println("Hospital do processo: " + proc.getHospital());
 
@@ -228,6 +241,10 @@ public class ProcessoController {
             @RequestParam(defaultValue = "false") boolean compRendaAnexado,
             @RequestParam(defaultValue = "false") boolean procuracaoAnexado,
             @RequestParam(defaultValue = "false") boolean declaracaoInsuficienciaAnexado,
+
+            @RequestParam(required = false) String deferimentoMensagem,
+            @RequestParam(required = false) TipoDeferimento deferimentoTipo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deferimentoData,
 
             @RequestParam(required = false) String obs) {
         Processo proc = processoRepository.findById(id).orElseThrow();
@@ -301,6 +318,21 @@ public class ProcessoController {
                 Produto p = produtoRepository.findById(produtoIds.get(i)).orElseThrow();
                 proc.addItem(p, produtoDatas.get(i), produtoQuantidades.get(i));
             }
+        }
+
+        if (deferimentoMensagem != null
+                && !deferimentoMensagem.isBlank()
+                && deferimentoTipo != null) {
+            Integer proximoNumero = deferimentoRepository.findMaxNumeroByProcessoId(proc.getId()) + 1;
+
+            Deferimento deferimento = new Deferimento();
+            deferimento.setNumeroDeferimento(proximoNumero);
+            deferimento.setMensagem(deferimentoMensagem.trim());
+            deferimento.setTipo(deferimentoTipo);
+            deferimento.setDataRegistro(LocalDateTime.now());
+            deferimento.setDataDeferimento(deferimentoData != null ? deferimentoData : LocalDate.now());
+
+            proc.addDeferimento(deferimento);
         }
 
         processoRepository.save(proc);

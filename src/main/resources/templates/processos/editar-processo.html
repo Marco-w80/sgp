@@ -427,6 +427,66 @@
           <textarea class="form-control" name="obs" rows="3" th:text="${processo.obs}"></textarea>
         </fieldset>
 
+        <!-- DEFERIMENTOS -->
+        <fieldset class="form-group border p-3 mt-4">
+          <legend class="w-auto px-2">Histórico de Deferimentos</legend>
+
+          <div class="table-responsive mb-3" th:if="${not #lists.isEmpty(deferimentosView)}">
+            <table class="table table-sm table-bordered mb-0">
+              <thead class="thead-light">
+                <tr>
+                  <th style="width: 10%">Nº</th>
+                  <th style="width: 15%">Tipo</th>
+                  <th>Mensagem</th>
+                  <th style="width: 15%">Data Deferimento</th>
+                  <th style="width: 20%">Data Registro</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="def : ${deferimentosView}">
+                  <td th:text="${def.numero}"></td>
+                  <td th:text="${def.tipo}"></td>
+                  <td th:text="${def.mensagem}"></td>
+                  <td th:text="${def.dataDeferimento}"></td>
+                  <td th:text="${def.dataRegistro}"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="alert alert-light border" th:if="${#lists.isEmpty(deferimentosView)}">
+            Nenhum deferimento registrado para este processo.
+          </div>
+
+          <details class="mb-3" id="painel-deferimento">
+            <summary class="btn btn-outline-primary" style="cursor: pointer; list-style: none;">
+              <i class="fas fa-plus mr-1"></i>Adicionar Deferimento
+            </summary>
+
+            <div class="form-row mt-3">
+              <div class="form-group col-md-4">
+                <label for="deferimentoTipo">Tipo</label>
+                <select class="form-control" id="deferimentoTipo" name="deferimentoTipo">
+                  <option value="">Selecione</option>
+                  <option value="GRUPO_PROD">Grupo Prod</option>
+                  <option value="JUIZ">Juiz</option>
+                </select>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="deferimentoData">Data do Deferimento</label>
+                <input type="date" class="form-control" id="deferimentoData" name="deferimentoData">
+                <small class="form-text text-muted">Se não informar, será usada a data de hoje.</small>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="deferimentoMensagem">Mensagem</label>
+                <textarea class="form-control" id="deferimentoMensagem" name="deferimentoMensagem" rows="2"
+                  placeholder="Digite a mensagem do deferimento"></textarea>
+                <small class="form-text text-muted">O número do deferimento será gerado automaticamente ao salvar.</small>
+              </div>
+            </div>
+          </details>
+        </fieldset>
+
         <div class="mt-4 d-flex justify-content-between">
           <div>
             <button type="submit" class="btn btn-success">
