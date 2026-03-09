@@ -48,6 +48,11 @@ Campos:
   - `declaracao_insuficiencia_anexado`
 - `obito` (boolean, NOT NULL, default false) — marcação informativa de óbito do paciente
 - `observacao_obito` (TEXT, NULL) — observação opcional do óbito
+- Campos de acompanhamento operacional (novos):
+  - `ultimo_acesso_em` (datetime, NULL)
+  - `ultimo_acesso_por` (varchar, NULL)
+  - `ultima_edicao_em` (datetime, NULL)
+  - `ultima_edicao_por` (varchar, NULL)
 - `obs` (TEXT, NULL)
 
 Relacionamentos:
@@ -106,13 +111,21 @@ Cuidados:
 Campos:
 - `id` (PK, auto increment)
 - `processo_id` (FK -> `processos.id`, NOT NULL)
+- `tipo_evento` (varchar, NOT NULL)
+  - valores utilizados no sistema: `ACESSO`, `EDICAO`
+  - valores de negócio previstos para evolução: `CRIACAO`, `STATUS_ALTERADO`
+- `usuario` (varchar, NULL)
 - `campo` (varchar, NOT NULL) — nome do campo alterado (ex.: "Advogado")
 - `valor_antigo` (TEXT, NULL)
 - `valor_novo` (TEXT, NULL)
-- `data_alteracao` (datetime, NOT NULL)
+- `data_hora` (datetime, NOT NULL)
+
+Índices:
+- `idx_processo_logs_processo_datahora (processo_id, data_hora)`
 
 Objetivo:
-- Registrar histórico de mudanças relevantes feitas em processos.
+- Registrar histórico de mudanças e interações relevantes feitas em processos.
+- Suportar rastreabilidade de **último acesso** e **última edição**.
 
 ---
 

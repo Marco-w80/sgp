@@ -179,6 +179,8 @@ public class ProcessoController {
     @GetMapping("/editar/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Processo proc = processoRepository.findById(id).orElseThrow();
+        processoLogService.registrarAcesso(proc);
+        proc = processoRepository.findById(id).orElseThrow();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         List<Map<String, String>> deferimentosView = proc.getDeferimentos().stream()
@@ -193,6 +195,18 @@ public class ProcessoController {
 
         model.addAttribute("processo", proc);
         model.addAttribute("deferimentosView", deferimentosView);
+        model.addAttribute(
+                "ultimoAcessoFormatado",
+                proc.getUltimoAcessoEm() != null
+                        ? proc.getUltimoAcessoEm().format(formatter)
+                        : "Sem registro"
+        );
+        model.addAttribute(
+                "ultimaEdicaoFormatada",
+                proc.getUltimaEdicaoEm() != null
+                        ? proc.getUltimaEdicaoEm().format(formatter)
+                        : "Sem registro"
+        );
 
         model.addAttribute("pacientes", pessoaRepository.findAll().stream()
                 .filter(p -> p instanceof Paciente).map(p -> (Paciente) p).collect(Collectors.toList()));
@@ -340,7 +354,8 @@ public class ProcessoController {
             proc.addDeferimento(deferimento);
         }
 
-        processoRepository.save(proc);
+        Processo processoSalvo = processoRepository.save(proc);
+        processoLogService.registrarEdicao(processoSalvo);
         return "redirect:/processos/listar";
     }
 

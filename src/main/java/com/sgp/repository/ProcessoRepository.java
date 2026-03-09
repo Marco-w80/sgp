@@ -19,6 +19,26 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
 
       boolean existsByNumeroInterno(String numeroInterno);
 
+    @Query(value = """
+            select p.id,
+                   pac.nome as nome_pessoa,
+                   p.ultimo_acesso_em,
+                   p.ultimo_acesso_por,
+                   p.ultima_edicao_em,
+                   p.ultima_edicao_por,
+                   timestampdiff(day, coalesce(p.ultimo_acesso_em, cast(p.data_inicio as datetime)), now()) as dias_sem_acesso,
+                   timestampdiff(day, coalesce(p.ultima_edicao_em, cast(p.data_inicio as datetime)), now()) as dias_sem_edicao
+            from processos p
+            join pessoas pac on pac.id = p.paciente_id
+            where (:diasSemAcesso is null
+                   or timestampdiff(day, coalesce(p.ultimo_acesso_em, cast(p.data_inicio as datetime)), now()) >= :diasSemAcesso)
+              and (:diasSemEdicao is null
+                   or timestampdiff(day, coalesce(p.ultima_edicao_em, cast(p.data_inicio as datetime)), now()) >= :diasSemEdicao)
+            order by p.id desc
+            """, nativeQuery = true)
+    List<Object[]> buscarAcompanhamento(@Param("diasSemAcesso") Integer diasSemAcesso,
+                                        @Param("diasSemEdicao") Integer diasSemEdicao);
+
 
 
     @Query("SELECT new com.sgp.dto.StatusCountDto(p.status, COUNT(p)) "

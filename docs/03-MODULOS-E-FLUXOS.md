@@ -198,6 +198,15 @@ Persistência:
 - `POST /processos/editar/{id}` → salva edição
 
 Regras e comportamento:
+- **Acompanhamento automático** (novo):
+  - ao abrir a tela de edição (`GET /processos/editar/{id}`), o sistema registra evento `ACESSO` no histórico;
+  - ao salvar edição (`POST /processos/editar/{id}`), o sistema registra evento `EDICAO`.
+- Campos auxiliares de acompanhamento no processo (performance para relatórios/BI):
+  - `ultimoAcessoEm`, `ultimoAcessoPor`
+  - `ultimaEdicaoEm`, `ultimaEdicaoPor`
+- A tela de edição exibe no cabeçalho:
+  - último acesso (data/hora + usuário)
+  - última edição (data/hora + usuário)
 - Itens são “resetados”:
   - `proc.clearItems()` + recriação da lista conforme arrays recebidos
 - Campo de óbito disponível na edição:
@@ -205,8 +214,23 @@ Regras e comportamento:
   - `observacaoObito` (texto opcional)
   - A marcação de óbito **não interrompe** o andamento do processo e não altera automaticamente status.
 - Auditoria:
-  - existe `ProcessoLogService.logIfChanged(...)` (exemplo aplicado ao campo Advogado)
-  - objetivo: registrar mudanças relevantes em `processo_logs`
+  - existe `ProcessoLogService.logIfChanged(...)` para alterações de campos
+  - existe registro de eventos de interação (`ACESSO` e `EDICAO`)
+  - objetivo: suportar trilha de acompanhamento operacional em `processo_logs`
+
+#### Acompanhamento operacional (base para indicadores)
+- Endpoint de apoio para consultas futuras e BI:
+  - `GET /api/processos/acompanhamento?diasSemAcesso=&diasSemEdicao=`
+- Retorno: lista de `ProcessoAcompanhamentoDTO` com:
+  - processoId
+  - nomePessoa
+  - ultimoAcesso / ultimoUsuarioAcesso
+  - ultimaEdicao / ultimoUsuarioEdicao
+  - diasSemAcesso / diasSemEdicao
+- Permite identificar cenários como:
+  - processos sem acesso há X dias
+  - processos sem edição há X dias
+  - processos sem interação recente
 
 #### Histórico de Deferimentos (novo)
 - Cada processo agora possui **histórico de deferimentos** (`1:N`).

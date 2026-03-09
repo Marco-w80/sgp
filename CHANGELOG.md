@@ -1,5 +1,36 @@
 # CHANGELOG — SGP (Sistema Grupo Prod)
 
+## [2026-03-09] - Feature
+
+### Descrição
+Implementado controle de acompanhamento operacional de processos com registro de **último acesso** e **última edição**, incluindo distinção entre eventos `ACESSO` e `EDICAO`.
+
+### Detalhes Técnicos
+- Entidade `Processo` atualizada com campos auxiliares:
+  - `ultimoAcessoEm`
+  - `ultimoAcessoPor`
+  - `ultimaEdicaoEm`
+  - `ultimaEdicaoPor`
+- Entidade `ProcessoLog` atualizada para suportar trilha de interação:
+  - `tipoEvento` (`ACESSO`, `EDICAO`, mantendo compatibilidade com logs de alteração)
+  - `usuario`
+  - `dataHora` (`data_hora`)
+  - índice `idx_processo_logs_processo_datahora (processo_id, data_hora)`
+- Fluxo de processo atualizado:
+  - `GET /processos/editar/{id}` registra evento `ACESSO` automaticamente
+  - `POST /processos/editar/{id}` registra evento `EDICAO` após persistência
+- Tela `processos/editar-processo` passou a exibir:
+  - último acesso (data/hora + usuário)
+  - última edição (data/hora + usuário)
+- Nova base para consultas de acompanhamento:
+  - `ProcessoAcompanhamentoDTO`
+  - consulta em `ProcessoRepository.buscarAcompanhamento(...)`
+  - endpoint `GET /api/processos/acompanhamento?diasSemAcesso=&diasSemEdicao=`
+
+### Observações
+- Implementação mantida no escopo do módulo de processos, sem alteração de regras de status/documentação/itens.
+- Projeto permanece com `spring.jpa.hibernate.ddl-auto=update`; novas colunas e índice são aplicados automaticamente no ambiente atual.
+
 ## [2026-03-08] - Improvement
 
 ### Descrição

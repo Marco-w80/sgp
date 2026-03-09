@@ -2,6 +2,7 @@ package com.sgp.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sgp.dto.ProcessoPendenteDTO;
+import com.sgp.dto.ProcessoAcompanhamentoDTO;
 import com.sgp.model.Processo;
 import com.sgp.model.ProcessoExcluido;
 import com.sgp.model.StatusProcesso;
@@ -91,6 +93,22 @@ public class ProcessoService {
             mapa.put(st, processoRepository.countByStatus(st));
         }
         return mapa;
+    }
+
+    public List<ProcessoAcompanhamentoDTO> listarAcompanhamento(Integer diasSemAcesso, Integer diasSemEdicao) {
+        return processoRepository.buscarAcompanhamento(diasSemAcesso, diasSemEdicao)
+                .stream()
+                .map(row -> new ProcessoAcompanhamentoDTO(
+                        row[0] != null ? ((Number) row[0]).longValue() : null,
+                        (String) row[1],
+                        row[2] != null ? ((Timestamp) row[2]).toLocalDateTime() : null,
+                        (String) row[3],
+                        row[4] != null ? ((Timestamp) row[4]).toLocalDateTime() : null,
+                        (String) row[5],
+                        row[6] != null ? ((Number) row[6]).longValue() : null,
+                        row[7] != null ? ((Number) row[7]).longValue() : null
+                ))
+                .toList();
     }
 
     /**

@@ -207,6 +207,10 @@
         <!-- DADOS DO PROCESSO -->
         <fieldset class="form-group border p-3">
           <legend class="w-auto px-2">Dados do Processo</legend>
+          <div class="alert alert-light border mb-3" role="alert">
+            <div><strong>Último acesso:</strong> <span th:text="${ultimoAcessoFormatado}">Sem registro</span> - usuário <span th:text="${processo.ultimoAcessoPor != null ? processo.ultimoAcessoPor : 'Sem registro'}">Sem registro</span></div>
+            <div class="mt-1"><strong>Última edição:</strong> <span th:text="${ultimaEdicaoFormatada}">Sem registro</span> - usuário <span th:text="${processo.ultimaEdicaoPor != null ? processo.ultimaEdicaoPor : 'Sem registro'}">Sem registro</span></div>
+          </div>
           <div class="form-row">
             <div class="form-group col-md-3">
               <label for="numeroInterno">Número Interno<span class="text-danger">*</span></label>

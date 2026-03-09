@@ -248,6 +248,9 @@ Redirect: `/processos/listar`
 
 ### GET `/processos/editar/{id}`
 - View: `processos/editar-processo`
+- Comportamento adicional:
+  - registra automaticamente evento `ACESSO` para o processo
+  - atualiza os campos auxiliares `ultimoAcessoEm` e `ultimoAcessoPor`
 - Popula:
   - processo atual
   - pacientes/advogados/medicos
@@ -260,6 +263,9 @@ Redirect: `/processos/listar`
 
 ### POST `/processos/editar/{id}`
 - Atualiza campos e itens do processo
+- Comportamento adicional:
+  - registra evento `EDICAO`
+  - atualiza `ultimaEdicaoEm` e `ultimaEdicaoPor`
 - Também recebe os campos de óbito no formulário de edição:
   - `obito` (boolean, default false)
   - `observacaoObito` (string opcional)
@@ -268,6 +274,30 @@ Redirect: `/processos/listar`
 - Itens do processo:
   - `proc.clearItems()` e re-adiciona se listas vierem consistentes
 - Redirect: `/processos/listar`
+
+---
+
+### GET `/api/processos/acompanhamento`
+Controller: `ProcessoApiController`
+
+Parâmetros (opcionais):
+- `diasSemAcesso` (Integer)
+- `diasSemEdicao` (Integer)
+
+Retorno:
+- `List<ProcessoAcompanhamentoDTO>` com:
+  - `processoId`
+  - `nomePessoa`
+  - `ultimoAcesso`
+  - `ultimoUsuarioAcesso`
+  - `ultimaEdicao`
+  - `ultimoUsuarioEdicao`
+  - `diasSemAcesso`
+  - `diasSemEdicao`
+
+Uso:
+- identificar processos sem acompanhamento por janela de dias
+- servir de base para indicadores operacionais futuros (BI/intranet)
 
 ### DELETE `/processos/excluir/{id}`
 - Retorna ResponseEntity com mensagem

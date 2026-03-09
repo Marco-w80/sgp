@@ -5,7 +5,12 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "processo_logs")
+@Table(
+        name = "processo_logs",
+        indexes = {
+                @Index(name = "idx_processo_logs_processo_datahora", columnList = "processo_id, data_hora")
+        }
+)
 public class ProcessoLog {
 
     @Id
@@ -16,6 +21,12 @@ public class ProcessoLog {
     @JoinColumn(name = "processo_id")
     private Processo processo;
 
+    @Column(name = "tipo_evento", nullable = false)
+    private String tipoEvento = "EDICAO";
+
+    @Column(name = "usuario")
+    private String usuario;
+
     @Column(nullable = false)
     private String campo;
 
@@ -25,8 +36,8 @@ public class ProcessoLog {
     @Column(name = "valor_novo", columnDefinition = "TEXT")
     private String valorNovo;
 
-    @Column(nullable = false)
-    private LocalDateTime dataAlteracao;
+    @Column(name = "data_hora", nullable = false)
+    private LocalDateTime dataHora;
 
     
 
@@ -34,10 +45,26 @@ public class ProcessoLog {
 
     public ProcessoLog(Processo processo, String campo, String valorAntigo, String valorNovo) {
         this.processo = processo;
+        this.tipoEvento = "EDICAO";
         this.campo = campo;
         this.valorAntigo = valorAntigo;
         this.valorNovo = valorNovo;
-        this.dataAlteracao = LocalDateTime.now();
+        this.dataHora = LocalDateTime.now();
+    }
+
+    public ProcessoLog(Processo processo,
+                       String tipoEvento,
+                       String usuario,
+                       String campo,
+                       String valorAntigo,
+                       String valorNovo) {
+        this.processo = processo;
+        this.tipoEvento = tipoEvento;
+        this.usuario = usuario;
+        this.campo = campo;
+        this.valorAntigo = valorAntigo;
+        this.valorNovo = valorNovo;
+        this.dataHora = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -54,6 +81,22 @@ public class ProcessoLog {
 
     public void setProcesso(Processo processo) {
         this.processo = processo;
+    }
+
+    public String getTipoEvento() {
+        return tipoEvento;
+    }
+
+    public void setTipoEvento(String tipoEvento) {
+        this.tipoEvento = tipoEvento;
+    }
+
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
     }
 
     public String getCampo() {
@@ -81,11 +124,19 @@ public class ProcessoLog {
     }
 
     public LocalDateTime getDataAlteracao() {
-        return dataAlteracao;
+        return dataHora;
     }
 
     public void setDataAlteracao(LocalDateTime dataAlteracao) {
-        this.dataAlteracao = dataAlteracao;
+        this.dataHora = dataAlteracao;
+    }
+
+    public LocalDateTime getDataHora() {
+        return dataHora;
+    }
+
+    public void setDataHora(LocalDateTime dataHora) {
+        this.dataHora = dataHora;
     }
 
  

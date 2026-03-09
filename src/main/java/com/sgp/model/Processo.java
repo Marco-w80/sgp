@@ -2,6 +2,7 @@ package com.sgp.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,6 +97,18 @@ public class Processo {
 
     @Column(name = "observacao_obito", columnDefinition = "TEXT")
     private String observacaoObito;
+
+    @Column(name = "ultimo_acesso_em")
+    private LocalDateTime ultimoAcessoEm;
+
+    @Column(name = "ultimo_acesso_por")
+    private String ultimoAcessoPor;
+
+    @Column(name = "ultima_edicao_em")
+    private LocalDateTime ultimaEdicaoEm;
+
+    @Column(name = "ultima_edicao_por")
+    private String ultimaEdicaoPor;
 
     public Processo() {}
 
@@ -229,5 +242,37 @@ public class Processo {
 
     public void setDeclaracaoInsuficienciaAnexado(boolean declaracaoInsuficienciaAnexado) {
         this.declaracaoInsuficienciaAnexado = declaracaoInsuficienciaAnexado;
+    }
+
+    public LocalDateTime getUltimoAcessoEm() {
+        return ultimoAcessoEm;
+    }
+
+    public void setUltimoAcessoEm(LocalDateTime ultimoAcessoEm) {
+        this.ultimoAcessoEm = ultimoAcessoEm;
+    }
+
+    public String getUltimoAcessoPor() {
+        return ultimoAcessoPor;
+    }
+
+    public void setUltimoAcessoPor(String ultimoAcessoPor) {
+        this.ultimoAcessoPor = ultimoAcessoPor;
+    }
+
+    public LocalDateTime getUltimaEdicaoEm() {
+        return ultimaEdicaoEm;
+    }
+
+    public void setUltimaEdicaoEm(LocalDateTime ultimaEdicaoEm) {
+        this.ultimaEdicaoEm = ultimaEdicaoEm;
+    }
+
+    public String getUltimaEdicaoPor() {
+        return ultimaEdicaoPor;
+    }
+
+    public void setUltimaEdicaoPor(String ultimaEdicaoPor) {
+        this.ultimaEdicaoPor = ultimaEdicaoPor;
     }
 }
