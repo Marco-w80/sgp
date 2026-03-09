@@ -1,5 +1,21 @@
 # CHANGELOG — SGP (Sistema Grupo Prod)
 
+## [2026-03-08] - Improvement
+
+### Descrição
+Otimizada a página `/processos/listar` para melhorar percepção de carregamento e escalabilidade inicial da listagem.
+
+### Detalhes Técnicos
+- Mantida a paginação já existente da própria tabela (DataTables), sem adicionar uma segunda paginação.
+- Template `processos/listar-processos.html` atualizado com:
+  - loading visual inicial (spinner) até a tabela estar pronta;
+  - nova coluna **Deferimentos** na listagem, exibindo **número + tipo** (ex.: `#3 - Juiz` / `#2 - Grupo Prod`);
+  - ajustes no DataTables (`deferRender`, `processing`, `stateSave`) para melhor experiência.
+
+### Observações
+- Mantidas ações existentes da tela (editar, visualizar detalhes em modal e criação de processo).
+- A mudança reduz carga inicial e melhora a experiência conforme a base cresce.
+
 ## [2026-03-08] - Feature
 
 ### Descrição

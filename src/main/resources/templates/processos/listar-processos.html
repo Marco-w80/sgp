@@ -4,6 +4,21 @@
 <head th:replace="~{fragments/head :: top}"></head>
 
 <style>
+  .page-loading-overlay {
+    min-height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: #4e73df;
+    gap: .75rem;
+  }
+
+  .page-loading-overlay .spinner-border {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
   /* Estilo para arredondar as bordas da tabela */
   .table-rounded-corners {
     border-collapse: separate;
@@ -132,8 +147,18 @@
   }
 
   #tabelaProcessos th:nth-child(11),
-  /* Obs */
+  /* Deferimentos */
   #tabelaProcessos td:nth-child(11) {
+    width: 12%;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #tabelaProcessos th:nth-child(12),
+  /* Obs */
+  #tabelaProcessos td:nth-child(12) {
     width: 8%;
     /* Ou um valor maior se a Obs for relevante */
     max-width: 150px;
@@ -146,9 +171,9 @@
     /* Adiciona "..." */
   }
 
-  #tabelaProcessos th:nth-child(12),
+  #tabelaProcessos th:nth-child(13),
   /* Ações */
-  #tabelaProcessos td:nth-child(12) {
+  #tabelaProcessos td:nth-child(13) {
     width: 7%;
     /* Ações costumam ser compactas */
     min-width: 80px;
@@ -181,6 +206,12 @@
   }
 </style>
 
+<div id="processosLoading" class="page-loading-overlay">
+  <div class="spinner-border" role="status" aria-hidden="true"></div>
+  <div class="small font-weight-bold">Carregando tabela de processos...</div>
+</div>
+
+<div id="processosContent" class="d-none">
 <div class="card shadow mb-4 table-rounded-corners">
   <div class="card-header py-3 d-sm-flex align-items-center justify-content-between mb-4">
     <h6 class="m-0 font-weight-bold text-primary">
@@ -206,13 +237,14 @@
             <th class="text-center">Status</th>
             <th class="text-center">Local</th>
             <th class="text-center">Produtos</th>
+            <th class="text-center">Deferimentos</th>
             <th class="text-center">Obs</th>
             <th class="text-center">Ações</th>
           </tr>
         </thead>
         <tbody>
           <tr th:if="${processos == null or #lists.isEmpty(processos)}">
-            <td colspan="12" class="text-center">Nenhum processo encontrado</td>
+            <td colspan="13" class="text-center">Nenhum processo encontrado</td>
           </tr>
           <tr th:each="proc : ${processos}">
             <td th:text="${proc.id}"></td>
@@ -238,11 +270,21 @@
                 </li>
               </ul>
             </td>
+            <td>
+              <ul class="mb-0 pl-3 text-left">
+                <li th:if="${#lists.isEmpty(proc.deferimentos)}">–</li>
+                <li th:each="def : ${proc.deferimentos}">
+                  <span th:text="${'#' + def.numeroDeferimento}">#1</span>
+                  -
+                  <span th:text="${def.tipo != null and def.tipo.name() == 'GRUPO_PROD' ? 'Grupo Prod' : (def.tipo != null and def.tipo.name() == 'JUIZ' ? 'Juiz' : '–')}">Grupo Prod</span>
+                </li>
+              </ul>
+            </td>
             <td th:text="${proc.obs}"></td>
 
             <style>
               /* Ajuste para a célula da coluna de Ações */
-              #tabelaProcessos td:nth-child(12) {
+              #tabelaProcessos td:nth-child(13) {
                 text-align: center;
                 vertical-align: middle;
                 white-space: nowrap;
@@ -279,6 +321,7 @@
 
     </div>
   </div>
+</div>
 </div>
 
 <style>
@@ -483,14 +526,31 @@
 
 <script>
   $(document).ready(function () {
+    const loadingEl = document.getElementById('processosLoading');
+    const contentEl = document.getElementById('processosContent');
+
+    function finalizarCarregamentoTabela() {
+      if (loadingEl) loadingEl.classList.add('d-none');
+      if (contentEl) contentEl.classList.remove('d-none');
+    }
+
     $('#tabelaProcessos').DataTable({
       language: { url: '/datatables/i18n/pt-BR.json' },
       pageLength: 10,
-      lengthMenu: [5, 10, 25, 50],
+      lengthMenu: [10, 25, 50, 100],
+      deferRender: true,
+      processing: true,
+      stateSave: true,
       columnDefs: [
-        { orderable: false, targets: [9, 10, 11] } // Produtos, Obs, Ações
-      ]
+        { orderable: false, targets: [9, 10, 11, 12] } // Produtos, Deferimentos, Obs, Ações
+      ],
+      initComplete: function () {
+        finalizarCarregamentoTabela();
+      }
     });
+
+    // Fallback de segurança caso algum plugin demore/falhe
+    setTimeout(finalizarCarregamentoTabela, 2500);
 
     $('#modalVerProcesso').on('show.bs.modal', function (e) {
       const button = $(e.relatedTarget);
