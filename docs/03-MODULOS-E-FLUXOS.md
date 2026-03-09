@@ -200,6 +200,10 @@ Persistência:
 Regras e comportamento:
 - Itens são “resetados”:
   - `proc.clearItems()` + recriação da lista conforme arrays recebidos
+- Campo de óbito disponível na edição:
+  - `obito` (checkbox informativo)
+  - `observacaoObito` (texto opcional)
+  - A marcação de óbito **não interrompe** o andamento do processo e não altera automaticamente status.
 - Auditoria:
   - existe `ProcessoLogService.logIfChanged(...)` (exemplo aplicado ao campo Advogado)
   - objetivo: registrar mudanças relevantes em `processo_logs`

@@ -1,5 +1,25 @@
 # CHANGELOG — SGP (Sistema Grupo Prod)
 
+## [2026-03-08] - Feature
+
+### Descrição
+Adicionado controle de óbito no fluxo de **edição de processo**, com marcação de óbito do paciente e campo opcional de observação.
+
+### Detalhes Técnicos
+- Entidade `Processo` atualizada com os campos:
+  - `obito` (boolean, default `false`)
+  - `observacaoObito` (TEXT, opcional)
+- Endpoint `POST /processos/editar/{id}` atualizado para receber e persistir:
+  - `obito`
+  - `observacaoObito`
+- Tela `processos/editar-processo` atualizada com:
+  - checkbox “Houve óbito do paciente”
+  - textarea “Observação do Óbito (opcional)”
+
+### Observações
+- A marcação de óbito é informativa e **não altera** o fluxo de continuidade do processo.
+- Não houve alteração de regras de status, documentos, itens e BI.
+
 ## [2026-03-01] - Feature
 
 ### Descrição

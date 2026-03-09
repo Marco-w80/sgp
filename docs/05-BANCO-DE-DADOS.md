@@ -46,6 +46,8 @@ Campos:
   - `comp_renda_anexado`
   - `procuracao_anexado`
   - `declaracao_insuficiencia_anexado`
+- `obito` (boolean, NOT NULL, default false) — marcação informativa de óbito do paciente
+- `observacao_obito` (TEXT, NULL) — observação opcional do óbito
 - `obs` (TEXT, NULL)
 
 Relacionamentos:

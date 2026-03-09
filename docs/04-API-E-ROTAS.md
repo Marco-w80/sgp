@@ -260,6 +260,9 @@ Redirect: `/processos/listar`
 
 ### POST `/processos/editar/{id}`
 - Atualiza campos e itens do processo
+- Também recebe os campos de óbito no formulário de edição:
+  - `obito` (boolean, default false)
+  - `observacaoObito` (string opcional)
 - Logs de alteração (implementado exemplo para Advogado):
   - `processoLogService.logIfChanged(proc, "Advogado", antigo, novo)`
 - Itens do processo:

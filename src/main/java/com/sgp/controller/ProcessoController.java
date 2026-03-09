@@ -246,6 +246,9 @@ public class ProcessoController {
             @RequestParam(required = false) TipoDeferimento deferimentoTipo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deferimentoData,
 
+            @RequestParam(defaultValue = "false") boolean obito,
+            @RequestParam(required = false) String observacaoObito,
+
             @RequestParam(required = false) String obs) {
         Processo proc = processoRepository.findById(id).orElseThrow();
 
@@ -301,6 +304,8 @@ public class ProcessoController {
         proc.setDoenca(doencaRepository.findById(doencaId).orElseThrow());
 
         proc.setObs(obs); // aceita null ou blank
+        proc.setObito(obito);
+        proc.setObservacaoObito(observacaoObito); // opcional
 
         proc.setCpfAnexado(cpfAnexado);
         proc.setCompResidenciaAnexado(compResidenciaAnexado);

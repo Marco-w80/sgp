@@ -91,6 +91,12 @@ public class Processo {
     @Column(columnDefinition = "TEXT")
     private String obs;
 
+    @Column(name = "obito", nullable = false)
+    private boolean obito = false;
+
+    @Column(name = "observacao_obito", columnDefinition = "TEXT")
+    private String observacaoObito;
+
     public Processo() {}
 
     // construtor apenas com campos obrigatórios
@@ -168,6 +174,22 @@ public class Processo {
 
     public String getObs() { return obs; }
     public void setObs(String obs) { this.obs = obs; }
+
+    public boolean isObito() {
+        return obito;
+    }
+
+    public void setObito(boolean obito) {
+        this.obito = obito;
+    }
+
+    public String getObservacaoObito() {
+        return observacaoObito;
+    }
+
+    public void setObservacaoObito(String observacaoObito) {
+        this.observacaoObito = observacaoObito;
+    }
 
     public boolean isCpfAnexado() {
         return cpfAnexado;
