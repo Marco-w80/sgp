@@ -1,6 +1,7 @@
 package com.sgp.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,17 @@ import com.sgp.projections.Projections;
 public interface ProcessoRepository extends JpaRepository<Processo, Long> {
 
       boolean existsByNumeroInterno(String numeroInterno);
+
+    @Query("""
+           select p from Processo p
+           where (:limiteAcesso is null or p.ultimoAcessoEm is null or p.ultimoAcessoEm <= :limiteAcesso)
+             and (:limiteEdicao is null or p.ultimaEdicaoEm is null or p.ultimaEdicaoEm <= :limiteEdicao)
+             and (:status is null or p.status = :status)
+           order by p.id desc
+           """)
+    List<Processo> buscarParaListagemComAcompanhamento(@Param("limiteAcesso") LocalDateTime limiteAcesso,
+                                                       @Param("limiteEdicao") LocalDateTime limiteEdicao,
+                                                       @Param("status") StatusProcesso status);
 
     @Query(value = """
             select p.id,

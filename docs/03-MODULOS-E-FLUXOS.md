@@ -75,6 +75,10 @@ Painel executivo para acompanhamento de processos, pendências documentais, lead
   - Consumo mensal total (todos produtos)
   - Top produtos por quantidade
   - Tabela de pendências documentais com ações
+- **Sem Acompanhamento**
+  - processos sem visita há X dias (parâmetro editável)
+  - distribuição por status dos processos sem visita
+  - tabela resumida com ação rápida para edição
 
 ### Modo Apresentação (TV Mode)
 - Botão flutuante ativa modo TV:
@@ -190,6 +194,17 @@ Persistência:
 
 ### 5.2) Listar processos
 - `GET /processos/listar` → lista todos
+
+Evolução de acompanhamento operacional:
+- A listagem passou a exibir colunas de monitoramento:
+  - último acesso (data/hora)
+  - usuário do último acesso
+  - dias sem acesso
+- Filtros na própria tela:
+  - `diasSemAcesso`
+  - `diasSemEdicao`
+- Critério aplicado:
+  - ao informar X dias, entram processos com data de acesso/edição anterior ao limite e também processos sem registro (`null`).
 
 ---
 

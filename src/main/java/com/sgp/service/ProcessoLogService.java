@@ -2,8 +2,10 @@ package com.sgp.service;
 
 import com.sgp.model.Processo;
 import com.sgp.model.ProcessoLog;
+import com.sgp.model.Usuario;
 import com.sgp.repository.ProcessoLogRepository;
 import com.sgp.repository.ProcessoRepository;
+import com.sgp.repository.UsuarioRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,10 +19,14 @@ public class ProcessoLogService {
 
     private final ProcessoLogRepository logRepository;
     private final ProcessoRepository processoRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public ProcessoLogService(ProcessoLogRepository logRepository, ProcessoRepository processoRepository) {
+    public ProcessoLogService(ProcessoLogRepository logRepository,
+                              ProcessoRepository processoRepository,
+                              UsuarioRepository usuarioRepository) {
         this.logRepository = logRepository;
         this.processoRepository = processoRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public void logIfChanged(Processo processo, String campo, Object antigo, Object novo) {
@@ -66,11 +72,18 @@ public class ProcessoLogService {
 
         Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails userDetails) {
-            return userDetails.getUsername();
+            return obterNomeOuEmail(userDetails.getUsername());
         }
         if (principal instanceof String str && !str.isBlank()) {
-            return str;
+            return obterNomeOuEmail(str);
         }
         return "Sistema";
+    }
+
+    private String obterNomeOuEmail(String login) {
+        return usuarioRepository.findByEmail(login)
+                .map(Usuario::getNome)
+                .filter(nome -> nome != null && !nome.isBlank())
+                .orElse(login);
     }
 }

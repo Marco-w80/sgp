@@ -111,6 +111,16 @@ public class ProcessoService {
                 .toList();
     }
 
+    public List<Processo> listarProcessosComFiltroAcompanhamento(Integer diasSemAcesso,
+                                                                 Integer diasSemEdicao,
+                                                                 StatusProcesso status) {
+        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime limiteAcesso = diasSemAcesso != null ? agora.minusDays(diasSemAcesso) : null;
+        LocalDateTime limiteEdicao = diasSemEdicao != null ? agora.minusDays(diasSemEdicao) : null;
+
+        return processoRepository.buscarParaListagemComAcompanhamento(limiteAcesso, limiteEdicao, status);
+    }
+
     /**
      * Exclui um processo e todos os seus produtos associados de forma transacional.
      * Primeiro remove os registros filhos (processo_produto) e depois o pai

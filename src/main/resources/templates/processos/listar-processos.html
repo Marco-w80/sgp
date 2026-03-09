@@ -146,9 +146,9 @@
     width: 8%;
   }
 
-  #tabelaProcessos th:nth-child(11),
+  #tabelaProcessos th:nth-child(14),
   /* Deferimentos */
-  #tabelaProcessos td:nth-child(11) {
+  #tabelaProcessos td:nth-child(14) {
     width: 12%;
     max-width: 200px;
     white-space: nowrap;
@@ -156,9 +156,9 @@
     text-overflow: ellipsis;
   }
 
-  #tabelaProcessos th:nth-child(12),
+  #tabelaProcessos th:nth-child(15),
   /* Obs */
-  #tabelaProcessos td:nth-child(12) {
+  #tabelaProcessos td:nth-child(15) {
     width: 8%;
     /* Ou um valor maior se a Obs for relevante */
     max-width: 150px;
@@ -171,9 +171,9 @@
     /* Adiciona "..." */
   }
 
-  #tabelaProcessos th:nth-child(13),
+  #tabelaProcessos th:nth-child(16),
   /* Ações */
-  #tabelaProcessos td:nth-child(13) {
+  #tabelaProcessos td:nth-child(16) {
     width: 7%;
     /* Ações costumam ser compactas */
     min-width: 80px;
@@ -198,9 +198,9 @@
     #tabelaProcessos th:nth-child(5),
     /* Advogado */
     #tabelaProcessos td:nth-child(5),
-    #tabelaProcessos th:nth-child(9),
+    #tabelaProcessos th:nth-child(12),
     /* Local */
-    #tabelaProcessos td:nth-child(9) {
+    #tabelaProcessos td:nth-child(12) {
       display: none;
     }
   }
@@ -223,6 +223,35 @@
   </div>
 
   <div class="card-body">
+    <form method="get" th:action="@{/processos/listar}" class="mb-3">
+      <div class="form-row align-items-end">
+        <div class="form-group col-md-3">
+          <label for="diasSemAcesso">Dias sem acesso</label>
+          <input type="number" min="0" class="form-control" id="diasSemAcesso" name="diasSemAcesso"
+                 th:value="${diasSemAcesso}">
+        </div>
+        <div class="form-group col-md-3">
+          <label for="diasSemEdicao">Dias sem edição</label>
+          <input type="number" min="0" class="form-control" id="diasSemEdicao" name="diasSemEdicao"
+                 th:value="${diasSemEdicao}">
+        </div>
+        <div class="form-group col-md-3">
+          <label for="status">Status</label>
+          <select class="form-control" id="status" name="status">
+            <option value="">Todos</option>
+            <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"
+                    th:selected="${statusSelecionado != null and statusSelecionado == s}"></option>
+          </select>
+        </div>
+        <div class="form-group col-md-3">
+          <button type="submit" class="btn btn-primary mr-2">
+            <i class="fas fa-filter mr-1"></i>Filtrar
+          </button>
+          <a th:href="@{/processos/listar}" class="btn btn-outline-secondary">Limpar</a>
+        </div>
+      </div>
+    </form>
+
     <div class="table-responsive">
       <table id="tabelaProcessos" class="table table-bordered table-hover w-100 table-rounded-corners" cellspacing="0">
         <thead class="thead-light">
@@ -235,6 +264,9 @@
             <th class="text-center">Médico</th>
             <th class="text-center">Início</th>
             <th class="text-center">Status</th>
+            <th class="text-center">Último acesso</th>
+            <th class="text-center">Usuário</th>
+            <th class="text-center">Dias sem acesso</th>
             <th class="text-center">Local</th>
             <th class="text-center">Produtos</th>
             <th class="text-center">Deferimentos</th>
@@ -244,7 +276,7 @@
         </thead>
         <tbody>
           <tr th:if="${processos == null or #lists.isEmpty(processos)}">
-            <td colspan="13" class="text-center">Nenhum processo encontrado</td>
+            <td colspan="16" class="text-center">Nenhum processo encontrado</td>
           </tr>
           <tr th:each="proc : ${processos}">
             <td th:text="${proc.id}"></td>
@@ -257,6 +289,9 @@
             <td th:text="${proc.medico != null ? proc.medico.nome : '–'}"></td>
             <td th:text="${#temporals.format(proc.dataInicio, 'dd/MM/yyyy')}"></td>
             <td th:text="${proc.status}"></td>
+            <td th:text="${proc.ultimoAcessoEm != null ? #temporals.format(proc.ultimoAcessoEm, 'dd/MM/yyyy HH:mm') : 'Nunca acessado'}"></td>
+            <td th:text="${proc.ultimoAcessoPor != null and !#strings.isEmpty(proc.ultimoAcessoPor) ? proc.ultimoAcessoPor : '–'}"></td>
+            <td th:text="${diasSemAcessoMap.containsKey(proc.id) ? diasSemAcessoMap.get(proc.id) + ' dias' : '—'}"></td>
             <!-- Local opcional -->
             <td th:text="${proc.local != null 
                           ? proc.local.comarca + ' – ' + proc.local.localizacao 
@@ -284,7 +319,7 @@
 
             <style>
               /* Ajuste para a célula da coluna de Ações */
-              #tabelaProcessos td:nth-child(13) {
+              #tabelaProcessos td:nth-child(16) {
                 text-align: center;
                 vertical-align: middle;
                 white-space: nowrap;
@@ -542,7 +577,7 @@
       processing: true,
       stateSave: true,
       columnDefs: [
-        { orderable: false, targets: [9, 10, 11, 12] } // Produtos, Deferimentos, Obs, Ações
+        { orderable: false, targets: [12, 13, 14, 15] } // Produtos, Deferimentos, Obs, Ações
       ],
       initComplete: function () {
         finalizarCarregamentoTabela();

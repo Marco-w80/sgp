@@ -31,6 +31,43 @@ Implementado controle de acompanhamento operacional de processos com registro de
 - Implementação mantida no escopo do módulo de processos, sem alteração de regras de status/documentação/itens.
 - Projeto permanece com `spring.jpa.hibernate.ddl-auto=update`; novas colunas e índice são aplicados automaticamente no ambiente atual.
 
+### Evolução da listagem operacional (`/processos/listar`)
+- Adicionadas colunas de acompanhamento na tabela:
+  - **Último acesso**
+  - **Usuário** (último usuário que acessou)
+  - **Dias sem acesso**
+- Adicionados filtros no topo da listagem:
+  - `diasSemAcesso`
+  - `diasSemEdicao`
+- Regras de filtro implementadas:
+  - quando `diasSemAcesso` é informado, lista processos com `ultimoAcessoEm` menor/igual ao limite de dias **ou sem acesso registrado**;
+  - quando `diasSemEdicao` é informado, lista processos com `ultimaEdicaoEm` menor/igual ao limite de dias **ou sem edição registrada**.
+- Backend da listagem atualizado para usar query dedicada (`buscarParaListagemComAcompanhamento`) e cálculo de `diasSemAcesso` exibido em tela.
+
+### Correção de compatibilidade em produção (`processo_logs`)
+- Corrigido erro ao acessar/editar processo em bancos com coluna legada obrigatória `data_alteracao`.
+- `ProcessoLog` agora sincroniza automaticamente `data_hora` e `data_alteracao` no persist/update, evitando falha SQL:
+  - `Field 'data_alteracao' doesn't have a default value`
+- Ajuste feito sem alterar schema, garantindo compatibilidade com ambientes já existentes.
+
+### Ajuste de identificação de usuário em acompanhamento
+- A captura de usuário nos eventos de processo (`ACESSO`/`EDICAO`) passou a priorizar o **nome do usuário** cadastrado (`usuarios.nome`) em vez do login/e-mail.
+- Impacto direto nas telas:
+  - `/processos/listar` (coluna “Usuário” do último acesso)
+  - `/processos/editar/{id}` (bloco de “Último acesso” e “Última edição”).
+
+### Filtro adicional por status na listagem de acompanhamento
+- Na tela `/processos/listar`, os filtros de `diasSemAcesso` e `diasSemEdicao` agora podem ser combinados com filtro de `status`.
+- Permite cenários operacionais como: “processos EM_ANDAMENTO sem acesso há X dias”.
+
+### Nova guia no Dashboard: Sem Acompanhamento
+- Adicionada nova guia na `/intranet` ao lado de “Produtos e Pendências”, com foco em processos sem visita há X dias.
+- Novo parâmetro de filtro na intranet: `diasSemVisita` (editável pelo usuário, padrão 7).
+- A guia exibe:
+  - KPI de total de processos sem visita no critério
+  - gráfico por status dos processos sem visita
+  - tabela resumida (paciente, nº interno, status, último acesso, dias sem visita, ação)
+
 ## [2026-03-08] - Improvement
 
 ### Descrição

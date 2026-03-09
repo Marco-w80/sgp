@@ -375,6 +375,11 @@
                 <input type="number" min="0" name="dias" th:value="${diasMinimos}" class="form-control form-control-sm">
               </div>
 
+              <div class="col-md-2 mb-2">
+                <label class="small font-weight-bold mb-1">Sem visita (dias+)</label>
+                <input type="number" min="0" name="diasSemVisita" th:value="${diasSemVisita}" class="form-control form-control-sm">
+              </div>
+
               <div class="col-md-4 mb-2 text-md-right">
                 <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-filter mr-1"></i>Aplicar
                   filtros</button>
@@ -632,6 +637,74 @@
                 </div>
               </div>
             </div>
+
+            <div class="dashboard-page" data-title="Sem Acompanhamento">
+              <div class="row">
+                <div class="col-xl-4 col-md-6 mb-4">
+                  <div class="card kpi-card card-theme-danger h-100">
+                    <div class="card-body">
+                      <i class="fas fa-user-clock kpi-icon"></i>
+                      <div class="kpi-value" th:text="${#lists.size(processosSemVisita)}">0</div>
+                      <div class="kpi-title">Sem visita há <span th:text="${diasSemVisita}">7</span>+ dias</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-8 col-md-6 mb-4">
+                  <div class="card shadow h-100">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-chart-pie mr-2"></i>Sem visita por status</h6>
+                    </div>
+                    <div class="card-body">
+                      <div id="chartSemVisitaStatus" style="height: 220px;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <div class="card shadow mb-4 w-100">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-warning"><i class="fas fa-search mr-2"></i>Processos sem visita recente</h6>
+                    </div>
+                    <div class="card-body scrollable-table-body">
+                      <div class="table-responsive">
+                        <table id="tabelaSemVisita" class="table table-bordered" width="100%" cellspacing="0">
+                          <thead>
+                            <tr>
+                              <th>Paciente</th>
+                              <th>Nº Interno</th>
+                              <th>Status</th>
+                              <th>Último acesso</th>
+                              <th>Dias sem visita</th>
+                              <th>Ações</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr th:if="${#lists.isEmpty(processosSemVisita)}">
+                              <td colspan="6" class="text-center text-muted">Nenhum processo sem visita no critério atual.</td>
+                            </tr>
+                            <tr th:each="proc : ${processosSemVisita}">
+                              <td th:text="${proc.paciente != null ? proc.paciente.nome : '—'}">Paciente</td>
+                              <td th:text="${proc.numeroInterno}">PROC-001</td>
+                              <td th:text="${proc.status}">EM_ANDAMENTO</td>
+                              <td th:text="${proc.ultimoAcessoEm != null ? #temporals.format(proc.ultimoAcessoEm, 'dd/MM/yyyy HH:mm') : 'Nunca acessado'}">Nunca acessado</td>
+                              <td th:text="${diasSemVisitaMap.containsKey(proc.id) ? diasSemVisitaMap.get(proc.id) + ' dias' : '—'}">0 dias</td>
+                              <td>
+                                <a th:href="@{/processos/editar/{id}(id=${proc.id})}" class="btn btn-circle btn-sm btn-secondary" title="Editar">
+                                  <i class="fas fa-edit"></i>
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div id="pagination-dots"></div>
@@ -666,6 +739,7 @@
     const consumoMensalTotal = /*[[${consumoMensalTotal}]]*/ null;
     const consumoProdutos = /*[[${consumoProdutos}]]*/[];
     const distGenero = /*[[${distGenero}]]*/ {};
+    const processosSemVisitaPorStatus = /*[[${processosSemVisitaPorStatus}]]*/ {};
     const idadePorSexo = /*[[${idadePorSexo}]]*/ null;
 
     const safe = (v, d) => (v === null || v === undefined) ? d : v;
@@ -880,6 +954,19 @@
       (function () {
         const labels = (consumoProdutos || []).map(d => d.produto); const data = (consumoProdutos || []).map(d => d.quantidade);
         Highcharts.chart('chartTopProdutos', { chart: { type: 'bar' }, title: null, xAxis: { categories: labels }, yAxis: { title: { text: 'Quantidade' } }, series: [{ name: 'Quantidade', data }] });
+      })();
+
+      // Sem visita por status
+      (function () {
+        const labels = Object.keys(processosSemVisitaPorStatus || {}).map(s => String(s).replaceAll('_', ' '));
+        const data = Object.values(processosSemVisitaPorStatus || {}).map(v => Number(v) || 0);
+        Highcharts.chart('chartSemVisitaStatus', {
+          chart: { type: 'column' },
+          title: null,
+          xAxis: { categories: labels },
+          yAxis: { title: { text: 'Processos' }, allowDecimals: false },
+          series: [{ name: 'Sem visita', data }]
+        });
       })();
     });
 

@@ -39,6 +39,9 @@ public class ProcessoLog {
     @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
+    @Column(name = "data_alteracao", nullable = false)
+    private LocalDateTime dataAlteracao;
+
     
 
     public ProcessoLog() {}
@@ -49,7 +52,9 @@ public class ProcessoLog {
         this.campo = campo;
         this.valorAntigo = valorAntigo;
         this.valorNovo = valorNovo;
-        this.dataHora = LocalDateTime.now();
+        LocalDateTime agora = LocalDateTime.now();
+        this.dataHora = agora;
+        this.dataAlteracao = agora;
     }
 
     public ProcessoLog(Processo processo,
@@ -64,7 +69,26 @@ public class ProcessoLog {
         this.campo = campo;
         this.valorAntigo = valorAntigo;
         this.valorNovo = valorNovo;
-        this.dataHora = LocalDateTime.now();
+        LocalDateTime agora = LocalDateTime.now();
+        this.dataHora = agora;
+        this.dataAlteracao = agora;
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void sincronizarDatas() {
+        if (this.dataHora == null && this.dataAlteracao == null) {
+            LocalDateTime agora = LocalDateTime.now();
+            this.dataHora = agora;
+            this.dataAlteracao = agora;
+            return;
+        }
+        if (this.dataHora == null) {
+            this.dataHora = this.dataAlteracao;
+        }
+        if (this.dataAlteracao == null) {
+            this.dataAlteracao = this.dataHora;
+        }
     }
 
     public Long getId() {
@@ -124,11 +148,14 @@ public class ProcessoLog {
     }
 
     public LocalDateTime getDataAlteracao() {
-        return dataHora;
+        return dataAlteracao;
     }
 
     public void setDataAlteracao(LocalDateTime dataAlteracao) {
-        this.dataHora = dataAlteracao;
+        this.dataAlteracao = dataAlteracao;
+        if (this.dataHora == null) {
+            this.dataHora = dataAlteracao;
+        }
     }
 
     public LocalDateTime getDataHora() {
@@ -137,6 +164,9 @@ public class ProcessoLog {
 
     public void setDataHora(LocalDateTime dataHora) {
         this.dataHora = dataHora;
+        if (this.dataAlteracao == null) {
+            this.dataAlteracao = dataHora;
+        }
     }
 
  

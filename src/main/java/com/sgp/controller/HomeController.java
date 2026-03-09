@@ -1,5 +1,6 @@
 package com.sgp.controller;
 
+import com.sgp.model.Processo;
 import com.sgp.service.DashboardService;
 import com.sgp.service.ProcessoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class HomeController {
@@ -33,6 +38,7 @@ public class HomeController {
 
     @GetMapping("/intranet")
     public String intranet(@RequestParam(name = "dias", required = false, defaultValue = "0") Integer diasMinimos,
+                           @RequestParam(name = "diasSemVisita", required = false, defaultValue = "7") Integer diasSemVisita,
                            @RequestParam(name = "anos", required = false) List<Integer> anos,
                            @RequestParam(name = "trimestre", required = false) Integer trimestre,
                            @RequestParam(name = "mes", required = false) Integer mes,
@@ -51,6 +57,24 @@ public class HomeController {
         LocalDate ate = periodo[1];
 
         var pendencias = processoService.listarProcessosComDocumentacaoPendenteComMinDias(diasMinimos, de, ate);
+        var processosSemVisita = processoService.listarProcessosComFiltroAcompanhamento(diasSemVisita, null, null);
+
+        LocalDateTime agora = LocalDateTime.now();
+        Map<Long, Long> diasSemVisitaMap = new LinkedHashMap<>();
+        for (Processo processo : processosSemVisita) {
+            LocalDateTime referencia = processo.getUltimoAcessoEm() != null
+                    ? processo.getUltimoAcessoEm()
+                    : (processo.getDataInicio() != null ? processo.getDataInicio().atStartOfDay() : null);
+            if (referencia != null) {
+                diasSemVisitaMap.put(processo.getId(), ChronoUnit.DAYS.between(referencia, agora));
+            }
+        }
+
+        Map<String, Long> processosSemVisitaPorStatus = processosSemVisita.stream()
+                .collect(Collectors.groupingBy(p -> p.getStatus() != null ? p.getStatus().name() : "SEM_STATUS",
+                        LinkedHashMap::new,
+                        Collectors.counting()));
+
         var statusCountsFormatado = dashboardService.contarPorStatusFormatado(de, ate);
         long processosGanhos = statusCountsFormatado.getOrDefault("CONCLUIDO", 0L);
         long processosEmAndamento = statusCountsFormatado.getOrDefault("EM ANDAMENTO", 0L);
@@ -85,6 +109,10 @@ public class HomeController {
         model.addAttribute("pendencias", pendencias);
         model.addAttribute("totalPendentes", pendencias.size());
         model.addAttribute("diasMinimos", diasMinimos);
+        model.addAttribute("diasSemVisita", diasSemVisita);
+        model.addAttribute("processosSemVisita", processosSemVisita);
+        model.addAttribute("diasSemVisitaMap", diasSemVisitaMap);
+        model.addAttribute("processosSemVisitaPorStatus", deepSanitizeForJson(processosSemVisitaPorStatus, "SEM_STATUS"));
 
         model.addAttribute("idadePorSexo", dashboardService.mediaIdadePorSexo(de, ate));
         model.addAttribute("anosDisponiveis", anosDisponiveis);

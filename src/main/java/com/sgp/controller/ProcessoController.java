@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -171,8 +173,26 @@ public class ProcessoController {
     }
 
     @GetMapping("/listar")
-    public String list(Model model) {
-        model.addAttribute("processos", processoRepository.findAll());
+    public String list(@RequestParam(required = false) Integer diasSemAcesso,
+                       @RequestParam(required = false) Integer diasSemEdicao,
+                       @RequestParam(required = false) StatusProcesso status,
+                       Model model) {
+        List<Processo> processos = processoService.listarProcessosComFiltroAcompanhamento(diasSemAcesso, diasSemEdicao, status);
+
+        LocalDateTime agora = LocalDateTime.now();
+        Map<Long, Long> diasSemAcessoMap = new HashMap<>();
+        for (Processo p : processos) {
+            if (p.getUltimoAcessoEm() != null) {
+                diasSemAcessoMap.put(p.getId(), ChronoUnit.DAYS.between(p.getUltimoAcessoEm(), agora));
+            }
+        }
+
+        model.addAttribute("processos", processos);
+        model.addAttribute("diasSemAcesso", diasSemAcesso);
+        model.addAttribute("diasSemEdicao", diasSemEdicao);
+        model.addAttribute("statusSelecionado", status);
+        model.addAttribute("statusValues", StatusProcesso.values());
+        model.addAttribute("diasSemAcessoMap", diasSemAcessoMap);
         return "processos/listar-processos";
     }
 

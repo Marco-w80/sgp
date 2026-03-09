@@ -120,6 +120,10 @@ Campos:
 - `valor_novo` (TEXT, NULL)
 - `data_hora` (datetime, NOT NULL)
 
+Compatibilidade de ambientes legados:
+- alguns bancos ainda possuem `data_alteracao` como coluna obrigatória;
+- a aplicação mantém ambos os campos sincronizados (`data_hora` e `data_alteracao`) para evitar erro de inserção em produção sem exigir migração imediata.
+
 Índices:
 - `idx_processo_logs_processo_datahora (processo_id, data_hora)`
 

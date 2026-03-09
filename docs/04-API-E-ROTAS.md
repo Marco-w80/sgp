@@ -29,6 +29,7 @@ Objetivo: servir como referência para mudanças, evitando quebrar URLs existent
 
 #### Parâmetros (filtros)
 - `dias` (Integer, default=0)
+- `diasSemVisita` (Integer, default=7)
 - `anos` (List<Integer>, opcional) — permite multi-seleção
 - `trimestre` (Integer, opcional, 1..4) — desativado automaticamente quando multi-ano
 - `mes` (Integer, opcional, 1..12) — desativado automaticamente quando multi-ano
@@ -49,11 +50,18 @@ A view recebe diversos objetos/estruturas para gráficos e indicadores, incluind
 - Top doenças e lead time médio por doença
 - Consumos (mensal e por produto)
 - Lista de pendências de documentação (com filtro de dias mínimos)
+- Lista de processos sem visita recente (com filtro `diasSemVisita`)
 - CSS por status:
   - ABERTO → `card-theme-secondary`
   - EM ANDAMENTO → `card-theme-primary`
   - CONCLUIDO → `card-theme-success`
   - SUSPENSO → `card-theme-danger`
+
+#### Nova guia de acompanhamento operacional
+- **Sem Acompanhamento**
+  - KPI com total de processos sem visita no critério de dias
+  - gráfico de distribuição por status
+  - tabela resumida com: paciente, número interno, status, último acesso, dias sem visita e ação para edição
 
 > Observação técnica: existe sanitização recursiva de Maps/List/arrays via `deepSanitizeForJson()` para evitar chaves null em JSON/JS.
 
@@ -244,7 +252,25 @@ Redirect: `/processos/listar`
 
 ### GET `/processos/listar`
 - View: `processos/listar-processos`
-- Lista todos processos
+- Lista processos com suporte a filtros de acompanhamento.
+
+Parâmetros (opcionais):
+- `diasSemAcesso` (Integer)
+- `diasSemEdicao` (Integer)
+- `status` (StatusProcesso)
+
+Comportamento:
+- sem parâmetros: lista padrão dos processos;
+- com filtros: aplica limite por dias nas colunas auxiliares de acompanhamento:
+  - `ultimoAcessoEm`
+  - `ultimaEdicaoEm`
+- o filtro de status pode ser usado em conjunto com os filtros de dias
+- processos sem acesso/edição (`null`) também aparecem quando o filtro correspondente é informado.
+
+A view também exibe:
+- último acesso
+- usuário do último acesso
+- dias sem acesso (calculado no backend para renderização na tabela)
 
 ### GET `/processos/editar/{id}`
 - View: `processos/editar-processo`
