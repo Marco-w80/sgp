@@ -124,3 +124,24 @@ Implementado histórico de deferimentos no módulo de Processos, permitindo múl
 ### Observações
 - BI/dashboard não recebeu integração nesta etapa.
 - Regras existentes de status, documentos e itens de produto não foram alteradas.
+
+## [2026-04-28] - Feature
+
+### Descricao
+Implementada exportacao completa de processos em Excel (.xlsx) nas telas /processos/listar e /relatorios/processos, com aplicacao dos filtros ativos e layout formatado.
+
+### Detalhes Tecnicos
+- Adicionada dependencia org.apache.poi:poi-ooxml para geracao de planilhas.
+- Criado servico ProcessoExcelService para centralizar a montagem do arquivo Excel.
+- Novos endpoints:
+  - GET /processos/exportar-excel
+  - GET /relatorios/processos/exportar-excel
+- Ambos os endpoints reutilizam a mesma logica de filtros ja existente em cada tela.
+- Templates atualizados com botao Exportar Excel preservando query params de filtro.
+- Layout da planilha inclui titulo, cabecalho destacado, bordas, alinhamento, auto filtro e ajuste de colunas.
+
+### Observacoes
+- Nao houve alteracao de schema/tabelas.
+- Nao houve alteracao de regras de negocio de processos.
+
+

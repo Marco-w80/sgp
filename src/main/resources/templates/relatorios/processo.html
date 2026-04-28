@@ -246,6 +246,20 @@
               </div>
             </div>
             <div class="form-group col-md text-right">
+              <a th:href="@{/relatorios/processos/exportar-excel(
+                  de=${param.de},
+                  ate=${param.ate},
+                  status=${param.status},
+                  paciente=${param.paciente},
+                  localId=${param.localId},
+                  cpfAnexado=${param.cpfAnexado},
+                  compResidenciaAnexado=${param.compResidenciaAnexado},
+                  compRendaAnexado=${param.compRendaAnexado},
+                  procuracaoAnexado=${param.procuracaoAnexado},
+                  declaracaoInsuficienciaAnexado=${param.declaracaoInsuficienciaAnexado})}"
+                 class="btn btn-success mr-2">
+                <i class="fas fa-file-excel mr-1"></i> Exportar Excel
+              </a>
               <button type="submit" class="btn btn-primary">
                 <i class="fas fa-search mr-1"></i> Filtrar
               </button>

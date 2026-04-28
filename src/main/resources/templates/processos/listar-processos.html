@@ -247,6 +247,10 @@
           <button type="submit" class="btn btn-primary mr-2">
             <i class="fas fa-filter mr-1"></i>Filtrar
           </button>
+          <a th:href="@{/processos/exportar-excel(diasSemAcesso=${diasSemAcesso},diasSemEdicao=${diasSemEdicao},status=${statusSelecionado})}"
+             class="btn btn-success mr-2">
+            <i class="fas fa-file-excel mr-1"></i>Exportar Excel
+          </a>
           <a th:href="@{/processos/listar}" class="btn btn-outline-secondary">Limpar</a>
         </div>
       </div>

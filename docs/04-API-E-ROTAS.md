@@ -339,7 +339,7 @@ Controller: `RelatorioProcessosController`
 Base path: `/relatorios/processos`
 
 #### GET `/relatorios/processos`
-- View: `relatorios/processo`
+- View: elatorios/processo`
 - Filtros:
   - `de` (LocalDate)
   - `ate` (LocalDate)
@@ -397,3 +397,28 @@ Base path: `/maintenance`
   - dashboard e relatórios
   - contagens por status
 - Endpoints `/api/dashboard/*` devem continuar retornando JSON compatível com os gráficos (Highcharts).
+---
+
+## Atualizacao 2026-04-28 - Rotas de Exportacao Excel (Processos)
+
+### GET /processos/exportar-excel
+- Controller: ProcessoController
+- Tipo: download de arquivo .xlsx
+- Parametros (opcionais):
+  - diasSemAcesso (Integer)
+  - diasSemEdicao (Integer)
+  - status (StatusProcesso)
+- Regra: aplica os mesmos filtros usados em /processos/listar.
+
+### GET /relatorios/processos/exportar-excel
+- Controller: RelatorioProcessosController
+- Tipo: download de arquivo .xlsx
+- Parametros (opcionais):
+  - de, ate (LocalDate)
+  - status (StatusProcesso)
+  - paciente (String)
+  - localId (Long)
+  - cpfAnexado, compResidenciaAnexado, compRendaAnexado, procuracaoAnexado, declaracaoInsuficienciaAnexado (Boolean)
+- Regra: aplica os mesmos filtros usados em /relatorios/processos.
+
+

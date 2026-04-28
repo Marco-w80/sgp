@@ -3,12 +3,15 @@ package com.sgp.controller;
 import com.sgp.dto.ProdutoDto;
 import com.sgp.model.*;
 import com.sgp.repository.*;
+import com.sgp.service.ProcessoExcelService;
 import com.sgp.service.ProcessoLogService;
 import com.sgp.service.ProcessoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,6 +48,8 @@ public class ProcessoController {
     private ProcessoLogService processoLogService;
     @Autowired
     private ProcessoService processoService;
+    @Autowired
+    private ProcessoExcelService processoExcelService;
     @Autowired
     private DeferimentoRepository deferimentoRepository;
 
@@ -194,6 +199,23 @@ public class ProcessoController {
         model.addAttribute("statusValues", StatusProcesso.values());
         model.addAttribute("diasSemAcessoMap", diasSemAcessoMap);
         return "processos/listar-processos";
+    }
+
+    @GetMapping("/exportar-excel")
+    public ResponseEntity<byte[]> exportarExcel(
+            @RequestParam(required = false) Integer diasSemAcesso,
+            @RequestParam(required = false) Integer diasSemEdicao,
+            @RequestParam(required = false) StatusProcesso status) {
+
+        List<Processo> processos = processoService.listarProcessosComFiltroAcompanhamento(diasSemAcesso, diasSemEdicao, status);
+        byte[] arquivo = processoExcelService.gerarRelatorioCompleto(processos, "Relatorio de Processos");
+        String data = LocalDate.now().toString();
+        String nomeArquivo = "relatorio-processos-" + data + ".xlsx";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + nomeArquivo + "\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(arquivo);
     }
 
     @GetMapping("/editar/{id}")

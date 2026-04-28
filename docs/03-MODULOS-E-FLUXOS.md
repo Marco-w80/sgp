@@ -333,3 +333,19 @@ Sempre atualizar também a documentação correspondente em:
 - `/docs/05-BANCO-DE-DADOS.md`
 - `/docs/06-DADOS-E-INDICADORES.md`
 - `/CHANGELOG.md` (obrigatório)
+---
+
+## Atualizacao 2026-04-28 - Exportacao Excel de Processos
+
+### Modulo Processos
+- A tela GET /processos/listar passou a ter acao de exportacao em Excel pela rota GET /processos/exportar-excel.
+- A exportacao respeita os mesmos filtros da listagem (diasSemAcesso, diasSemEdicao, status).
+
+### Modulo Relatorios
+- A tela GET /relatorios/processos passou a ter acao de exportacao em Excel pela rota GET /relatorios/processos/exportar-excel.
+- A exportacao respeita os mesmos filtros do relatorio (periodo, status, paciente, local e flags de anexos).
+
+### Observacao de Arquitetura
+- A geracao do arquivo foi centralizada no servico ProcessoExcelService, evitando duplicacao entre os dois fluxos.
+
+
