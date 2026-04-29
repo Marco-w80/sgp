@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<div th:replace="~{fragments/head :: top}"></div>
+
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">
+      <i class="fas fa-envelope-open-text mr-2"></i>Configuração de Alertas - Resumo Diário
+    </h6>
+  </div>
+  <div class="card-body">
+    <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
+
+    <form th:action="@{/intranet/alertas/config/salvar}" method="post">
+      <div class="form-group">
+        <label for="emailsDestino">E-mails destinatários</label>
+        <input type="text"
+               class="form-control"
+               id="emailsDestino"
+               name="emailsDestino"
+               th:value="${config.emailsDestino}"
+               placeholder="email1@dominio.com, email2@dominio.com"
+               required>
+        <small class="form-text text-muted">Separe múltiplos e-mails com vírgula.</small>
+      </div>
+
+      <div class="form-group">
+        <label for="diasSemAcesso">Dias mínimos sem acesso</label>
+        <input type="number"
+               class="form-control"
+               id="diasSemAcesso"
+               name="diasSemAcesso"
+               min="0"
+               th:value="${config.diasSemAcesso}"
+               required>
+      </div>
+
+      <div class="form-group">
+        <label for="horarioEnvio">Horário do envio automático</label>
+        <input type="time"
+               class="form-control"
+               id="horarioEnvio"
+               name="horarioEnvio"
+               th:value="${config.horarioEnvio}"
+               required>
+      </div>
+
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="ativo" name="ativo" th:checked="${config.ativo}">
+        <label class="form-check-label" for="ativo">Rotina diária ativa no horário configurado</label>
+      </div>
+
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="enviarSemResultados" name="enviarSemResultados" th:checked="${config.enviarSemResultados}">
+        <label class="form-check-label" for="enviarSemResultados">Enviar e-mail mesmo sem processos pendentes</label>
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save mr-1"></i>Salvar configuração
+      </button>
+    </form>
+
+    <hr>
+
+    <form th:action="@{/intranet/alertas/config/enviar-teste}" method="post">
+      <button type="submit" class="btn btn-outline-success">
+        <i class="fas fa-paper-plane mr-1"></i>Enviar teste agora
+      </button>
+    </form>
+  </div>
+</div>
+
+<div th:replace="~{fragments/foot :: bot}"></div>
+</html>

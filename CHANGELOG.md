@@ -1,95 +1,95 @@
-# CHANGELOG — SGP (Sistema Grupo Prod)
+﻿# CHANGELOG â€” SGP (Sistema Grupo Prod)
 
 ## [2026-03-09] - Feature
 
-### Descrição
-Implementado controle de acompanhamento operacional de processos com registro de **último acesso** e **última edição**, incluindo distinção entre eventos `ACESSO` e `EDICAO`.
+### DescriÃ§Ã£o
+Implementado controle de acompanhamento operacional de processos com registro de **Ãºltimo acesso** e **Ãºltima ediÃ§Ã£o**, incluindo distinÃ§Ã£o entre eventos `ACESSO` e `EDICAO`.
 
-### Detalhes Técnicos
+### Detalhes TÃ©cnicos
 - Entidade `Processo` atualizada com campos auxiliares:
   - `ultimoAcessoEm`
   - `ultimoAcessoPor`
   - `ultimaEdicaoEm`
   - `ultimaEdicaoPor`
-- Entidade `ProcessoLog` atualizada para suportar trilha de interação:
-  - `tipoEvento` (`ACESSO`, `EDICAO`, mantendo compatibilidade com logs de alteração)
+- Entidade `ProcessoLog` atualizada para suportar trilha de interaÃ§Ã£o:
+  - `tipoEvento` (`ACESSO`, `EDICAO`, mantendo compatibilidade com logs de alteraÃ§Ã£o)
   - `usuario`
   - `dataHora` (`data_hora`)
-  - índice `idx_processo_logs_processo_datahora (processo_id, data_hora)`
+  - Ã­ndice `idx_processo_logs_processo_datahora (processo_id, data_hora)`
 - Fluxo de processo atualizado:
   - `GET /processos/editar/{id}` registra evento `ACESSO` automaticamente
-  - `POST /processos/editar/{id}` registra evento `EDICAO` após persistência
+  - `POST /processos/editar/{id}` registra evento `EDICAO` apÃ³s persistÃªncia
 - Tela `processos/editar-processo` passou a exibir:
-  - último acesso (data/hora + usuário)
-  - última edição (data/hora + usuário)
+  - Ãºltimo acesso (data/hora + usuÃ¡rio)
+  - Ãºltima ediÃ§Ã£o (data/hora + usuÃ¡rio)
 - Nova base para consultas de acompanhamento:
   - `ProcessoAcompanhamentoDTO`
   - consulta em `ProcessoRepository.buscarAcompanhamento(...)`
   - endpoint `GET /api/processos/acompanhamento?diasSemAcesso=&diasSemEdicao=`
 
-### Observações
-- Implementação mantida no escopo do módulo de processos, sem alteração de regras de status/documentação/itens.
-- Projeto permanece com `spring.jpa.hibernate.ddl-auto=update`; novas colunas e índice são aplicados automaticamente no ambiente atual.
+### ObservaÃ§Ãµes
+- ImplementaÃ§Ã£o mantida no escopo do mÃ³dulo de processos, sem alteraÃ§Ã£o de regras de status/documentaÃ§Ã£o/itens.
+- Projeto permanece com `spring.jpa.hibernate.ddl-auto=update`; novas colunas e Ã­ndice sÃ£o aplicados automaticamente no ambiente atual.
 
-### Evolução da listagem operacional (`/processos/listar`)
+### EvoluÃ§Ã£o da listagem operacional (`/processos/listar`)
 - Adicionadas colunas de acompanhamento na tabela:
-  - **Último acesso**
-  - **Usuário** (último usuário que acessou)
+  - **Ãšltimo acesso**
+  - **UsuÃ¡rio** (Ãºltimo usuÃ¡rio que acessou)
   - **Dias sem acesso**
 - Adicionados filtros no topo da listagem:
   - `diasSemAcesso`
   - `diasSemEdicao`
 - Regras de filtro implementadas:
-  - quando `diasSemAcesso` é informado, lista processos com `ultimoAcessoEm` menor/igual ao limite de dias **ou sem acesso registrado**;
-  - quando `diasSemEdicao` é informado, lista processos com `ultimaEdicaoEm` menor/igual ao limite de dias **ou sem edição registrada**.
-- Backend da listagem atualizado para usar query dedicada (`buscarParaListagemComAcompanhamento`) e cálculo de `diasSemAcesso` exibido em tela.
+  - quando `diasSemAcesso` Ã© informado, lista processos com `ultimoAcessoEm` menor/igual ao limite de dias **ou sem acesso registrado**;
+  - quando `diasSemEdicao` Ã© informado, lista processos com `ultimaEdicaoEm` menor/igual ao limite de dias **ou sem ediÃ§Ã£o registrada**.
+- Backend da listagem atualizado para usar query dedicada (`buscarParaListagemComAcompanhamento`) e cÃ¡lculo de `diasSemAcesso` exibido em tela.
 
-### Correção de compatibilidade em produção (`processo_logs`)
-- Corrigido erro ao acessar/editar processo em bancos com coluna legada obrigatória `data_alteracao`.
+### CorreÃ§Ã£o de compatibilidade em produÃ§Ã£o (`processo_logs`)
+- Corrigido erro ao acessar/editar processo em bancos com coluna legada obrigatÃ³ria `data_alteracao`.
 - `ProcessoLog` agora sincroniza automaticamente `data_hora` e `data_alteracao` no persist/update, evitando falha SQL:
   - `Field 'data_alteracao' doesn't have a default value`
-- Ajuste feito sem alterar schema, garantindo compatibilidade com ambientes já existentes.
+- Ajuste feito sem alterar schema, garantindo compatibilidade com ambientes jÃ¡ existentes.
 
-### Ajuste de identificação de usuário em acompanhamento
-- A captura de usuário nos eventos de processo (`ACESSO`/`EDICAO`) passou a priorizar o **nome do usuário** cadastrado (`usuarios.nome`) em vez do login/e-mail.
+### Ajuste de identificaÃ§Ã£o de usuÃ¡rio em acompanhamento
+- A captura de usuÃ¡rio nos eventos de processo (`ACESSO`/`EDICAO`) passou a priorizar o **nome do usuÃ¡rio** cadastrado (`usuarios.nome`) em vez do login/e-mail.
 - Impacto direto nas telas:
-  - `/processos/listar` (coluna “Usuário” do último acesso)
-  - `/processos/editar/{id}` (bloco de “Último acesso” e “Última edição”).
+  - `/processos/listar` (coluna â€œUsuÃ¡rioâ€ do Ãºltimo acesso)
+  - `/processos/editar/{id}` (bloco de â€œÃšltimo acessoâ€ e â€œÃšltima ediÃ§Ã£oâ€).
 
 ### Filtro adicional por status na listagem de acompanhamento
 - Na tela `/processos/listar`, os filtros de `diasSemAcesso` e `diasSemEdicao` agora podem ser combinados com filtro de `status`.
-- Permite cenários operacionais como: “processos EM_ANDAMENTO sem acesso há X dias”.
+- Permite cenÃ¡rios operacionais como: â€œprocessos EM_ANDAMENTO sem acesso hÃ¡ X diasâ€.
 
 ### Nova guia no Dashboard: Sem Acompanhamento
-- Adicionada nova guia na `/intranet` ao lado de “Produtos e Pendências”, com foco em processos sem visita há X dias.
-- Novo parâmetro de filtro na intranet: `diasSemVisita` (editável pelo usuário, padrão 7).
+- Adicionada nova guia na `/intranet` ao lado de â€œProdutos e PendÃªnciasâ€, com foco em processos sem visita hÃ¡ X dias.
+- Novo parÃ¢metro de filtro na intranet: `diasSemVisita` (editÃ¡vel pelo usuÃ¡rio, padrÃ£o 7).
 - A guia exibe:
-  - KPI de total de processos sem visita no critério
-  - gráfico por status dos processos sem visita
-  - tabela resumida (paciente, nº interno, status, último acesso, dias sem visita, ação)
+  - KPI de total de processos sem visita no critÃ©rio
+  - grÃ¡fico por status dos processos sem visita
+  - tabela resumida (paciente, nÂº interno, status, Ãºltimo acesso, dias sem visita, aÃ§Ã£o)
 
 ## [2026-03-08] - Improvement
 
-### Descrição
-Otimizada a página `/processos/listar` para melhorar percepção de carregamento e escalabilidade inicial da listagem.
+### DescriÃ§Ã£o
+Otimizada a pÃ¡gina `/processos/listar` para melhorar percepÃ§Ã£o de carregamento e escalabilidade inicial da listagem.
 
-### Detalhes Técnicos
-- Mantida a paginação já existente da própria tabela (DataTables), sem adicionar uma segunda paginação.
+### Detalhes TÃ©cnicos
+- Mantida a paginaÃ§Ã£o jÃ¡ existente da prÃ³pria tabela (DataTables), sem adicionar uma segunda paginaÃ§Ã£o.
 - Template `processos/listar-processos.html` atualizado com:
-  - loading visual inicial (spinner) até a tabela estar pronta;
-  - nova coluna **Deferimentos** na listagem, exibindo **número + tipo** (ex.: `#3 - Juiz` / `#2 - Grupo Prod`);
-  - ajustes no DataTables (`deferRender`, `processing`, `stateSave`) para melhor experiência.
+  - loading visual inicial (spinner) atÃ© a tabela estar pronta;
+  - nova coluna **Deferimentos** na listagem, exibindo **nÃºmero + tipo** (ex.: `#3 - Juiz` / `#2 - Grupo Prod`);
+  - ajustes no DataTables (`deferRender`, `processing`, `stateSave`) para melhor experiÃªncia.
 
-### Observações
-- Mantidas ações existentes da tela (editar, visualizar detalhes em modal e criação de processo).
-- A mudança reduz carga inicial e melhora a experiência conforme a base cresce.
+### ObservaÃ§Ãµes
+- Mantidas aÃ§Ãµes existentes da tela (editar, visualizar detalhes em modal e criaÃ§Ã£o de processo).
+- A mudanÃ§a reduz carga inicial e melhora a experiÃªncia conforme a base cresce.
 
 ## [2026-03-08] - Feature
 
-### Descrição
-Adicionado controle de óbito no fluxo de **edição de processo**, com marcação de óbito do paciente e campo opcional de observação.
+### DescriÃ§Ã£o
+Adicionado controle de Ã³bito no fluxo de **ediÃ§Ã£o de processo**, com marcaÃ§Ã£o de Ã³bito do paciente e campo opcional de observaÃ§Ã£o.
 
-### Detalhes Técnicos
+### Detalhes TÃ©cnicos
 - Entidade `Processo` atualizada com os campos:
   - `obito` (boolean, default `false`)
   - `observacaoObito` (TEXT, opcional)
@@ -97,33 +97,33 @@ Adicionado controle de óbito no fluxo de **edição de processo**, com marcaç�
   - `obito`
   - `observacaoObito`
 - Tela `processos/editar-processo` atualizada com:
-  - checkbox “Houve óbito do paciente”
-  - textarea “Observação do Óbito (opcional)”
+  - checkbox â€œHouve Ã³bito do pacienteâ€
+  - textarea â€œObservaÃ§Ã£o do Ã“bito (opcional)â€
 
-### Observações
-- A marcação de óbito é informativa e **não altera** o fluxo de continuidade do processo.
-- Não houve alteração de regras de status, documentos, itens e BI.
+### ObservaÃ§Ãµes
+- A marcaÃ§Ã£o de Ã³bito Ã© informativa e **nÃ£o altera** o fluxo de continuidade do processo.
+- NÃ£o houve alteraÃ§Ã£o de regras de status, documentos, itens e BI.
 
 ## [2026-03-01] - Feature
 
-### Descrição
-Implementado histórico de deferimentos no módulo de Processos, permitindo múltiplos deferimentos por processo com numeração sequencial automática.
+### DescriÃ§Ã£o
+Implementado histÃ³rico de deferimentos no mÃ³dulo de Processos, permitindo mÃºltiplos deferimentos por processo com numeraÃ§Ã£o sequencial automÃ¡tica.
 
-### Detalhes Técnicos
-- Nova entidade `Deferimento` com vínculo `ManyToOne` para `Processo`.
+### Detalhes TÃ©cnicos
+- Nova entidade `Deferimento` com vÃ­nculo `ManyToOne` para `Processo`.
 - Novo enum `TipoDeferimento` com valores `GRUPO_PROD` e `JUIZ`.
 - `Processo` agora possui lista de deferimentos (`cascade = ALL`, `orphanRemoval = true`).
 - Regra de sequencial por processo implementada no backend (`max + 1`).
 - Garantia de unicidade no banco: `UNIQUE(processo_id, numero_deferimento)`.
-- Tela de edição de processo atualizada com:
+- Tela de ediÃ§Ã£o de processo atualizada com:
   - lista de deferimentos registrados
-  - botão “Adicionar Deferimento”
+  - botÃ£o â€œAdicionar Deferimentoâ€
   - campos de mensagem e tipo
-- Relatório de processos atualizado para exibição simples dos deferimentos.
+- RelatÃ³rio de processos atualizado para exibiÃ§Ã£o simples dos deferimentos.
 
-### Observações
-- BI/dashboard não recebeu integração nesta etapa.
-- Regras existentes de status, documentos e itens de produto não foram alteradas.
+### ObservaÃ§Ãµes
+- BI/dashboard nÃ£o recebeu integraÃ§Ã£o nesta etapa.
+- Regras existentes de status, documentos e itens de produto nÃ£o foram alteradas.
 
 ## [2026-04-28] - Feature
 
@@ -145,3 +145,63 @@ Implementada exportacao completa de processos em Excel (.xlsx) nas telas /proces
 - Nao houve alteracao de regras de negocio de processos.
 
 
+
+## [2026-04-29] - Feature
+
+### Descricao
+Implementado envio automatico diario por e-mail, as 09:00 (America/Sao_Paulo), com resumo de processos pendentes sem acesso ha 10 dias ou mais, limitado aos status ABERTO e EM_ANDAMENTO.
+
+### Detalhes Tecnicos
+- Scheduling habilitado com `@EnableScheduling` em `SgpApplication`.
+- Criado `ProcessoResumoPendenteEmailScheduler` com cron configuravel por propriedade:
+  - `app.alertas.email.resumo.cron=0 0 9 * * *`
+  - `app.alertas.email.resumo.zone=America/Sao_Paulo`
+- Criado `ProcessoResumoPendenteEmailService` para:
+  - buscar processos com status `ABERTO` e `EM_ANDAMENTO`;
+  - calcular dias sem acesso com base em `ultimoAcessoEm`;
+  - quando `ultimoAcessoEm` for nulo, usar `dataInicio` como referencia;
+  - identificar pendencias documentais obrigatorias (CPF, Comprovante de Residencia, Comprovante de Renda, Procuracao e Declaracao de Insuficiencia);
+  - montar e enviar e-mail HTML tabular;
+  - enviar tambem quando nao houver pendencias, com mensagem informativa.
+- `AlertaEmailService` ampliado para envio HTML (`enviarEmailHtml`) reaproveitando o SMTP ja configurado.
+- `ProcessoRepository` ampliado com `findByStatusInOrderByIdDesc(...)` para filtrar status no banco.
+- Novo destinatario de resumo por propriedade: `app.alertas.email.resumo.to`.
+
+### Observacoes
+- Falhas de envio sao tratadas com log de erro, sem impacto no fluxo principal do sistema.
+- Nao houve alteracao de schema/tabelas.
+
+## [2026-04-29] - Feature (Configuração de alertas)
+
+### Descricao
+Adicionada tela administrativa para configurar o resumo diario de processos pendentes por e-mail, com envio manual de teste.
+
+### Detalhes Tecnicos
+- Nova entidade `AlertaResumoConfig` (tabela `alerta_resumo_config`) para persistir:
+  - emails de destino
+  - dias minimos sem acesso
+  - flag de rotina ativa
+  - flag para enviar mesmo sem resultados
+- Novo controller web: `AlertaResumoConfigController`:
+  - `GET /intranet/alertas/config`
+  - `POST /intranet/alertas/config/salvar`
+  - `POST /intranet/alertas/config/enviar-teste`
+- Nova tela Thymeleaf: `alertas/config-resumo-diario.html`.
+- Menu lateral recebeu item `Alertas` para acesso rapido a configuracao.
+- `ProcessoResumoPendenteEmailService` passou a ler configuracao persistida e aplicar filtros dinamicos.
+
+### Observacoes
+- A rotina agendada continua as 09:00 (America/Sao_Paulo), mas agora pode ser ativada/desativada via tela.
+- Envio manual usa as mesmas regras e o mesmo SMTP da rotina automatica.
+
+### Melhoria visual do e-mail de resumo diario
+- O e-mail de resumo diario foi redesenhado com layout HTML mais moderno (cabecalho visual, bloco de resumo e tabela estilizada).
+- Inclusao da logo da GrupoProd no cabecalho do e-mail (`static/img/logo.png`) via inline image.
+- O envio agora inclui anexo Excel (`.xlsx`) com os processos considerados no resumo do dia.
+- Botao visual no corpo do e-mail orienta o download pelo anexo.
+
+
+### Configuracao de horario na tela de alertas
+- A pagina `/intranet/alertas/config` agora permite definir o horario de envio (`HH:mm`) da rotina automatica.
+- O scheduler foi ajustado para verificacao a cada minuto e disparo no horario configurado, sem necessidade de alterar properties.
+- Incluida protecao para evitar mais de um envio automatico no mesmo dia (`ultimaExecucaoEm`).

@@ -422,3 +422,10 @@ Base path: `/maintenance`
 - Regra: aplica os mesmos filtros usados em /relatorios/processos.
 
 
+
+## Atualizacao 2026-04-29 - Alertas
+
+### Novas rotas
+- `GET /intranet/alertas/config` - Tela de configuracao do resumo diario por e-mail.
+- `POST /intranet/alertas/config/salvar` - Salva parametros da rotina de alertas.
+- `POST /intranet/alertas/config/enviar-teste` - Dispara envio manual imediato (teste/operacao).

@@ -341,3 +341,20 @@ Uso:
 Para fechar 100%:
 1) Enviar o model de `GrupoDoenca` (para tabelas/colunas reais).
 2) Confirmar a naming strategy do Hibernate (para saber o nome real das tabelas sem `@Table` como `Hospital`, `Usuario`, `Doenca`).
+## Atualizacao 2026-04-29 - Tabela de configuracao de alertas
+
+### Nova tabela
+- `alerta_resumo_config`
+  - `id` (PK)
+  - `emails_destino` (TEXT)
+  - `dias_sem_acesso` (INT)
+  - `ativo` (BOOLEAN)
+  - `enviar_sem_resultados` (BOOLEAN)
+
+### Objetivo
+Persistir parametros da rotina diaria de resumo de processos pendentes por e-mail sem depender de alteracao em arquivo de propriedades.
+
+### Atualizacao 2026-04-29 - Tabela de configuracao de alertas
+- `alerta_resumo_config`
+  - novo campo `horario_envio` (VARCHAR 5, formato HH:mm)
+  - novo campo `ultima_execucao_em` (DATETIME)

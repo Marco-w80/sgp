@@ -349,3 +349,61 @@ Sempre atualizar também a documentação correspondente em:
 - A geracao do arquivo foi centralizada no servico ProcessoExcelService, evitando duplicacao entre os dois fluxos.
 
 
+
+## Atualizacao 2026-04-29 - Resumo Diario de Processos Pendentes por E-mail
+
+### Modulo Processos / Acompanhamento
+- Foi adicionada rotina automatica diaria para monitoramento de processos sem acesso recente.
+- A rotina executa todos os dias as 09:00 no timezone `America/Sao_Paulo`.
+- Escopo da selecao:
+  - status `ABERTO` e `EM_ANDAMENTO`;
+  - somente processos com 10 dias ou mais sem acesso.
+
+### Regra de dias sem acesso
+- Base principal: `processo.ultimoAcessoEm`.
+- Quando `ultimoAcessoEm` estiver nulo, o calculo usa `processo.dataInicio` como referencia segura.
+
+### Conteudo do e-mail diario
+- Assunto: `SGP - Resumo diario de processos pendentes`.
+- Corpo em HTML com data de geracao e tabela contendo:
+  - ID, Interno, Processo, Paciente, Advogado, Medico, Inicio, Status,
+  - Ultimo acesso, Dias sem acesso, Deferimentos, Pendencias documentais.
+- Pendencias documentais verificadas:
+  - CPF
+  - Comprovante de Residencia
+  - Comprovante de Renda
+  - Procuracao
+  - Declaracao de Insuficiencia
+- Quando todos os documentos estiverem anexados: `Sem pendencias documentais`.
+- Quando nao houver processos elegiveis: e-mail enviado com mensagem de ausencia de pendencias.
+
+### Operacao e resiliencia
+- SMTP reaproveitado da configuracao existente.
+- Destinatario configuravel via `app.alertas.email.resumo.to`.
+- Erros de envio sao registrados em log e nao interrompem o sistema principal.
+
+## Atualizacao 2026-04-29 - Configuracao de Alertas via Tela Administrativa
+
+### Modulo Alertas
+- Novo menu lateral `Alertas` (perfil ADMIN) para acesso a configuracao.
+- Nova pagina: `GET /intranet/alertas/config`.
+- Recursos da tela:
+  - configuracao de e-mails destinatarios
+  - configuracao de dias minimos sem acesso
+  - ativacao/desativacao da rotina diaria
+  - opcao de enviar e-mail mesmo sem pendencias
+  - botao de envio manual de teste
+
+### Fluxo operacional
+- O scheduler diario consulta a configuracao persistida antes de enviar.
+- Se a rotina estiver desativada, o agendamento nao dispara envio.
+- O envio manual usa as mesmas regras do envio diario.
+
+### Atualizacao visual 2026-04-29 - E-mail de alertas
+- O e-mail de alertas diarios recebeu template HTML customizado com identidade visual.
+- A logo oficial da GrupoProd passou a ser exibida no cabecalho da mensagem.
+- O relatorio de processos do dia passou a ser enviado como anexo em Excel no mesmo e-mail.
+
+### Atualizacao 2026-04-29 - Horario configuravel de envio
+- A configuracao de alertas passou a permitir ajuste de horario (campo `HH:mm`) direto na tela admin.
+- A rotina automatica respeita o horario salvo e executa no maximo uma vez por dia.

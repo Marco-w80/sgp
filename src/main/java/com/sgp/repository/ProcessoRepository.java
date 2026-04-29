@@ -92,6 +92,8 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
             @Param("declaracaoInsuficienciaAnexado") Boolean declaracaoInsuficienciaAnexado
     );
 
+    List<Processo> findByStatusInOrderByIdDesc(List<StatusProcesso> statuses);
+
         long countByStatus(StatusProcesso status);
 
 

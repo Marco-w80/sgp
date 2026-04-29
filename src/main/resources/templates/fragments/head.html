@@ -153,6 +153,12 @@
           </a>
         </li>
 
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+          <a class="nav-link" th:href="@{/intranet/alertas/config}">
+            <i class="fas fa-fw fa-envelope"></i>
+            <span>Alertas</span>
+          </a>
+        </li>
         <!-- Menu: Relatórios -->
         <li class="nav-item" sec:authorize="hasAnyRole('USUARIO','ADMIN')">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRelatorios"
