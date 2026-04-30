@@ -429,3 +429,23 @@ Base path: `/maintenance`
 - `GET /intranet/alertas/config` - Tela de configuracao do resumo diario por e-mail.
 - `POST /intranet/alertas/config/salvar` - Salva parametros da rotina de alertas.
 - `POST /intranet/alertas/config/enviar-teste` - Dispara envio manual imediato (teste/operacao).
+
+## Atualizacao 2026-04-29 - Pendencias de Processos por Tipo
+
+### Dashboard (/intranet)
+- O resumo visual de pendencias agora possui dois acessos:
+  - card "Sem numero de processo" -> `/processos/pendencias?tipo=sem-numero-processo`
+  - card "Pendencia documental" -> `/processos/pendencias?tipo=documentacao`
+
+### Nova rota MVC
+- `GET /processos/pendencias`
+  - Controller: `ProcessoController`
+  - Parametro:
+    - `tipo` (opcional, default `documentacao`)
+    - valores aceitos: `sem-numero-processo`, `documentacao`
+  - View: `processos/pendencias-processos`
+
+## Atualizacao 2026-04-29 - Status de Processos
+- Nao houve criacao de novas rotas/endpoints nesta alteracao.
+- Ajuste funcional aplicado nas mesmas rotas do modulo de processos e relatorios, com novo status `OBITO` no fluxo de formulario.
+- Compatibilidade de leitura para registros legados `CONCLUIDO` preservada no backend.

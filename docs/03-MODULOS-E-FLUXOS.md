@@ -407,3 +407,28 @@ Sempre atualizar também a documentação correspondente em:
 ### Atualizacao 2026-04-29 - Horario configuravel de envio
 - A configuracao de alertas passou a permitir ajuste de horario (campo `HH:mm`) direto na tela admin.
 - A rotina automatica respeita o horario salvo e executa no maximo uma vez por dia.
+
+## Atualizacao 2026-04-29 - Separacao de Pendencias no Dashboard
+
+### Intranet / BI
+- O card unico de "Processos pendentes" foi substituido por dois cards:
+  - "Sem numero de processo"
+  - "Pendencia documental"
+- Cada card mostra contagem propria e direciona para listagem filtrada.
+
+### Modulo Processos
+- Nova rota de consulta operacional:
+  - `GET /processos/pendencias?tipo=sem-numero-processo`
+  - `GET /processos/pendencias?tipo=documentacao`
+- A listagem exibe identificacao do processo e, no tipo documental, os documentos faltantes.
+
+## Atualizacao 2026-04-29 - Status OBITO e deferimento livre
+
+### Modulo Processos
+- O fluxo de cadastro/edicao/listagem passou a trabalhar com `OBITO` como status ativo.
+- `CONCLUIDO` foi removido das opcoes de formulario e filtros operacionais.
+- Para compatibilidade, processos antigos com `CONCLUIDO` continuam legiveis e exibidos como `OBITO`.
+
+### Modulo Deferimentos
+- Na tela de edicao, o deferimento passou a aceitar entrada livre de mensagem.
+- A interface nao exige mais escolha manual de tipo para registrar novo deferimento.

@@ -356,3 +356,26 @@ Para detalhar o BI com 100% de fidelidade:
 1) Enviar as `@Query`/implementações do `ProcessoRepository` e `ProcessoProdutoRepository`
    (para documentar exatamente as regras: período, “completo”, lead time, agrupamentos).
 2) Confirmar se existe campo de “data fim/conclusão” do processo (ou se lead time é calculado por status/log).
+---
+
+## 10) Atualizacao 2026-04-29 - Separacao de pendencias no Dashboard
+
+### Novos cards na Visao Geral
+- Card `Sem numero de processo`:
+  - origem: `processoService.contarProcessosSemNumeroProcesso()`
+  - regra: `numeroProcesso` nulo, vazio ou apenas espacos
+  - link: `/processos/pendencias?tipo=sem-numero-processo`
+- Card `Pendencia documental`:
+  - origem: `processoService.contarProcessosComPendenciaDocumental()`
+  - regra: falta de pelo menos 1 documento obrigatorio
+  - link: `/processos/pendencias?tipo=documentacao`
+
+### Listagem operacional das pendencias
+- Nova tela `processos/pendencias-processos` com visao filtrada por tipo.
+- Campos principais da tabela:
+  - ID, Interno, Numero do processo, Paciente, Advogado, Medico, Inicio, Status, Tipo de pendencia, Documentos faltantes.
+
+## Atualizacao 2026-04-29 - BI e status OBITO
+- Contagens de status no dashboard passam a consolidar `CONCLUIDO` legado em `OBITO`.
+- Card/KPI de status final usa chave `OBITO`.
+- Visualmente, tabelas do BI exibem `�BITO` para registros `OBITO` e `CONCLUIDO`.

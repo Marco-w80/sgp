@@ -57,12 +57,16 @@ public class DashboardService {
                 : processoRepository.contarPorStatusPeriodo(de, ate);
 
         Map<String, Long> out = new LinkedHashMap<>();
-        for (StatusProcesso st : StatusProcesso.values()) {
-            out.put(st.name().replace('_', ' '), 0L);
-        }
+        out.put("ABERTO", 0L);
+        out.put("EM ANDAMENTO", 0L);
+        out.put("OBITO", 0L);
+        out.put("SUSPENSO", 0L);
 
         for (var row : rows) {
             String key = row.getStatus() == null ? "SEM STATUS" : row.getStatus().replace('_', ' ');
+            if ("CONCLUIDO".equals(key)) {
+                key = "OBITO";
+            }
             out.merge(key, row.getTotal(), Long::sum);
         }
 

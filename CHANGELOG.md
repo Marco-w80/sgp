@@ -1,5 +1,48 @@
 ﻿# CHANGELOG â€” SGP (Sistema Grupo Prod)
 
+## [2026-04-29] - Ajuste de status e deferimento em Processos
+
+### Descricao
+- Incluido o status `OBITO` no enum de processos.
+- `CONCLUIDO` deixou de aparecer em cadastro/edicao/filtros de processos e relatorio.
+- Compatibilidade historica mantida: registros antigos com `CONCLUIDO` continuam funcionando e sao exibidos como `OBITO` nas telas.
+- Campo de deferimento passou a aceitar preenchimento livre sem depender de selecao de tipo na interface.
+
+### Detalhes Tecnicos
+- `StatusProcesso` atualizado com `OBITO`, mantendo `CONCLUIDO` para leitura de legado.
+- `ProcessoController` passou a montar lista de status de formulario sem `CONCLUIDO`.
+- `DashboardService` normaliza contagem de status legado `CONCLUIDO` para `OBITO`.
+- `HomeController` atualizado para KPI/CSS com chave `OBITO`.
+- Em `editar-processo`, o tipo de deferimento foi removido da entrada manual (campo oculto com valor padrao interno), preservando persistencia do historico.
+- Views atualizadas para mostrar `OBITO` com rotulo `ÓBITO`.
+
+### Observacoes
+- Nao houve mudanca de schema de banco.
+- Nao houve exclusao ou alteracao destrutiva de dados historicos.
+
+## [2026-04-29] - Feature
+
+### Descricao
+Separacao do card unico de "Processos pendentes" da intranet em dois cards especificos com contagem e navegacao por tipo de pendencia.
+
+### Detalhes Tecnicos
+- Dashboard (`GET /intranet`) agora exibe:
+  - `Sem numero de processo` (campo `numeroProcesso` nulo, vazio ou apenas espacos).
+  - `Pendencia documental` (faltando ao menos um documento obrigatorio).
+- Novas consultas no `ProcessoRepository` para:
+  - contar/listar processos sem numero de processo;
+  - contar/listar processos com pendencia documental.
+- `ProcessoService` recebeu metodos especificos de contagem e listagem de pendencias.
+- Novo endpoint MVC:
+  - `GET /processos/pendencias?tipo=sem-numero-processo`
+  - `GET /processos/pendencias?tipo=documentacao`
+- Nova view `processos/pendencias-processos` com tabela dedicada contendo:
+  - ID, interno, numero do processo, paciente, advogado, medico, inicio, status, tipo de pendencia e documentos faltantes.
+
+### Observacoes
+- Nao houve alteracao de schema/tabelas.
+- Mantido padrao visual atual dos cards e tabelas.
+
 ## [2026-03-09] - Feature
 
 ### DescriÃ§Ã£o

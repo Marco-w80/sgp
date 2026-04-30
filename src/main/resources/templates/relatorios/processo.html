@@ -191,7 +191,8 @@
               <label for="status" class="form-label">Status:</label>
               <select id="status" name="status" class="form-control">
                 <option value="">Todos</option>
-                <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"
+                <option th:each="s : ${statusValues}" th:value="${s}"
+                  th:text="${s.name() == 'OBITO' ? 'ÓBITO' : #strings.replace(s.name(), '_', ' ')}"
                   th:selected="${param.status} == ${s}"></option>
               </select>
             </div>
@@ -303,7 +304,7 @@
               <td th:text="${proc.numeroInterno}"></td>
               <td th:text="${proc.numeroProcesso}"></td>
               <td th:text="${#temporals.format(proc.dataInicio,'dd/MM/yyyy')}"></td>
-              <td th:text="${proc.status}"></td>
+              <td th:text="${proc.status != null and (proc.status.name() == 'CONCLUIDO' or proc.status.name() == 'OBITO') ? 'ÓBITO' : (proc.status != null ? #strings.replace(proc.status.name(), '_', ' ') : '-')}"></td>
               <td th:text="${proc.paciente != null ? proc.paciente.nome : ''}"></td>
               <td th:text="${proc.advogado != null ? proc.advogado.nome : ''}"></td>
               <td th:text="${proc.medico != null ? proc.medico.nome : ''}"></td>

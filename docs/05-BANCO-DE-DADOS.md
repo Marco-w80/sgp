@@ -358,3 +358,13 @@ Persistir parametros da rotina diaria de resumo de processos pendentes por e-mai
 - `alerta_resumo_config`
   - novo campo `horario_envio` (VARCHAR 5, formato HH:mm)
   - novo campo `ultima_execucao_em` (DATETIME)
+
+## Atualizacao 2026-04-29 - Status e deferimento
+
+### Tabela `processos`
+- Campo `status` continua sem mudanca de schema.
+- Enum de aplicacao passou a incluir `OBITO` e manter `CONCLUIDO` para compatibilidade historica.
+
+### Tabela `deferimentos`
+- Sem mudanca de schema.
+- Registro de deferimento na edicao passou a nao depender de selecao manual de tipo na interface.

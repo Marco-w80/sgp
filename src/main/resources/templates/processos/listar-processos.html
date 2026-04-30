@@ -239,7 +239,8 @@
           <label for="status">Status</label>
           <select class="form-control" id="status" name="status">
             <option value="">Todos</option>
-            <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"
+            <option th:each="s : ${statusValues}" th:value="${s}"
+                    th:text="${s.name() == 'OBITO' ? 'ÓBITO' : #strings.replace(s.name(), '_', ' ')}"
                     th:selected="${statusSelecionado != null and statusSelecionado == s}"></option>
           </select>
         </div>
@@ -292,7 +293,7 @@
             <!-- Médico opcional -->
             <td th:text="${proc.medico != null ? proc.medico.nome : '–'}"></td>
             <td th:text="${#temporals.format(proc.dataInicio, 'dd/MM/yyyy')}"></td>
-            <td th:text="${proc.status}"></td>
+            <td th:text="${proc.status != null and (proc.status.name() == 'CONCLUIDO' or proc.status.name() == 'OBITO') ? 'ÓBITO' : (proc.status != null ? #strings.replace(proc.status.name(), '_', ' ') : '–')}"></td>
             <td th:text="${proc.ultimoAcessoEm != null ? #temporals.format(proc.ultimoAcessoEm, 'dd/MM/yyyy HH:mm') : 'Nunca acessado'}"></td>
             <td th:text="${proc.ultimoAcessoPor != null and !#strings.isEmpty(proc.ultimoAcessoPor) ? proc.ultimoAcessoPor : '–'}"></td>
             <td th:text="${diasSemAcessoMap.containsKey(proc.id) ? diasSemAcessoMap.get(proc.id) + ' dias' : '—'}"></td>
@@ -658,7 +659,7 @@
             <p><strong>Médico:</strong> ${data.medico
               ? `${safe(data.medico.nome)} - CRM: ${safe(data.medico.crm)}`
               : '–'}</p>
-            <p><strong>Status:</strong> ${safe(data.status)}</p>
+            <p><strong>Status:</strong> ${data.status === 'CONCLUIDO' || data.status === 'OBITO' ? 'ÓBITO' : safe(data.status)}</p>
             <p><strong>Data Início:</strong> ${formatDate(data.dataInicio)}</p>
             <p><strong>Local:</strong> ${data.local
               ? `${safe(data.local.comarca)} – ${safe(data.local.localizacao)}`

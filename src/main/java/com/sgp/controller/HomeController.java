@@ -76,7 +76,7 @@ public class HomeController {
                         Collectors.counting()));
 
         var statusCountsFormatado = dashboardService.contarPorStatusFormatado(de, ate);
-        long processosGanhos = statusCountsFormatado.getOrDefault("CONCLUIDO", 0L);
+        long processosGanhos = statusCountsFormatado.getOrDefault("OBITO", 0L);
         long processosEmAndamento = statusCountsFormatado.getOrDefault("EM ANDAMENTO", 0L);
 
         model.addAttribute("statusCounts", deepSanitizeForJson(statusCountsFormatado, "SEM_STATUS"));
@@ -108,6 +108,8 @@ public class HomeController {
         // --- o resto permanece ---
         model.addAttribute("pendencias", pendencias);
         model.addAttribute("totalPendentes", pendencias.size());
+        model.addAttribute("totalPendenciasSemNumeroProcesso", processoService.contarProcessosSemNumeroProcesso());
+        model.addAttribute("totalPendenciasDocumentacao", processoService.contarProcessosComPendenciaDocumental());
         model.addAttribute("diasMinimos", diasMinimos);
         model.addAttribute("diasSemVisita", diasSemVisita);
         model.addAttribute("processosSemVisita", processosSemVisita);
@@ -130,7 +132,7 @@ public class HomeController {
         Map<String, String> css = Map.of(
                 "ABERTO", "card-theme-secondary",
                 "EM ANDAMENTO", "card-theme-primary", // Corrigido para "EM ANDAMENTO"
-                "CONCLUIDO", "card-theme-success",
+                "OBITO", "card-theme-success",
                 "SUSPENSO", "card-theme-danger"
         );
         model.addAttribute("statusCss", css);

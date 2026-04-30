@@ -94,7 +94,41 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
 
     List<Processo> findByStatusInOrderByIdDesc(List<StatusProcesso> statuses);
 
-        long countByStatus(StatusProcesso status);
+    long countByStatus(StatusProcesso status);
+
+    @Query("""
+           select count(p) from Processo p
+           where p.numeroProcesso is null or trim(p.numeroProcesso) = ''
+           """)
+    long countSemNumeroProcesso();
+
+    @Query("""
+           select p from Processo p
+           where p.numeroProcesso is null or trim(p.numeroProcesso) = ''
+           order by p.id desc
+           """)
+    List<Processo> listarSemNumeroProcesso();
+
+    @Query("""
+           select count(p) from Processo p
+           where p.cpfAnexado = false
+              or p.compResidenciaAnexado = false
+              or p.compRendaAnexado = false
+              or p.procuracaoAnexado = false
+              or p.declaracaoInsuficienciaAnexado = false
+           """)
+    long countComPendenciaDocumental();
+
+    @Query("""
+           select p from Processo p
+           where p.cpfAnexado = false
+              or p.compResidenciaAnexado = false
+              or p.compRendaAnexado = false
+              or p.procuracaoAnexado = false
+              or p.declaracaoInsuficienciaAnexado = false
+           order by p.id desc
+           """)
+    List<Processo> listarComPendenciaDocumental();
 
 
     // Contagem por Status

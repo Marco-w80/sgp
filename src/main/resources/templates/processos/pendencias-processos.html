@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+  <title th:text="${tituloPendencias}">Pendências de Processos</title>
+  <th:block th:replace="~{fragments/head :: top}"></th:block>
+</head>
+<body>
+  <div class="card shadow mb-4">
+    <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-primary" th:text="${tituloPendencias}">Pendências de Processos</h6>
+      <span class="badge badge-warning p-2" th:text="'Total: ' + ${totalPendencias}">Total: 0</span>
+    </div>
+    <div class="card-body">
+      <div class="mb-3">
+        <a class="btn btn-sm mr-1"
+           th:classappend="${tipoSelecionado == 'sem-numero-processo'} ? 'btn-primary' : 'btn-outline-primary'"
+           th:href="@{/processos/pendencias(tipo='sem-numero-processo')}">Sem número de processo</a>
+        <a class="btn btn-sm"
+           th:classappend="${tipoSelecionado == 'documentacao'} ? 'btn-primary' : 'btn-outline-primary'"
+           th:href="@{/processos/pendencias(tipo='documentacao')}">Pendência documental</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover" id="tabelaPendencias" width="100%">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Interno</th>
+              <th>Número do processo</th>
+              <th>Paciente</th>
+              <th>Advogado</th>
+              <th>Médico</th>
+              <th>Início</th>
+              <th>Status</th>
+              <th>Pendência</th>
+              <th>Documentos faltantes</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(pendencias)}">
+              <td colspan="11" class="text-center text-muted">Nenhum processo encontrado para o filtro selecionado.</td>
+            </tr>
+            <tr th:each="item : ${pendencias}">
+              <td th:text="${item.processo.id}">1</td>
+              <td th:text="${item.processo.numeroInterno}">PROC-001</td>
+              <td th:text="${#strings.isEmpty(item.processo.numeroProcesso) ? '-' : item.processo.numeroProcesso}">-</td>
+              <td th:text="${item.processo.paciente != null ? item.processo.paciente.nome : '-'}">Paciente</td>
+              <td th:text="${item.processo.advogado != null ? item.processo.advogado.nome : '-'}">Advogado</td>
+              <td th:text="${item.processo.medico != null ? item.processo.medico.nome : '-'}">Médico</td>
+              <td th:text="${item.processo.dataInicio != null ? #temporals.format(item.processo.dataInicio, 'dd/MM/yyyy') : '-'}">01/01/2026</td>
+              <td th:text="${item.processo.status != null ? item.processo.status : '-'}">ABERTO</td>
+              <td th:text="${item.tipoPendencia}">Pendência documental</td>
+              <td>
+                <span th:if="${#lists.isEmpty(item.documentosFaltantes)}">-</span>
+                <ul class="mb-0 pl-3" th:unless="${#lists.isEmpty(item.documentosFaltantes)}">
+                  <li th:each="doc : ${item.documentosFaltantes}" th:text="${doc}">CPF</li>
+                </ul>
+              </td>
+              <td>
+                <a th:href="@{/processos/editar/{id}(id=${item.processo.id})}" class="btn btn-sm btn-secondary">
+                  <i class="fas fa-edit"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <th:block th:replace="~{fragments/foot :: bot}"></th:block>
+</body>
+</html>

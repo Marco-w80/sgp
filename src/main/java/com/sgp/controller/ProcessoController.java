@@ -1,6 +1,7 @@
 package com.sgp.controller;
 
 import com.sgp.dto.ProdutoDto;
+import com.sgp.dto.ProcessoPendenciaListagemDTO;
 import com.sgp.model.*;
 import com.sgp.repository.*;
 import com.sgp.service.ProcessoExcelService;
@@ -24,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Controller
@@ -78,7 +80,7 @@ public class ProcessoController {
         model.addAttribute("locais", localRepository.findAll());
         model.addAttribute("produtos", produtos);
 
-        model.addAttribute("statusValues", StatusProcesso.values());
+        model.addAttribute("statusValues", statusValuesForForm());
 
         model.addAttribute("gruposDoenca", grupoDoencaRepository.findAll());
         model.addAttribute("doencas", doencaRepository.findAll());
@@ -196,9 +198,33 @@ public class ProcessoController {
         model.addAttribute("diasSemAcesso", diasSemAcesso);
         model.addAttribute("diasSemEdicao", diasSemEdicao);
         model.addAttribute("statusSelecionado", status);
-        model.addAttribute("statusValues", StatusProcesso.values());
+        model.addAttribute("statusValues", statusValuesForForm());
         model.addAttribute("diasSemAcessoMap", diasSemAcessoMap);
         return "processos/listar-processos";
+    }
+
+    @GetMapping("/pendencias")
+    public String listarPendencias(@RequestParam(name = "tipo", required = false, defaultValue = "documentacao") String tipo,
+                                   Model model) {
+        List<ProcessoPendenciaListagemDTO> pendencias;
+        String tipoSelecionado;
+        String titulo;
+
+        if ("sem-numero-processo".equalsIgnoreCase(tipo)) {
+            pendencias = processoService.listarPendenciasSemNumeroProcesso();
+            tipoSelecionado = "sem-numero-processo";
+            titulo = "Pendências por Falta de Número de Processo";
+        } else {
+            pendencias = processoService.listarPendenciasDocumentais();
+            tipoSelecionado = "documentacao";
+            titulo = "Pendências por Falta de Documentação";
+        }
+
+        model.addAttribute("pendencias", pendencias);
+        model.addAttribute("tipoSelecionado", tipoSelecionado);
+        model.addAttribute("tituloPendencias", titulo);
+        model.addAttribute("totalPendencias", pendencias.size());
+        return "processos/pendencias-processos";
     }
 
     @GetMapping("/exportar-excel")
@@ -259,15 +285,13 @@ public class ProcessoController {
 
         model.addAttribute("locais", localRepository.findAll());
         model.addAttribute("produtos", produtoRepository.findAll());
-        model.addAttribute("statusValues", StatusProcesso.values());
+        model.addAttribute("statusValues", statusValuesForForm());
 
         model.addAttribute("hospitais", hospitalRepository.findAll());
         model.addAttribute("gruposDoenca", grupoDoencaRepository.findAll());
         model.addAttribute("doencas", doencaRepository.findAll());
 
         model.addAttribute("tiposHospital", TipoHospital.values());
-        model.addAttribute("tipoDeferimentoValues", TipoDeferimento.values());
-
         System.out.println("Hospital do processo: " + proc.getHospital());
 
         return "processos/editar-processo";
@@ -382,14 +406,13 @@ public class ProcessoController {
         }
 
         if (deferimentoMensagem != null
-                && !deferimentoMensagem.isBlank()
-                && deferimentoTipo != null) {
+                && !deferimentoMensagem.isBlank()) {
             Integer proximoNumero = deferimentoRepository.findMaxNumeroByProcessoId(proc.getId()) + 1;
 
             Deferimento deferimento = new Deferimento();
             deferimento.setNumeroDeferimento(proximoNumero);
             deferimento.setMensagem(deferimentoMensagem.trim());
-            deferimento.setTipo(deferimentoTipo);
+            deferimento.setTipo(deferimentoTipo != null ? deferimentoTipo : TipoDeferimento.JUIZ);
             deferimento.setDataRegistro(LocalDateTime.now());
             deferimento.setDataDeferimento(deferimentoData != null ? deferimentoData : LocalDate.now());
 
@@ -399,6 +422,12 @@ public class ProcessoController {
         Processo processoSalvo = processoRepository.save(proc);
         processoLogService.registrarEdicao(processoSalvo);
         return "redirect:/processos/listar";
+    }
+
+    private List<StatusProcesso> statusValuesForForm() {
+        return Arrays.stream(StatusProcesso.values())
+                .filter(status -> status != StatusProcesso.CONCLUIDO)
+                .collect(Collectors.toList());
     }
 
     @DeleteMapping("/excluir/{id}")

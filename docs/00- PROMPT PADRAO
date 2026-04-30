@@ -88,3 +88,15 @@ Atualizar sempre:
 
 ## 9) Minha Tarefa (detalhada)
 <<COLE AQUI A DESCRIÇÃO COMPLETA DA TAREFA>>
+
+
+## 10) Problemas com caracteres especiais
+
+Além das restrições específicas da tarefa, obrigatoriamente:
+
+preservar codificação UTF-8 em todos os arquivos alterados
+não corromper acentos, cedilha ou caracteres especiais
+não alterar textos fora do escopo da tarefa
+não regravar arquivos inteiros sem necessidade
+não alterar regras de negócio, fórmulas, fluxo, endpoints ou estrutura sem solicitação explícita
+ao final, procurar e corrigir textos corrompidos como �, Ã, Ã§, Ã£, Ã©, Ãª, â, posi��es, ser�, Relat�rio, configura��o

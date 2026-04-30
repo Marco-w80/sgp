@@ -229,7 +229,8 @@
             <div class="form-group col-md-2">
               <label for="status">Status<span class="text-danger">*</span></label>
               <select class="form-control" name="status" required>
-                <option th:each="s : ${statusValues}" th:value="${s}" th:text="${s}"
+                <option th:each="s : ${statusValues}" th:value="${s}"
+                  th:text="${s.name() == 'OBITO' ? 'ÓBITO' : #strings.replace(s.name(), '_', ' ')}"
                   th:selected="${processo.status == s}"></option>
               </select>
             </div>
@@ -482,23 +483,16 @@
             </summary>
 
             <div class="form-row mt-3">
-              <div class="form-group col-md-4">
-                <label for="deferimentoTipo">Tipo</label>
-                <select class="form-control" id="deferimentoTipo" name="deferimentoTipo">
-                  <option value="">Selecione</option>
-                  <option value="GRUPO_PROD">Grupo Prod</option>
-                  <option value="JUIZ">Juiz</option>
-                </select>
-              </div>
+              <input type="hidden" id="deferimentoTipo" name="deferimentoTipo" value="JUIZ">
               <div class="form-group col-md-4">
                 <label for="deferimentoData">Data do Deferimento</label>
                 <input type="date" class="form-control" id="deferimentoData" name="deferimentoData">
                 <small class="form-text text-muted">Se não informar, será usada a data de hoje.</small>
               </div>
-              <div class="form-group col-md-4">
-                <label for="deferimentoMensagem">Mensagem</label>
+              <div class="form-group col-md-8">
+                <label for="deferimentoMensagem">Deferimento</label>
                 <textarea class="form-control" id="deferimentoMensagem" name="deferimentoMensagem" rows="2"
-                  placeholder="Digite a mensagem do deferimento"></textarea>
+                  placeholder="Digite livremente o deferimento"></textarea>
                 <small class="form-text text-muted">O número do deferimento será gerado automaticamente ao salvar.</small>
               </div>
             </div>

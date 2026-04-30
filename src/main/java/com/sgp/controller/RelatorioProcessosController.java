@@ -15,7 +15,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/relatorios/processos")
@@ -49,7 +51,9 @@ public class RelatorioProcessosController {
 
         // 1) Busca os locais e enum para popular os filtros
         List<Local> locais = localRepository.findAll();
-        StatusProcesso[] statusValues = StatusProcesso.values();
+        List<StatusProcesso> statusValues = Arrays.stream(StatusProcesso.values())
+                .filter(statusValue -> statusValue != StatusProcesso.CONCLUIDO)
+                .collect(Collectors.toList());
 
         // 2) Filtra processos conforme parâmetros
         List<Processo> processos = processoRepository

@@ -71,6 +71,12 @@
       text-align: center;
     }
 
+    .kpi-link {
+      text-decoration: none !important;
+      color: inherit;
+      display: block;
+    }
+
     /* Cores temáticas para os KPIs */
     .kpi-card.card-theme-primary .kpi-icon,
     .kpi-card.card-theme-primary .kpi-title {
@@ -411,16 +417,30 @@
             <div class="dashboard-page" data-title="Visão Geral">
               <div class="row">
                 <div class="col-xl-2 col-md-6 mb-4">
-                  <div class="card kpi-card card-theme-warning h-100">
-                    <div class="card-body">
-                      <i class="fas fa-file-invoice kpi-icon"></i>
-                      <div class="kpi-value" th:text="${totalPendentes}">0</div>
-                      <div class="kpi-title">Processos pendentes</div>
+                  <a class="kpi-link" th:href="@{/processos/pendencias(tipo='sem-numero-processo')}">
+                    <div class="card kpi-card card-theme-warning h-100">
+                      <div class="card-body">
+                        <i class="fas fa-hashtag kpi-icon"></i>
+                        <div class="kpi-value" th:text="${totalPendenciasSemNumeroProcesso}">0</div>
+                        <div class="kpi-title">Sem número de processo</div>
+                      </div>
                     </div>
-                  </div>
+                  </a>
                 </div>
 
-                <div class="col-xl-6 col-md-6">
+                <div class="col-xl-2 col-md-6 mb-4">
+                  <a class="kpi-link" th:href="@{/processos/pendencias(tipo='documentacao')}">
+                    <div class="card kpi-card card-theme-warning h-100">
+                      <div class="card-body">
+                        <i class="fas fa-file-invoice kpi-icon"></i>
+                        <div class="kpi-value" th:text="${totalPendenciasDocumentacao}">0</div>
+                        <div class="kpi-title">Pendência documental</div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+
+                <div class="col-xl-4 col-md-6">
                   <div class="row">
                     <div class="col-md-3 mb-4" th:each="entry : ${statusCounts}">
                       <div class="card kpi-card h-100"
@@ -688,7 +708,7 @@
                             <tr th:each="proc : ${processosSemVisita}">
                               <td th:text="${proc.paciente != null ? proc.paciente.nome : '—'}">Paciente</td>
                               <td th:text="${proc.numeroInterno}">PROC-001</td>
-                              <td th:text="${proc.status}">EM_ANDAMENTO</td>
+                              <td th:text="${proc.status != null and (proc.status.name() == 'CONCLUIDO' or proc.status.name() == 'OBITO') ? 'ÓBITO' : (proc.status != null ? #strings.replace(proc.status.name(), '_', ' ') : '—')}">EM ANDAMENTO</td>
                               <td th:text="${proc.ultimoAcessoEm != null ? #temporals.format(proc.ultimoAcessoEm, 'dd/MM/yyyy HH:mm') : 'Nunca acessado'}">Nunca acessado</td>
                               <td th:text="${diasSemVisitaMap.containsKey(proc.id) ? diasSemVisitaMap.get(proc.id) + ' dias' : '—'}">0 dias</td>
                               <td>

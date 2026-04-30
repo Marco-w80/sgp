@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sgp.dto.ProcessoPendenteDTO;
 import com.sgp.dto.ProcessoAcompanhamentoDTO;
+import com.sgp.dto.ProcessoPendenciaListagemDTO;
 import com.sgp.model.Processo;
 import com.sgp.model.ProcessoExcluido;
 import com.sgp.model.StatusProcesso;
@@ -93,6 +94,32 @@ public class ProcessoService {
             mapa.put(st, processoRepository.countByStatus(st));
         }
         return mapa;
+    }
+
+    public long contarProcessosSemNumeroProcesso() {
+        return processoRepository.countSemNumeroProcesso();
+    }
+
+    public long contarProcessosComPendenciaDocumental() {
+        return processoRepository.countComPendenciaDocumental();
+    }
+
+    public List<ProcessoPendenciaListagemDTO> listarPendenciasSemNumeroProcesso() {
+        return processoRepository.listarSemNumeroProcesso().stream()
+                .map(p -> new ProcessoPendenciaListagemDTO(
+                        p,
+                        "Sem número de processo",
+                        List.of()))
+                .toList();
+    }
+
+    public List<ProcessoPendenciaListagemDTO> listarPendenciasDocumentais() {
+        return processoRepository.listarComPendenciaDocumental().stream()
+                .map(p -> new ProcessoPendenciaListagemDTO(
+                        p,
+                        "Pendência documental",
+                        documentosFaltando(p)))
+                .toList();
     }
 
     public List<ProcessoAcompanhamentoDTO> listarAcompanhamento(Integer diasSemAcesso, Integer diasSemEdicao) {
