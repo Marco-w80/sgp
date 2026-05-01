@@ -6,30 +6,69 @@
 
   <style>
     /* ================================================================== */
-    /* SEÇÃO 1: TEMA GLOBAL E VARIÁVEIS DE COR                            */
+    /* SEÇÃO 1: TEMA GLOBAL E IDENTIDADE VISUAL (Baseado no Print)        */
     /* ================================================================== */
     :root {
+      /* Cores da Marca */
       --cor-primaria: #166298;
-      --cor-secundaria: #192f51;
-      --cor-fundo-claro: #f8f9fc;
+      /* Azul vivo: Botões, Ícones principais e Títulos */
+      --cor-secundaria: #1d3b5c;
+      /* Azul Marinho: Cor da sua Sidebar e Modo TV */
+      --cor-fundo-claro: #f4f6f9;
+      /* Cinza bem claro do fundo da página */
       --cor-texto-escuro: #5a5c69;
+      /* Texto padrão */
       --cor-borda-suave: #e3e6f0;
+      /* Bordas das tabelas e cards */
+
+      /* Cores de Feedback (Alertas, KPIs) */
       --cor-perigo: #e74a3b;
+      /* Vermelho (Óbito, Atrasos) */
       --cor-sucesso: #1cc88a;
-      --cor-aviso: #F0AD4E;
+      /* Verde (Concluído) */
+      --cor-aviso: #f6c23e;
+      /* Amarelo/Laranja suave (Pendências) */
+      --cor-info: #36b9cc;
+      /* Ciano (Andamento/Informativo) */
+    }
+
+    body {
+      background-color: var(--cor-fundo-claro);
+      color: var(--cor-texto-escuro);
     }
 
     /* ================================================================== */
     /* SEÇÃO 2: ESTILOS DE COMPONENTES PRINCIPAIS                         */
     /* ================================================================== */
 
-    /* --- Cards de Gráficos e Tabelas --- */
+    /* --- Cards Gerais --- */
     .card.shadow {
-      border: 1px solid var(--cor-borda-suave);
-      box-shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .10) !important;
+      border: 1px solid rgba(0, 0, 0, .05);
+      border-radius: 0.35rem;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05) !important;
+      /* Sombra bem mais suave */
+      background-color: #fff;
     }
 
-    /* --- Títulos dos Gráficos --- */
+    /* Remove o fundo cinza do cabeçalho do card para ficar igual ao seu relatório */
+    .card-header {
+      background-color: #fff;
+      border-bottom: 1px solid var(--cor-borda-suave);
+      padding: 1.25rem 1.25rem 1rem;
+    }
+
+    .card-header h6 {
+      font-size: 1rem;
+      /* Título levemente maior */
+      color: var(--cor-primaria) !important;
+    }
+
+    /* Efeito de hover sutil nos gráficos */
+    .dashboard-page.active .card.shadow:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 .25rem 2rem 0 rgba(58, 59, 69, .15) !important;
+    }
+
     .text-theme-primary {
       color: var(--cor-primaria) !important;
     }
@@ -37,6 +76,8 @@
     /* --- Cards de KPI (Indicadores) --- */
     .kpi-card {
       border: 1px solid var(--cor-borda-suave);
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
     }
 
     .kpi-card .card-body {
@@ -44,43 +85,54 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 1rem 0.5rem;
+      padding: 1.25rem 0.75rem;
+      text-align: center;
     }
 
     .kpi-card .kpi-icon {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      transition: transform 0.2s ease-in-out;
+      font-size: 2.2rem;
+      margin-bottom: 0.75rem;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .kpi-card:hover .kpi-icon {
-      transform: scale(1.1);
+      transform: scale(1.15) rotate(5deg);
     }
 
     .kpi-card .kpi-value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      line-height: 1.2;
+      font-size: 1.8rem;
+      font-weight: 800;
+      line-height: 1.1;
       color: var(--cor-secundaria);
+      margin-bottom: 0.2rem;
     }
 
     .kpi-card .kpi-title {
-      font-size: 0.8rem;
-      font-weight: 600;
+      font-size: 0.75rem;
+      font-weight: 700;
       text-transform: uppercase;
-      text-align: center;
+      letter-spacing: 0.5px;
     }
 
     .kpi-link {
       text-decoration: none !important;
       color: inherit;
       display: block;
+      height: 100%;
     }
 
     /* Cores temáticas para os KPIs */
+    .kpi-card.card-theme-primary {
+      border-bottom: 4px solid var(--cor-primaria);
+    }
+
     .kpi-card.card-theme-primary .kpi-icon,
     .kpi-card.card-theme-primary .kpi-title {
       color: var(--cor-primaria);
+    }
+
+    .kpi-card.card-theme-success {
+      border-bottom: 4px solid var(--cor-sucesso);
     }
 
     .kpi-card.card-theme-success .kpi-icon,
@@ -88,9 +140,17 @@
       color: var(--cor-sucesso);
     }
 
+    .kpi-card.card-theme-danger {
+      border-bottom: 4px solid var(--cor-perigo);
+    }
+
     .kpi-card.card-theme-danger .kpi-icon,
     .kpi-card.card-theme-danger .kpi-title {
       color: var(--cor-perigo);
+    }
+
+    .kpi-card.card-theme-warning {
+      border-bottom: 4px solid var(--cor-aviso);
     }
 
     .kpi-card.card-theme-warning .kpi-icon,
@@ -98,14 +158,63 @@
       color: var(--cor-aviso);
     }
 
+    .kpi-card.card-theme-secondary {
+      border-bottom: 4px solid var(--cor-texto-escuro);
+    }
+
     .kpi-card.card-theme-secondary .kpi-icon,
     .kpi-card.card-theme-secondary .kpi-title {
       color: var(--cor-texto-escuro);
     }
 
-    /* --- Helpers de Layout --- */
+    /* Container para forçar todos na mesma linha */
+    .kpi-row-horizontal {
+      display: flex;
+      flex-wrap: nowrap;
+      /* Impede quebra de linha */
+      gap: 10px;
+      /* Espaçamento entre os cards */
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      /* Permite scroll horizontal se a tela for muito pequena */
+      padding-bottom: 5px;
+    }
+
+    /* Base para todos os wrappers de card */
+    .kpi-item {
+      flex: 1 1 0;
+      /* Todos tentam ter o mesmo tamanho */
+      min-width: 120px;
+      /* Garante que não fiquem ilegíveis em telas menores */
+    }
+
+    /* Estilo para os cards de status ficarem um pouco menores */
+    .kpi-item-status {
+      flex: 0.8 1 0;
+      /* Ocupa 20% menos espaço que os outros */
+    }
+
+    /* Ajuste nos títulos para caber em uma linha só se necessário */
+    .kpi-card .kpi-title {
+      font-size: 0.65rem;
+      /* Um pouco menor para não quebrar linha */
+      white-space: nowrap;
+    }
+
+    .kpi-card .kpi-value {
+      font-size: 1.4rem;
+      /* Valor levemente menor para manter proporção */
+    }
+
+    .kpi-card .kpi-icon {
+      font-size: 1.5rem;
+      /* Ícone menor */
+    }
+
+    /* --- Helpers de Layout e Scrollbar --- */
     .overview-chart-container {
       height: 45vh;
+      min-height: 300px;
       padding: 1rem;
     }
 
@@ -114,53 +223,99 @@
       overflow-y: auto;
     }
 
+    /* Scrollbar estilizado para a tabela */
+    .scrollable-table-body::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .scrollable-table-body::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .scrollable-table-body::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+
+    .scrollable-table-body::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
     /* ================================================================== */
     /* SEÇÃO 3: NAVEGAÇÃO DO DASHBOARD                                    */
     /* ================================================================== */
-    #tv-mode-btn {
+
+    /* ================================================================== */
+    /* MENU FLUTUANTE DE AÇÕES (FABs)                                     */
+    /* ================================================================== */
+    .floating-action-menu {
       position: fixed;
       bottom: 2rem;
       right: 2rem;
       z-index: 1050;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      /* Espaço entre os botões */
+    }
+
+    .fab-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+      transition: all 0.2s ease-in-out;
+      border: none;
+      font-size: 1.2rem;
+    }
+
+    .fab-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
     }
 
     .dashboard-nav {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      border-bottom: 1px solid var(--cor-borda-suave);
+      gap: 0.25rem;
+      border-bottom: 2px solid var(--cor-borda-suave);
       margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
     }
 
     .dashboard-nav-btn {
-      padding: 0.75rem 1.25rem;
+      padding: 0.6rem 1rem;
       border: none;
       background-color: transparent;
       color: var(--cor-texto-escuro);
       font-weight: 600;
-      border-bottom: 3px solid transparent;
+      border-radius: 0.35rem;
       transition: all 0.2s ease-in-out;
     }
 
     .dashboard-nav-btn:hover {
-      background-color: #f1f3f8;
+      background-color: #eaecf4;
       color: var(--cor-primaria);
     }
 
     .dashboard-nav-btn.active {
-      color: var(--cor-primaria);
-      border-bottom-color: var(--cor-primaria);
+      background-color: var(--cor-primaria);
+      color: white;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
     }
 
     /* ================================================================== */
-    /* SEÇÃO 4: MODO APRESENTAÇÃO (TV)                                    */
+    /* SEÇÃO 4: MODO APRESENTAÇÃO (TV) E FILTROS                          */
     /* ================================================================== */
 
-    /* --- Estrutura e Animação --- */
     .dashboard-page {
       display: none;
       width: 100%;
-      animation: fadeIn 0.6s;
+      animation: fadeIn 0.4s ease-out;
     }
 
     .dashboard-page.active {
@@ -170,14 +325,16 @@
     @keyframes fadeIn {
       from {
         opacity: 0;
+        transform: translateY(10px);
       }
 
       to {
         opacity: 1;
+        transform: translateY(0);
       }
     }
 
-    /* --- Ativação do Modo TV --- */
+    /* Estilos do Modo TV mantidos exatamente como você fez... */
     body.tv-mode {
       background-color: var(--cor-secundaria) !important;
       color: #e3e6f0 !important;
@@ -186,15 +343,22 @@
 
     body.tv-mode #content-wrapper {
       overflow-y: hidden !important;
-      /* Força a remoção do scroll vertical */
     }
 
     body.tv-mode #accordionSidebar,
     body.tv-mode #content-wrapper>#content>nav.navbar,
     body.tv-mode footer,
-    body.tv-mode #tv-mode-btn,
-    body.tv-mode .dashboard-nav {
+    body.tv-mode .dashboard-nav,
+    body.tv-mode #tv-mode-btn {
+      /* Esconde APENAS o botão da TV, mantendo o botão de Filtro */
       display: none !important;
+    }
+
+    /* Opcional: Deixa o fundo do filtro um pouco translúcido no Modo TV para harmonizar com o fundo escuro */
+    body.tv-mode #dashboardFilterBar {
+      background-color: rgba(255, 255, 255, 0.95) !important;
+      margin-top: 1rem;
+      z-index: 1040;
     }
 
     body.tv-mode .container-fluid {
@@ -210,7 +374,6 @@
       overflow: hidden;
     }
 
-    /* --- Título da Apresentação --- */
     body.tv-mode #presentation-title {
       background-color: var(--cor-primaria);
       color: white !important;
@@ -220,23 +383,21 @@
       font-size: 1.5rem;
       margin-bottom: 1rem !important;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: all 0.4s ease;
     }
 
     body.tv-mode #presentation-title::before {
       font-family: "Font Awesome 5 Free";
       font-weight: 900;
       content: "\f080";
-      /* Ícone de gráfico de barras */
       margin-right: 0.75rem;
     }
 
     body.tv-mode .container-fluid>h1#presentation-title {
       display: block;
       text-align: center;
+      margin-top: 2rem;
     }
 
-    /* --- Controles Manuais (Setas e Pontos) --- */
     #presentation-controls {
       display: none;
       position: fixed;
@@ -288,33 +449,199 @@
       z-index: 1051;
     }
 
+    body.tv-mode #pagination-dots {
+      display: flex;
+    }
+
     .pagination-dot {
       width: 12px;
       height: 12px;
-      background-color: rgba(255, 255, 255, 0.5);
+      background-color: rgba(255, 255, 255, 0.3);
       border-radius: 50%;
       transition: all 0.3s;
     }
 
     .pagination-dot.active {
       background-color: white;
-      transform: scale(1.2);
+      transform: scale(1.3);
     }
 
+    /* Barra de Filtros Refinada */
     .dashboard-filter-bar {
-      border: 1px solid var(--cor-borda-suave);
-      border-radius: 0.5rem;
-      background: #fff;
-      padding: 1rem;
-      margin-bottom: 1rem;
+      border: 1px solid var(--cor-borda-suave) !important;
+      border-radius: 0.5rem !important;
+      background: #fff !important;
+      padding: 1.25rem !important;
+      margin-bottom: 1.5rem !important;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05) !important;
     }
 
-    .dashboard-resumo {
-      border-left: 4px solid var(--cor-primaria);
-      background: #f8f9fc;
-      padding: .9rem 1rem;
-      border-radius: .35rem;
-      margin-bottom: 1rem;
+    /* ================================================================== */
+    /* ESTILOS DOS BOTÕES DE FILTRO E AÇÃO                                */
+    /* ================================================================== */
+
+    .btn-filter-primary {
+      background-color: var(--cor-primaria);
+      color: #ffffff;
+      border: none;
+      border-radius: 0.35rem;
+      /* Bordas levemente arredondadas */
+      padding: 0.5rem 1.5rem;
+      /* Mais "respiro" nas laterais */
+      font-weight: 600;
+      font-size: 0.85rem;
+      box-shadow: 0 0.125rem 0.25rem rgba(22, 98, 152, 0.2);
+      /* Sombra colorida suave */
+      transition: all 0.2s ease-in-out;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-filter-primary:hover {
+      background-color: #124e7a;
+      /* Azul um tom mais escuro */
+      color: #ffffff;
+      box-shadow: 0 0.25rem 0.5rem rgba(22, 98, 152, 0.3);
+      transform: translateY(-1px);
+      /* Efeito de elevação ao passar o mouse */
+    }
+
+    .btn-filter-secondary {
+      background-color: #ffffff;
+      color: var(--cor-texto-escuro);
+      border: 1px solid var(--cor-borda-suave);
+      border-radius: 0.35rem;
+      padding: 0.5rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s ease-in-out;
+      text-decoration: none !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-filter-secondary:hover {
+      background-color: var(--cor-fundo-claro);
+      color: var(--cor-secundaria);
+      /* Texto fica mais escuro no hover */
+      border-color: #cdd1e0;
+      /* Borda levemente mais marcada */
+    }
+
+    /* ================================================================== */
+    /* TABELAS MODERNAS E AÇÕES                                           */
+    /* ================================================================== */
+
+    .table {
+      border-collapse: separate;
+      border-spacing: 0;
+      border: none !important;
+      /* Removemos a borda externa pesada */
+    }
+
+    .table th {
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #858796;
+      letter-spacing: 0.05em;
+      background-color: #f8f9fc !important;
+      /* Fundo cinza bem claro no cabeçalho */
+      border-top: none !important;
+      border-bottom: 2px solid var(--cor-borda-suave) !important;
+      border-left: none !important;
+      /* Removemos linhas verticais */
+      border-right: none !important;
+      padding: 1rem 0.75rem;
+    }
+
+    .table td {
+      font-size: 0.85rem;
+      color: var(--cor-texto-escuro);
+      vertical-align: middle;
+      border-top: 1px solid var(--cor-borda-suave);
+      border-left: none !important;
+      /* Removemos linhas verticais */
+      border-right: none !important;
+      padding: 1rem 0.75rem;
+    }
+
+    /* Limpando a lista de documentos faltando */
+    .doc-list {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: #6e707e;
+    }
+
+    .doc-list li {
+      margin-bottom: 0.2rem;
+    }
+
+    /* Badges com estilo "Soft" (fundo claro, texto escuro) para melhor leitura */
+    .badge-soft-warning {
+      background-color: #fdf3d8;
+      color: #d98a00;
+      font-weight: 700;
+      padding: 0.4rem 0.75rem;
+      border-radius: 0.35rem;
+      font-size: 0.75rem;
+      display: inline-block;
+    }
+
+    /* Badge Soft Vermelha (Perigo/Atraso) */
+    .badge-soft-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+      font-weight: 700;
+      padding: 0.4rem 0.75rem;
+      border-radius: 0.35rem;
+      font-size: 0.75rem;
+      display: inline-block;
+    }
+
+    /* Badge Soft Cinzenta (Status Neutro) */
+    .badge-soft-secondary {
+      background-color: #e3e6f0;
+      color: #5a5c69;
+      font-weight: 700;
+      padding: 0.4rem 0.75rem;
+      border-radius: 0.35rem;
+      font-size: 0.75rem;
+      display: inline-block;
+    }
+
+    /* Arrumando os Botões de Ação na Tabela */
+    .table-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.4rem;
+      /* Dá um espacinho entre os botões */
+    }
+
+    .table-actions .btn {
+      border-radius: 50% !important;
+      /* Força o círculo perfeito */
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      background-color: transparent;
+      border: 1px solid var(--cor-primaria);
+      color: var(--cor-primaria);
+      transition: all 0.2s;
+    }
+
+    .table-actions .btn:hover {
+      background-color: var(--cor-primaria);
+      color: #fff;
+      box-shadow: 0 0.15rem 0.5rem rgba(22, 98, 152, 0.3);
+      transform: translateY(-2px);
     }
   </style>
 </head>
@@ -324,31 +651,56 @@
     <button id="prev-slide-btn" class="presentation-nav-btn" title="Anterior (←)">&lt;</button>
     <button id="next-slide-btn" class="presentation-nav-btn" title="Próximo (→)">&gt;</button>
   </div>
+
   <div id="wrapper">
     <div id="content-wrapper" class="d-flex flex-column pb-5">
       <div id="content">
-
         <div class="container-fluid pt-4">
 
-          <button id="tv-mode-btn" class="btn btn-primary btn-circle shadow mr-5" title="Entrar em Modo Apresentação">
-            <i class="fas fa-tv"></i>
-          </button>
+          <div class="floating-action-menu">
+            <button class="btn btn-info fab-btn text-white" type="button" data-toggle="collapse"
+              data-target="#dashboardFilterBar" title="Exibir/Ocultar Filtros">
+              <i class="fas fa-filter"></i>
+            </button>
 
-          <h1 id="presentation-title" class="h3 text-gray-800">Dashboard</h1>
+            <button id="tv-mode-btn" class="btn btn-primary fab-btn text-white" title="Entrar em Modo Apresentação">
+              <i class="fas fa-tv"></i>
+            </button>
+          </div>
 
-          <form class="dashboard-filter-bar" method="get" th:action="@{/intranet}">
-            <div class="form-row align-items-end">
-              <div class="col-md-3 mb-2">
-                <label class="small font-weight-bold mb-1">Anos (multiselect)</label>
-                <select id="filtroAnos" name="anos" class="form-control form-control-sm" multiple size="4">
-                  <option th:each="anoItem : ${anosDisponiveis}" th:value="${anoItem}" th:text="${anoItem}"
-                    th:selected="${anosSelecionados != null and #lists.contains(anosSelecionados, anoItem)}">2026</option>
-                </select>
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 id="presentation-title" class="h3 mb-0 text-gray-800 font-weight-bold">Dashboard</h1>
+          </div>
+
+          <form id="dashboardFilterBar" class="dashboard-filter-bar bg-light collapse show" method="get"
+            th:action="@{/intranet}">
+            <div class="row align-items-end">
+
+              <div class="col-xl-2 col-lg-3 col-md-4 mb-3">
+                <label class="small font-weight-bold text-uppercase text-muted mb-1">Anos</label>
+                <div class="dropdown">
+                  <button
+                    class="btn btn-white border btn-sm btn-block dropdown-toggle text-left d-flex justify-content-between align-items-center"
+                    type="button" id="dropdownAnos" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    style="background: #fff;">
+                    <span id="textoAnosSelecionados" class="text-truncate pr-2">Selecione...</span>
+                  </button>
+                  <div class="dropdown-menu p-2 shadow-sm" aria-labelledby="dropdownAnos"
+                    style="max-height: 200px; overflow-y: auto; min-width: 100%;" id="menuAnos">
+                    <div class="custom-control custom-checkbox mb-1" th:each="anoItem : ${anosDisponiveis}">
+                      <input type="checkbox" class="custom-control-input ano-checkbox" name="anos"
+                        th:id="'ano_' + ${anoItem}" th:value="${anoItem}"
+                        th:checked="${anosSelecionados != null and #lists.contains(anosSelecionados, anoItem)}">
+                      <label class="custom-control-label w-100" th:for="'ano_' + ${anoItem}" th:text="${anoItem}"
+                        style="cursor: pointer;">2026</label>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div class="col-md-2 mb-2">
-                <label class="small font-weight-bold mb-1">Trimestre</label>
-                <select id="filtroTrimestre" name="trimestre" class="form-control form-control-sm">
+              <div class="col-xl-2 col-lg-3 col-md-4 mb-3">
+                <label class="small font-weight-bold text-uppercase text-muted mb-1">Trimestre</label>
+                <select id="filtroTrimestre" name="trimestre" class="form-control form-control-sm border-0 shadow-sm">
                   <option value="">Ano inteiro</option>
                   <option value="1" th:selected="${trimestreSelecionado == 1}">1º tri (Jan-Mar)</option>
                   <option value="2" th:selected="${trimestreSelecionado == 2}">2º tri (Abr-Jun)</option>
@@ -357,9 +709,9 @@
                 </select>
               </div>
 
-              <div class="col-md-2 mb-2">
-                <label class="small font-weight-bold mb-1">Mês (opcional)</label>
-                <select id="filtroMes" name="mes" class="form-control form-control-sm">
+              <div class="col-xl-2 col-lg-3 col-md-4 mb-3">
+                <label class="small font-weight-bold text-uppercase text-muted mb-1">Mês</label>
+                <select id="filtroMes" name="mes" class="form-control form-control-sm border-0 shadow-sm">
                   <option value="">Todos os meses</option>
                   <option value="1" th:selected="${mesSelecionado == 1}">Janeiro</option>
                   <option value="2" th:selected="${mesSelecionado == 2}">Fevereiro</option>
@@ -376,107 +728,103 @@
                 </select>
               </div>
 
-              <div class="col-md-2 mb-2">
-                <label class="small font-weight-bold mb-1">Pendências (dias+)</label>
-                <input type="number" min="0" name="dias" th:value="${diasMinimos}" class="form-control form-control-sm">
+              <div class="col-xl-2 col-lg-3 col-md-6 mb-3">
+                <label class="small font-weight-bold text-uppercase text-muted mb-1">Pendências (+dias)</label>
+                <input type="number" min="0" name="dias" th:value="${diasMinimos}"
+                  class="form-control form-control-sm border-0 shadow-sm">
               </div>
 
-              <div class="col-md-2 mb-2">
-                <label class="small font-weight-bold mb-1">Sem visita (dias+)</label>
-                <input type="number" min="0" name="diasSemVisita" th:value="${diasSemVisita}" class="form-control form-control-sm">
+              <div class="col-xl-2 col-lg-3 col-md-6 mb-3">
+                <label class="small font-weight-bold text-uppercase text-muted mb-1">Sem visita (+dias)</label>
+                <input type="number" min="0" name="diasSemVisita" th:value="${diasSemVisita}"
+                  class="form-control form-control-sm border-0 shadow-sm">
               </div>
 
-              <div class="col-md-4 mb-2 text-md-right">
-                <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-filter mr-1"></i>Aplicar
-                  filtros</button>
-                <a th:href="@{/intranet}" class="btn btn-sm btn-outline-secondary ml-1">Limpar</a>
+              <div class="col-xl-2 col-lg-9 col-md-12 mb-3 text-xl-right text-lg-left">
+                <button type="submit" class="btn-filter-primary mr-2">
+                  <i class="fas fa-filter mr-2"></i>Aplicar
+                </button>
+                <a th:href="@{/intranet}" class="btn-filter-secondary">
+                  Limpar
+                </a>
               </div>
 
-              <div class="col-12">
-                <small class="text-muted">Dica: segure <strong>Ctrl</strong> para selecionar mais de um ano. Com mais
-                  de um ano, trimestre/mês ficam desativados.</small>
-              </div>
+            </div>
 
+            <div class="row">
+              <div class="col-12 mt-1">
+                <small class="text-muted"><i class="fas fa-info-circle mr-1"></i>Dica: Selecionar mais de um ano
+                  desativará os filtros de trimestre e mês.</small>
+              </div>
             </div>
           </form>
 
-          <!-- <div class="dashboard-resumo">
-            <div class="font-weight-bold text-theme-primary" th:text="'Painel de acompanhamento • ' + ${periodoDescricao}">
-              Painel de acompanhamento</div>
-            <div class="small text-muted">
-              Indicadores para comprovar ao médico a evolução dos processos monitorados.
-              <strong th:text="${processosEmAndamento}">0</strong> em andamento e
-              <strong class="text-success" th:text="${processosGanhos}">0</strong> ganhos no período.
-            </div>
-          </div> -->
-
-          <nav class="dashboard-nav">
-          </nav>
+          <nav class="dashboard-nav"></nav>
 
           <div id="presentation-wrapper">
+
             <div class="dashboard-page" data-title="Visão Geral">
-              <div class="row">
-                <div class="col-xl-2 col-md-6 mb-4">
+
+              <div class="kpi-row-horizontal">
+
+                <div class="kpi-item">
                   <a class="kpi-link" th:href="@{/processos/pendencias(tipo='sem-numero-processo')}">
-                    <div class="card kpi-card card-theme-warning h-100">
+                    <div class="card kpi-card card-theme-warning h-100 shadow-sm">
                       <div class="card-body">
                         <i class="fas fa-hashtag kpi-icon"></i>
                         <div class="kpi-value" th:text="${totalPendenciasSemNumeroProcesso}">0</div>
-                        <div class="kpi-title">Sem número de processo</div>
+                        <div class="kpi-title">Sem número</div>
                       </div>
                     </div>
                   </a>
                 </div>
 
-                <div class="col-xl-2 col-md-6 mb-4">
+                <div class="kpi-item">
                   <a class="kpi-link" th:href="@{/processos/pendencias(tipo='documentacao')}">
-                    <div class="card kpi-card card-theme-warning h-100">
+                    <div class="card kpi-card card-theme-warning h-100 shadow-sm">
                       <div class="card-body">
                         <i class="fas fa-file-invoice kpi-icon"></i>
                         <div class="kpi-value" th:text="${totalPendenciasDocumentacao}">0</div>
-                        <div class="kpi-title">Pendência documental</div>
+                        <div class="kpi-title">Pendência Doc</div>
                       </div>
                     </div>
                   </a>
                 </div>
 
-                <div class="col-xl-4 col-md-6">
-                  <div class="row">
-                    <div class="col-md-3 mb-4" th:each="entry : ${statusCounts}">
-                      <div class="card kpi-card h-100"
-                        th:classappend="${statusCss[entry.key]} ?: 'card-theme-secondary'">
-                        <div class="card-body">
-                          <i class="fas fa-tasks kpi-icon"></i>
-                          <div class="kpi-value" th:text="${entry.value}">0</div>
-                          <div class="kpi-title" th:text="${entry.key}">STATUS</div>
-                        </div>
-                      </div>
+                <div class="kpi-item kpi-item-status" th:each="entry : ${statusCounts}">
+                  <div class="card kpi-card h-100 shadow-sm"
+                    th:classappend="${statusCss[entry.key]} ?: 'card-theme-secondary'">
+                    <div class="card-body">
+                      <i class="fas fa-tasks kpi-icon"></i>
+                      <div class="kpi-value" th:text="${entry.value}">0</div>
+                      <div class="kpi-title" th:text="${entry.key}">STATUS</div>
                     </div>
                   </div>
                 </div>
 
-                <div class="col-xl-2 col-md-6 mb-4">
-                  <div class="card kpi-card card-theme-primary h-100">
+                <div class="kpi-item">
+                  <div class="card kpi-card card-theme-primary h-100 shadow-sm">
                     <div class="card-body">
                       <i class="fas fa-hourglass-half kpi-icon"></i>
                       <div class="kpi-value" th:text="${leadResumo != null} ? ${leadResumo.mediaDias} : '-'">-</div>
-                      <div class="kpi-title">Lead Time (dias)</div>
+                      <div class="kpi-title">Lead Time</div>
                     </div>
                   </div>
                 </div>
 
-                <div class="col-xl-2 col-md-6 mb-4">
-                  <div class="card kpi-card card-theme-danger h-100">
+                <div class="kpi-item">
+                  <div class="card kpi-card card-theme-danger h-100 shadow-sm">
                     <div class="card-body">
                       <i class="fas fa-calendar-times kpi-icon"></i>
                       <div class="kpi-value" th:text="${leadResumo != null} ? ${leadResumo.p90} : '-'">-</div>
-                      <div class="kpi-title">Lead Time P90 (dias)</div>
+                      <div class="kpi-title">Lead Time P90</div>
                     </div>
                   </div>
                 </div>
+
               </div>
 
-              <div class="row mt-4">
+              <div class="row">
                 <div class="col-12">
                   <div class="card shadow">
                     <div class="card-header py-3">
@@ -500,7 +848,7 @@
                           class="fas fa-check-circle mr-2"></i>Documentação Completa</h6>
                     </div>
                     <div class="card-body">
-                      <div id="chartDoc" style="height: 280px;"></div>
+                      <div id="chartDoc" style="height: 300px;"></div>
                     </div>
                   </div>
                 </div>
@@ -512,7 +860,7 @@
                         por Advogado</h6>
                     </div>
                     <div class="card-body">
-                      <div id="chartProdAdv" style="height: 280px;"></div>
+                      <div id="chartProdAdv" style="height: 300px;"></div>
                     </div>
                   </div>
                 </div>
@@ -524,7 +872,7 @@
                         Time médio por Doença</h6>
                     </div>
                     <div class="card-body">
-                      <div id="chartLeadDoenca" style="height: 280px;"></div>
+                      <div id="chartLeadDoenca" style="height: 300px;"></div>
                     </div>
                   </div>
                 </div>
@@ -547,8 +895,8 @@
                 <div class="col-xl-6 col-lg-12 mb-4">
                   <div class="card shadow">
                     <div class="card-header py-3">
-                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-users mr-2"></i>Média
-                        de Idade por Sexo</h6>
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-users mr-2"></i>Média de
+                        Idade por Sexo</h6>
                     </div>
                     <div class="card-body">
                       <div id="chartIdadeSexo" style="height: 280px"></div>
@@ -570,7 +918,7 @@
                   <div class="card shadow">
                     <div class="card-header py-3">
                       <h6 class="m-0 font-weight-bold text-theme-primary"><i
-                          class="fas fa-hospital mr-2"></i>Distribuição por Tipo de Hospital</h6>
+                          class="fas fa-hospital mr-2"></i>Distribuição por Hospital</h6>
                     </div>
                     <div class="card-body">
                       <div id="chartTipoHospital" style="height: 280px;"></div>
@@ -586,7 +934,7 @@
                   <div class="card shadow">
                     <div class="card-header py-3">
                       <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-pills mr-2"></i>Consumo
-                        Mensal (todos produtos)</h6>
+                        Mensal (Global)</h6>
                     </div>
                     <div class="card-body">
                       <div id="chartConsumoMensal" style="height: 280px;"></div>
@@ -597,7 +945,7 @@
                   <div class="card shadow">
                     <div class="card-header py-3">
                       <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-sort-amount-up mr-2"></i>Top
-                        Produtos por Quantidade</h6>
+                        Produtos</h6>
                     </div>
                     <div class="card-body">
                       <div id="chartTopProdutos" style="height: 280px;"></div>
@@ -606,46 +954,50 @@
                 </div>
               </div>
 
-              <div class="row mt-4">
+              <div class="row">
                 <div class="col-12">
                   <div class="card shadow mb-4 w-100">
                     <div class="card-header py-3">
                       <h6 class="m-0 font-weight-bold text-warning"><i
                           class="fas fa-exclamation-triangle mr-2"></i>Pendências de Documentação</h6>
                     </div>
-                    <div class="card-body scrollable-table-body">
+                    <div class="card-body scrollable-table-body p-0">
                       <div class="table-responsive">
-                        <table id="tabelaPendencias" class="table table-bordered" width="100%" cellspacing="0">
+                        <table id="tabelaPendencias" class="table table-hover table-striped mb-0" width="100%"
+                          cellspacing="0">
                           <thead>
                             <tr>
                               <th>Paciente</th>
                               <th>Número Processo</th>
                               <th>Documentos Faltando</th>
-                              <th>Dias aguardando</th>
-                              <th>Ações</th>
+                              <th class="text-center">Dias aguardando</th>
+                              <th class="text-center">Ações</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr th:if="${#lists.isEmpty(pendencias)}">
-                              <td colspan="5" class="text-center text-muted">Nenhum processo com pendência.</td>
+                              <td colspan="5" class="text-center text-muted py-4">Nenhum processo com pendência.</td>
                             </tr>
                             <tr th:each="pendencia : ${pendencias}">
-                              <td th:text="${pendencia.processo.paciente.nome}">Fulano</td>
-                              <td th:text="${pendencia.processo.numeroInterno}">PROC-001</td>
-                              <td>
-                                <ul class="mb-0 pl-3">
+                              <td class="align-middle" th:text="${pendencia.processo.paciente.nome}">Fulano</td>
+                              <td class="align-middle font-weight-bold" style="color: var(--cor-secundaria);"
+                                th:text="${pendencia.processo.numeroInterno}">PROC-001</td>
+                              <td class="align-middle">
+                                <ul class="doc-list">
                                   <li th:each="doc : ${pendencia.documentosFaltando}" th:text="${doc}">CPF</li>
                                 </ul>
                               </td>
-                              <td><span th:text="${pendencia.diasAguardando} + ' dias'">5 dias</span></td>
-                              <td>
-                                <div class="btn-group btn-group-sm">
-                                  <a th:href="@{/processos/editar/{id}(id=${pendencia.processo.id})}"
-                                    class="btn btn-circle btn-sm btn-secondary" title="Editar"><i
-                                      class="fas fa-edit"></i></a>
-                                  <button type="button" class="btn btn-circle btn-sm btn-info ml-1" data-toggle="modal"
-                                    data-target="#modalVerProcesso" th:attr="data-id=${pendencia.processo.id}"
-                                    title="Ver Detalhes"><i class="fas fa-eye"></i></button>
+                              <td class="align-middle text-center">
+                                <span class="badge-soft-warning" th:text="${pendencia.diasAguardando} + ' dias'">5
+                                  dias</span>
+                              </td>
+                              <td class="align-middle text-center">
+                                <div class="table-actions">
+                                  <a th:href="@{/processos/editar/{id}(id=${pendencia.processo.id})}" class="btn"
+                                    title="Editar"><i class="fas fa-edit"></i></a>
+                                  <button type="button" class="btn" data-toggle="modal" data-target="#modalVerProcesso"
+                                    th:attr="data-id=${pendencia.processo.id}" title="Ver Detalhes"><i
+                                      class="fas fa-eye"></i></button>
                                 </div>
                               </td>
                             </tr>
@@ -661,7 +1013,7 @@
             <div class="dashboard-page" data-title="Sem Acompanhamento">
               <div class="row">
                 <div class="col-xl-4 col-md-6 mb-4">
-                  <div class="card kpi-card card-theme-danger h-100">
+                  <div class="card kpi-card card-theme-danger h-100 shadow-sm">
                     <div class="card-body">
                       <i class="fas fa-user-clock kpi-icon"></i>
                       <div class="kpi-value" th:text="${#lists.size(processosSemVisita)}">0</div>
@@ -673,7 +1025,8 @@
                 <div class="col-xl-8 col-md-6 mb-4">
                   <div class="card shadow h-100">
                     <div class="card-header py-3">
-                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-chart-pie mr-2"></i>Sem visita por status</h6>
+                      <h6 class="m-0 font-weight-bold text-theme-primary"><i class="fas fa-chart-pie mr-2"></i>Sem
+                        visita por status</h6>
                     </div>
                     <div class="card-body">
                       <div id="chartSemVisitaStatus" style="height: 220px;"></div>
@@ -686,35 +1039,57 @@
                 <div class="col-12">
                   <div class="card shadow mb-4 w-100">
                     <div class="card-header py-3">
-                      <h6 class="m-0 font-weight-bold text-warning"><i class="fas fa-search mr-2"></i>Processos sem visita recente</h6>
+                      <h6 class="m-0 font-weight-bold text-warning"><i class="fas fa-search mr-2"></i>Processos sem
+                        visita recente</h6>
                     </div>
-                    <div class="card-body scrollable-table-body">
+                    <div class="card-body scrollable-table-body p-0">
                       <div class="table-responsive">
-                        <table id="tabelaSemVisita" class="table table-bordered" width="100%" cellspacing="0">
+                        <table id="tabelaSemVisita" class="table table-hover table-striped mb-0" width="100%"
+                          cellspacing="0">
                           <thead>
                             <tr>
                               <th>Paciente</th>
                               <th>Nº Interno</th>
                               <th>Status</th>
                               <th>Último acesso</th>
-                              <th>Dias sem visita</th>
-                              <th>Ações</th>
+                              <th class="text-center">Dias sem visita</th>
+                              <th class="text-center">Ações</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr th:if="${#lists.isEmpty(processosSemVisita)}">
-                              <td colspan="6" class="text-center text-muted">Nenhum processo sem visita no critério atual.</td>
+                              <td colspan="6" class="text-center text-muted py-4">Nenhum processo sem visita no critério
+                                atual.</td>
                             </tr>
                             <tr th:each="proc : ${processosSemVisita}">
-                              <td th:text="${proc.paciente != null ? proc.paciente.nome : '—'}">Paciente</td>
-                              <td th:text="${proc.numeroInterno}">PROC-001</td>
-                              <td th:text="${proc.status != null and (proc.status.name() == 'CONCLUIDO' or proc.status.name() == 'OBITO') ? 'ÓBITO' : (proc.status != null ? #strings.replace(proc.status.name(), '_', ' ') : '—')}">EM ANDAMENTO</td>
-                              <td th:text="${proc.ultimoAcessoEm != null ? #temporals.format(proc.ultimoAcessoEm, 'dd/MM/yyyy HH:mm') : 'Nunca acessado'}">Nunca acessado</td>
-                              <td th:text="${diasSemVisitaMap.containsKey(proc.id) ? diasSemVisitaMap.get(proc.id) + ' dias' : '—'}">0 dias</td>
-                              <td>
-                                <a th:href="@{/processos/editar/{id}(id=${proc.id})}" class="btn btn-circle btn-sm btn-secondary" title="Editar">
-                                  <i class="fas fa-edit"></i>
-                                </a>
+                              <td class="align-middle" th:text="${proc.paciente != null ? proc.paciente.nome : '—'}">
+                                Paciente</td>
+
+                              <td class="align-middle font-weight-bold" style="color: var(--cor-secundaria);"
+                                th:text="${proc.numeroInterno}">PROC-001</td>
+
+                              <td class="align-middle">
+                                <span class="badge-soft-secondary"
+                                  th:text="${proc.status != null and (proc.status.name() == 'CONCLUIDO' or proc.status.name() == 'OBITO') ? 'ÓBITO' : (proc.status != null ? #strings.replace(proc.status.name(), '_', ' ') : '—')}">EM
+                                  ANDAMENTO</span>
+                              </td>
+
+                              <td class="align-middle"
+                                th:text="${proc.ultimoAcessoEm != null ? #temporals.format(proc.ultimoAcessoEm, 'dd/MM/yyyy HH:mm') : 'Nunca acessado'}">
+                                Nunca acessado</td>
+
+                              <td class="align-middle text-center">
+                                <span class="badge-soft-danger"
+                                  th:text="${diasSemVisitaMap.containsKey(proc.id) ? diasSemVisitaMap.get(proc.id) + ' dias' : '—'}">0
+                                  dias</span>
+                              </td>
+
+                              <td class="align-middle text-center">
+                                <div class="table-actions">
+                                  <a th:href="@{/processos/editar/{id}(id=${proc.id})}" class="btn" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                  </a>
+                                </div>
                               </td>
                             </tr>
                           </tbody>
@@ -731,17 +1106,16 @@
 
         </div>
       </div>
-
-
     </div>
     <th:block th:replace="~{fragments/foot :: bot}"></th:block>
   </div>
-
 
   <script src="/vendor/highcharts/highcharts.js"></script>
   <script src="/vendor/highcharts/accessibility.js"></script>
   <script src="/vendor/highcharts/exporting.js"></script>
   <script src="/vendor/highcharts/export-data.js"></script>
+
+
 
   <script th:inline="javascript">
     /*<![CDATA[*/
@@ -763,7 +1137,8 @@
     const idadePorSexo = /*[[${idadePorSexo}]]*/ null;
 
     const safe = (v, d) => (v === null || v === undefined) ? d : v;
-    const minhaPaletaHighcharts = ['#166298', '#1cc88a', '#F0AD4E', '#e74a3b', '#5a5c69', '#192f51'];
+    // Paleta sincronizada com a nova identidade visual
+    const minhaPaletaHighcharts = ['#166298', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#1d3b5c', '#858796'];
 
     Highcharts.setOptions({
       lang: { shortMonths: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], weekdays: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'] },
@@ -857,7 +1232,14 @@
         document.body.classList.add('tv-mode');
         // Garante que o título da página atual seja exibido ao entrar no modo TV
         presentationTitle.textContent = pages[currentPageIndex].dataset.title;
+
+        // NOVO: Recolhe o filtro automaticamente para limpar a tela para a apresentação
+        $('#dashboardFilterBar').collapse('hide');
+
         startSlideshow();
+
+        // Força os gráficos a se redimensionarem para o novo espaço
+        setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 350);
       });
 
       prevSlideBtn.addEventListener('click', () => { prevPage(); resetSlideshowTimer(); });
@@ -876,11 +1258,37 @@
       });
 
       // 6. Inicialização
-      const atualizarRegraAnos = () => {
-        if (!filtroAnos || !filtroTrimestre || !filtroMes) return;
-        const anosSelecionados = Array.from(filtroAnos.selectedOptions || []);
-        const multiAno = anosSelecionados.length > 1;
+      // ==========================================
+      // LÓGICA ATUALIZADA DO FILTRO DE ANOS (CHECKBOXES)
+      // ==========================================
+      const anoCheckboxes = document.querySelectorAll('.ano-checkbox');
+      const textoAnosSelecionados = document.getElementById('textoAnosSelecionados');
+      const menuAnos = document.getElementById('menuAnos');
 
+      // Impede que o dropdown feche ao clicar nos checkboxes
+      if (menuAnos) {
+        menuAnos.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+      }
+
+      const atualizarRegraAnos = () => {
+        if (!filtroTrimestre || !filtroMes) return;
+
+        // Pega todos os checkboxes de ano marcados
+        const selecionados = Array.from(anoCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+        const multiAno = selecionados.length > 1;
+
+        // Atualiza o texto do botão do dropdown
+        if (selecionados.length === 0) {
+          textoAnosSelecionados.textContent = 'Todos os anos';
+        } else if (selecionados.length === 1) {
+          textoAnosSelecionados.textContent = selecionados[0];
+        } else {
+          textoAnosSelecionados.textContent = selecionados.length + ' anos selecionados';
+        }
+
+        // Bloqueia Trimestre/Mês se mais de um ano estiver selecionado
         filtroTrimestre.disabled = multiAno;
         filtroMes.disabled = multiAno;
 
@@ -890,18 +1298,21 @@
         }
       };
 
+      // Adiciona o evento de mudança para cada checkbox
+      anoCheckboxes.forEach(cb => cb.addEventListener('change', atualizarRegraAnos));
+
+      // Lógica de limpar Mês se escolher Trimestre (e vice-versa)
       if (filtroTrimestre && filtroMes) {
         filtroTrimestre.addEventListener('change', () => {
-          if (filtroTrimestre.value) {
-            filtroMes.value = '';
-          }
+          if (filtroTrimestre.value) filtroMes.value = '';
         });
         filtroMes.addEventListener('change', () => {
-          if (filtroMes.value) {
-            filtroTrimestre.value = '';
-          }
+          if (filtroMes.value) filtroTrimestre.value = '';
         });
       }
+
+      // Executa a regra ao carregar a página para manter o estado correto
+      atualizarRegraAnos();
 
       if (filtroAnos) {
         filtroAnos.addEventListener('change', atualizarRegraAnos);
