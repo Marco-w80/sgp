@@ -4,351 +4,390 @@
 <head>
   <title>Relatório de Processos</title>
   <th:block th:replace="~{fragments/head :: top}"></th:block>
-  <style>
-    :root {
-      --primary-dark-blue: #2c3e50;
-      --primary-blue-hover: #1a252f;
-      --secondary-gray: #6c757d;
-      --light-gray-bg: #f4f6f9;
-      --card-border: #dee2e6;
-      --text-dark: #2d2f33;
-      --text-light: #ffffff;
-      --line-separator: #e0e0e0;
-      --success-color: #198754;
-      --warning-color: #ffc107;
-      --danger-color: #dc3545;
 
-      --table-header-bg-default: var(--primary-dark-blue);
-      --table-header-color-default: var(--text-light);
-      --table-row-hover-bg: #f1f5f9;
+  <link href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.bootstrap4.min.css" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. PALETA DE CORES E TEMA GLOBAL (PADRÃO DO SISTEMA)
+       ========================================================================== */
+    :root {
+      --cor-primaria: #166298;
+      --cor-secundaria: #192f51;
+      --cor-fundo-claro: #f8f9fc;
+      --cor-texto-escuro: #5a5c69;
+      --cor-borda-suave: #e3e6f0;
+      --cor-fundo-hover: #f1f3f8;
+      --cor-sucesso: #1cc88a;
+      --cor-perigo: #e74a3b;
     }
 
+    body {
+      background-color: #f1f5f9;
+      color: var(--cor-texto-escuro);
+    }
 
-    /* --- Estilo para o FIELDSET (Critérios de Filtro) --- */
+    /* ==========================================================================
+       2. CRITÉRIOS DE FILTRO (FIELDSET ESTILIZADO)
+       ========================================================================== */
     fieldset.filter-fieldset {
-      border: 1px solid var(--card-border);
+      border: none;
       border-radius: 0.75rem;
-      padding: 1.5rem 2rem;
-      /* Padding interno do fieldset */
+      padding: 1.5rem;
       margin-bottom: 2rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      background-color: #fff;
+      box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.05) !important;
     }
 
     legend.filter-legend {
-      /* Estilos para o título do fieldset */
-      padding: 0 0.5rem;
-      /* Padding horizontal para o legend */
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text-dark);
       width: auto;
-      /* Para o legend não ocupar a largura total */
-      margin-left: -0.5rem;
-      /* Ajuste para o legend se alinhar com a borda */
-      margin-bottom: 1rem;
-      /* Espaçamento abaixo do legend */
+      padding: 0.2rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--cor-primaria);
+      letter-spacing: 0.05em;
+      background-color: var(--cor-fundo-claro);
+      border-radius: 0.375rem;
+      border: 1px solid var(--cor-borda-suave);
     }
 
-    legend.filter-legend .fas {
-      margin-right: 8px;
-      color: var(--secondary-gray);
-      font-size: 0.95rem;
+    .form-label {
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--cor-secundaria);
+      margin-bottom: 0.4rem;
     }
 
-
-    /* --- Estilo para o SUB-CARD (Resultados do Relatório) --- */
-    /* Mantemos o sub-card-container para a tabela de resultados */
-    .sub-card-container {
-      background-color: #fff;
-      border: 1px solid var(--card-border);
+    /* ==========================================================================
+       3. CARD PRINCIPAL E CABEÇALHO (PADRÃO)
+       ========================================================================== */
+    .card.shadow {
+      border: none;
       border-radius: 0.75rem;
-      margin-bottom: 0;
-      /* Último elemento, não precisa de margin-bottom extra */
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.07) !important;
     }
 
-    /* Estilo para arredondar as bordas da tabela */
-    .table-rounded-corners {
-      border-collapse: separate;
-      border-spacing: 0;
-      border-radius: .5rem;
-      overflow: hidden;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-      width: 100%;
+    .card-header {
+      background-color: var(--cor-fundo-claro);
+      border-bottom: 2px solid var(--cor-primaria);
+      padding: 1rem 1.5rem;
+      border-top-left-radius: 0.75rem;
+      border-top-right-radius: 0.75rem;
     }
 
-    /* Removendo ícones dos cabeçalhos da tabela */
-    .table-rounded-corners th .fas {
-      display: none;
+    .card-header h6 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cor-primaria) !important;
     }
 
-    /* Ajustes de padding e fonte para células da tabela */
-    .table-rounded-corners th,
-    .table-rounded-corners td {
+    .card-body-table {
+      padding: 0 !important;
+    }
+
+    /* ==========================================================================
+       4. BOTÕES PADRONIZADOS
+       ========================================================================== */
+    .btn {
+      font-weight: 600 !important;
+      transition: all 0.2s ease-in-out !important;
+      border-radius: 0.375rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .btn-primary { background-color: var(--cor-primaria) !important; border-color: var(--cor-primaria) !important; color: white !important; }
+    .btn-primary:hover { background-color: var(--cor-secundaria) !important; border-color: var(--cor-secundaria) !important; }
+    
+    .btn-success { background-color: var(--cor-sucesso) !important; border: none !important; color: white !important; }
+
+    /* ==========================================================================
+       5. TABELA ELEGANTE E REFINADA
+       ========================================================================== */
+    .table-container {
+      border-radius: 0 0 0.75rem 0.75rem !important;
+      background-color: #fff !important;
+      overflow: hidden !important;
+    }
+
+    .table {
+      border: 1px solid var(--cor-borda-suave) !important;
+      width: 100% !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      background-color: #fff !important;
+      margin-bottom: 0 !important;
+    }
+
+    /* Cantos arredondados das células */
+    .table thead:first-child tr:first-child th:first-child { border-top-left-radius: 0.75rem !important; }
+    .table thead:first-child tr:first-child th:last-child { border-top-right-radius: 0.75rem !important; }
+    .table tbody:last-of-type tr:last-child td:first-child { border-bottom-left-radius: 0.75rem !important; }
+    .table tbody:last-of-type tr:last-child td:last-child { border-bottom-right-radius: 0.75rem !important; }
+
+    .table th {
+      color: var(--cor-secundaria) !important;
+      font-weight: 700 !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 1rem 0.75rem !important;
+      text-transform: uppercase !important;
+      font-size: 0.70rem !important;
+      letter-spacing: 0.04em !important;
+      border-bottom: 2px solid var(--cor-borda-suave) !important;
+      border-top: none !important;
+      background-color: var(--cor-fundo-claro) !important;
+      white-space: nowrap;
+    }
+
+    .table td {
       text-align: center;
-      vertical-align: middle;
-      padding: 0.6rem 0.4rem;
-      font-size: 0.85rem;
+      vertical-align: middle !important;
+      padding: 0.75rem !important;
+      border-top: 1px solid var(--cor-borda-suave) !important;
+      color: var(--cor-texto-escuro) !important;
+      background-color: #fff !important;
+      font-size: 0.8rem;
+    }
+
+    .table tbody tr:hover td {
+      background-color: var(--cor-fundo-hover) !important;
+      transition: background-color 0.2s ease-in-out !important;
+    }
+
+    /* Ajustes visuais para as colunas fixadas pelo plugin */
+    .dtfc-fixed-right {
+      background-color: #fff !important;
+      border-left: 1px solid var(--cor-borda-suave) !important; /* Divisória visual suave */
+    }
+    
+    .table thead .dtfc-fixed-right {
+      background-color: var(--cor-fundo-claro) !important;
+    }
+
+    .table tbody tr:hover .dtfc-fixed-right {
+      background-color: var(--cor-fundo-hover) !important;
+    }
+
+    /* ==========================================================================
+       6. ESTILOS ESPECÍFICOS DO RELATÓRIO (COLUNAS E TRUNCAMENTO)
+       ========================================================================== */
+    .col-narrow { width: 1%; min-width: 45px; text-align: center !important; }
+
+    .col-deferimentos {
+      min-width: 320px;
+      white-space: normal !important;
+      text-align: left !important;
+      font-size: 0.75rem !important;
+    }
+
+    .deferimento-list { margin: 0; padding-left: 1rem; }
+    
+    .truncate-rel {
+      max-width: 150px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .table-rounded-corners th {
-      font-weight: 600;
+    .text-success { color: var(--cor-sucesso) !important; }
+    .text-danger { color: var(--cor-perigo) !important; }
+
+    /* ==========================================================================
+       7. DATATABLES ESTILIZADO
+       ========================================================================== */
+    div.dataTables_wrapper { padding: 1.5rem !important; }
+    
+    div.dataTables_wrapper .dataTables_paginate .pagination .page-link {
+      color: var(--cor-primaria) !important;
+      background-color: #f1f5f9 !important;
+      border: 1px solid var(--cor-borda-suave) !important;
+      margin: 0 0.15rem !important;
+      border-radius: 0.375rem !important;
     }
 
-    /* Largura mínima para colunas de ID e anexos */
-    .table-rounded-corners td:nth-child(1),
-    .table-rounded-corners th:nth-child(1),
-    .table-rounded-corners td:nth-child(10),
-    .table-rounded-corners th:nth-child(10),
-    .table-rounded-corners td:nth-child(11),
-    .table-rounded-corners th:nth-child(11),
-    .table-rounded-corners td:nth-child(12),
-    .table-rounded-corners th:nth-child(12),
-    .table-rounded-corners td:nth-child(13),
-    .table-rounded-corners th:nth-child(13),
-    .table-rounded-corners td:nth-child(14),
-    .table-rounded-corners th:nth-child(14) {
-      width: 1%;
-      max-width: 50px;
-      min-width: 30px;
+    div.dataTables_wrapper .dataTables_paginate .pagination .page-item.active .page-link {
+      background-color: var(--cor-primaria) !important;
+      border-color: var(--cor-primaria) !important;
+      color: #fff !important;
     }
 
-    /* Ajuste para colunas de texto com conteúdo variável */
-    .table-rounded-corners td:nth-child(2),
-    .table-rounded-corners td:nth-child(3),
-    .table-rounded-corners td:nth-child(4),
-    .table-rounded-corners td:nth-child(5),
-    .table-rounded-corners td:nth-child(6),
-    .table-rounded-corners td:nth-child(7),
-    .table-rounded-corners td:nth-child(8),
-    .table-rounded-corners td:nth-child(9) {
-      max-width: 120px;
-      width: auto;
+    /* ==========================================================================
+       CORREÇÃO DO CABEÇALHO FANTASMA E ALINHAMENTO (DATATABLES)
+       ========================================================================== */
+    .dataTables_scrollBody thead th,
+    .dataTables_scrollBody thead td {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      border-top: none !important;
+      border-bottom: none !important;
+      height: 0 !important;
+      /* Mantemos o padding e borders laterais intocados para o DataTables 
+         conseguir calcular o alinhamento das colunas corretamente! */
     }
-
-    .table-rounded-corners tbody tr:first-child td {
-      border-top: none;
-    }
-
-    .table-rounded-corners tbody tr:hover {
-      background-color: var(--table-row-hover-bg);
-    }
-
-    /* Estilos para ícones de check/times nas colunas booleanas */
-    .text-success {
-      color: var(--success-color) !important;
-    }
-
-    .text-danger {
-      color: var(--danger-color) !important;
-    }
-
-    /* Alinhamento do botão filtrar */
-    .form-row.align-items-end {
-      align-items: flex-end;
-    }
-
-    .form-group.col-md-auto {
-      margin-right: 1.5rem;
-    }
-
-    .form-group.col-md.text-right {
-      flex-grow: 1;
-      text-align: right;
+    
+    .dataTables_scrollBody thead tr {
+      height: 0 !important;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="card shadow mb-4">
-    <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
-      <h6 class="m-0 font-weight-bold text-primary">
-        <i class="fas fa-file-alt mr-2"></i> Relatório de Processos
-      </h6>
-    </div>
+  <div class="container-fluid py-4">
+    
+    <fieldset class="filter-fieldset">
+      <legend class="filter-legend shadow-sm">
+        <i class="fas fa-filter mr-2"></i> Critérios de Filtro
+      </legend>
+      <form th:action="@{/relatorios/processos}" method="get">
+        <div class="form-row">
+          <div class="form-group col-md-2">
+            <label for="de" class="form-label">Início De:</label>
+            <input type="date" id="de" name="de" class="form-control form-control-sm" th:value="${param.de}">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="ate" class="form-label">Até:</label>
+            <input type="date" id="ate" name="ate" class="form-control form-control-sm" th:value="${param.ate}">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="status" class="form-label">Status:</label>
+            <select id="status" name="status" class="form-control form-control-sm">
+              <option value="">Todos</option>
+              <option th:each="s : ${statusValues}" th:value="${s}"
+                th:text="${s.name() == 'OBITO' ? 'ÓBITO' : #strings.replace(s.name(), '_', ' ')}"
+                th:selected="${param.status} == ${s}"></option>
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="paciente" class="form-label">Paciente:</label>
+            <input type="text" id="paciente" name="paciente" class="form-control form-control-sm" th:value="${param.paciente}" placeholder="Nome ou CPF">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="localId" class="form-label">Local:</label>
+            <select id="localId" name="localId" class="form-control form-control-sm">
+              <option value="">Todos</option>
+              <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca}" th:selected="${param.localId} == ${l.id}"></option>
+            </select>
+          </div>
+        </div>
 
-    <div class="card-body">
-      <fieldset class="filter-fieldset">
-        <legend class="filter-legend">
-          <i class="fas fa-filter mr-2"></i> Critérios de Filtro
-        </legend>
-        <form th:action="@{/relatorios/processos}" method="get">
-          <div class="form-row">
-            <div class="form-group col-md-3 col-lg-2">
-              <label for="de" class="form-label">Data Início De:</label>
-              <input type="date" id="de" name="de" class="form-control" th:value="${param.de}">
+        <div class="form-row align-items-center mt-2">
+          <div class="col-auto">
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input class="custom-control-input" type="checkbox" id="cpfAnexado" name="cpfAnexado" th:checked="${param.cpfAnexado}">
+              <label class="custom-control-label small font-weight-bold text-secondary" for="cpfAnexado">CPF</label>
             </div>
-            <div class="form-group col-md-3 col-lg-2">
-              <label for="ate" class="form-label">Até:</label>
-              <input type="date" id="ate" name="ate" class="form-control" th:value="${param.ate}">
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input class="custom-control-input" type="checkbox" id="compResidenciaAnexado" name="compResidenciaAnexado" th:checked="${param.compResidenciaAnexado}">
+              <label class="custom-control-label small font-weight-bold text-secondary" for="compResidenciaAnexado">Resid.</label>
             </div>
-            <div class="form-group col-md-3 col-lg-2">
-              <label for="status" class="form-label">Status:</label>
-              <select id="status" name="status" class="form-control">
-                <option value="">Todos</option>
-                <option th:each="s : ${statusValues}" th:value="${s}"
-                  th:text="${s.name() == 'OBITO' ? 'ÓBITO' : #strings.replace(s.name(), '_', ' ')}"
-                  th:selected="${param.status} == ${s}"></option>
-              </select>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input class="custom-control-input" type="checkbox" id="compRendaAnexado" name="compRendaAnexado" th:checked="${param.compRendaAnexado}">
+              <label class="custom-control-label small font-weight-bold text-secondary" for="compRendaAnexado">Renda</label>
             </div>
-            <div class="form-group col-md-3 col-lg-3">
-              <label for="paciente" class="form-label">Paciente:</label>
-              <input type="text" id="paciente" name="paciente" class="form-control" th:value="${param.paciente}"
-                placeholder="Nome ou CPF">
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input class="custom-control-input" type="checkbox" id="procuracaoAnexado" name="procuracaoAnexado" th:checked="${param.procuracaoAnexado}">
+              <label class="custom-control-label small font-weight-bold text-secondary" for="procuracaoAnexado">Proc.</label>
             </div>
-            <div class="form-group col-md-3 col-lg-3">
-              <label for="localId" class="form-label">Local:</label>
-              <select id="localId" name="localId" class="form-control">
-                <option value="">Todos</option>
-                <option th:each="l : ${locais}" th:value="${l.id}" th:text="${l.comarca}"
-                  th:selected="${param.localId} == ${l.id}"></option>
-              </select>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input class="custom-control-input" type="checkbox" id="declaracaoInsuficienciaAnexado" name="declaracaoInsuficienciaAnexado" th:checked="${param.declaracaoInsuficienciaAnexado}">
+              <label class="custom-control-label small font-weight-bold text-secondary" for="declaracaoInsuficienciaAnexado">Insufic.</label>
             </div>
           </div>
-          <div class="form-row align-items-end mt-3">
-            <div class="form-group col-md-auto">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="cpfAnexado" name="cpfAnexado"
-                  th:checked="${param.cpfAnexado}">
-                <label class="form-check-label" for="cpfAnexado">CPF Anexado</label>
-              </div>
-            </div>
-            <div class="form-group col-md-auto">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="compResidenciaAnexado" name="compResidenciaAnexado"
-                  th:checked="${param.compResidenciaAnexado}">
-                <label class="form-check-label" for="compResidenciaAnexado">Comprovante Residência</label>
-              </div>
-            </div>
-            <div class="form-group col-md-auto">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="compRendaAnexado" name="compRendaAnexado"
-                  th:checked="${param.compRendaAnexado}">
-                <label class="form-check-label" for="compRendaAnexado">Comprovante Renda</label>
-              </div>
-            </div>
-            <div class="form-group col-md-auto">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="procuracaoAnexado" name="procuracaoAnexado"
-                  th:checked="${param.procuracaoAnexado}">
-                <label class="form-check-label" for="procuracaoAnexado">Procuração Anexada</label>
-              </div>
-            </div>
-            <div class="form-group col-md-auto">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="declaracaoInsuficienciaAnexado"
-                  name="declaracaoInsuficienciaAnexado" th:checked="${param.declaracaoInsuficienciaAnexado}">
-                <label class="form-check-label" for="declaracaoInsuficienciaAnexado">Declaração Insuficiência</label>
-              </div>
-            </div>
-            <div class="form-group col-md text-right">
-              <a th:href="@{/relatorios/processos/exportar-excel(
-                  de=${param.de},
-                  ate=${param.ate},
-                  status=${param.status},
-                  paciente=${param.paciente},
-                  localId=${param.localId},
-                  cpfAnexado=${param.cpfAnexado},
-                  compResidenciaAnexado=${param.compResidenciaAnexado},
-                  compRendaAnexado=${param.compRendaAnexado},
-                  procuracaoAnexado=${param.procuracaoAnexado},
-                  declaracaoInsuficienciaAnexado=${param.declaracaoInsuficienciaAnexado})}"
-                 class="btn btn-success mr-2">
-                <i class="fas fa-file-excel mr-1"></i> Exportar Excel
-              </a>
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-search mr-1"></i> Filtrar
-              </button>
-            </div>
+          
+          <div class="col text-right">
+            <a th:href="@{/relatorios/processos/exportar-excel(de=${param.de}, ate=${param.ate}, status=${param.status}, paciente=${param.paciente}, localId=${param.localId}, cpfAnexado=${param.cpfAnexado}, compResidenciaAnexado=${param.compResidenciaAnexado}, compRendaAnexado=${param.compRendaAnexado}, procuracaoAnexado=${param.procuracaoAnexado}, declaracaoInsuficienciaAnexado=${param.declaracaoInsuficienciaAnexado})}"
+               class="btn btn-sm btn-success shadow-sm mr-2">
+              <i class="fas fa-file-excel mr-1"></i> Excel
+            </a>
+            <button type="submit" class="btn btn-sm btn-primary shadow-sm px-4">
+              <i class="fas fa-search mr-1"></i> Filtrar
+            </button>
           </div>
-        </form>
-      </fieldset>
-    </div>
-  </div>
-  <div class="sub-card-container">
-    <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">
-        <i class="fas fa-table mr-2"></i> Resultados do Relatório
-      </h6>
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table id="tabelaProcessos" class="table w-100 table-rounded-corners" cellspacing="0">
-          <thead>
-            <tr>
-              <th class="text-center d-none">ID</th>
-              <th class="text-center">Nº Interno</th>
-              <th class="text-center">Nº Processo</th>
-              <th class="text-center">Data Início</th>
-              <th class="text-center">Status</th>
-              <th class="text-center">Paciente</th>
-              <th class="text-center">Advogado</th>
-              <th class="text-center">Médico</th>
-              <th class="text-center">Local</th>
-              <th class="text-center">Deferimentos</th>
-              <th class="text-center" data-orderable="false">CPF</th>
-              <th class="text-center" data-orderable="false">Resid.</th>
-              <th class="text-center" data-orderable="false">Renda</th>
-              <th class="text-center" data-orderable="false">Proc.</th>
-              <th class="text-center" data-orderable="false">Decl. Insuf.</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="proc : ${processos}">
-              <td class="d-none" th:text="${proc.id}"></td>
-              <td th:text="${proc.numeroInterno}"></td>
-              <td th:text="${proc.numeroProcesso}"></td>
-              <td th:text="${#temporals.format(proc.dataInicio,'dd/MM/yyyy')}"></td>
-              <td th:text="${proc.status != null and (proc.status.name() == 'CONCLUIDO' or proc.status.name() == 'OBITO') ? 'ÓBITO' : (proc.status != null ? #strings.replace(proc.status.name(), '_', ' ') : '-')}"></td>
-              <td th:text="${proc.paciente != null ? proc.paciente.nome : ''}"></td>
-              <td th:text="${proc.advogado != null ? proc.advogado.nome : ''}"></td>
-              <td th:text="${proc.medico != null ? proc.medico.nome : ''}"></td>
-              <td th:text="${proc.local != null ? proc.local.comarca : ''}"></td>
-              <td class="text-left" style="white-space: normal; min-width: 260px;">
-                <ul class="mb-0 pl-3" th:if="${not #lists.isEmpty(proc.deferimentos)}">
-                  <li th:each="def : ${proc.deferimentos}">
-                    <span th:text="${'#' + def.numeroDeferimento + ' - '}"></span>
-                    <span th:if="${def.tipo != null}"
-                      th:text="${def.tipo == T(com.sgp.model.TipoDeferimento).GRUPO_PROD ? 'Grupo Prod' : 'Juiz'}"></span>
-                    <span th:unless="${def.tipo != null}">-</span>
-                    <span th:text="${' (' + (def.dataDeferimento != null ? #temporals.format(def.dataDeferimento, 'dd/MM/yyyy') : '-') + '): '}"></span>
-                    <span th:if="${def.mensagem != null and !#strings.isEmpty(#strings.trim(def.mensagem))}" th:text="${def.mensagem}"></span>
-                    <span th:unless="${def.mensagem != null and !#strings.isEmpty(#strings.trim(def.mensagem))}">-</span>
-                  </li>
-                </ul>
-                <span th:if="${#lists.isEmpty(proc.deferimentos)}">-</span>
-              </td>
-              <td>
-                <i class="fas fa-check-circle text-success" th:if="${proc.cpfAnexado}"></i>
-                <i class="fas fa-times-circle text-danger" th:unless="${proc.cpfAnexado}"></i>
-              </td>
-              <td>
-                <i class="fas fa-check-circle text-success" th:if="${proc.compResidenciaAnexado}"></i>
-                <i class="fas fa-times-circle text-danger" th:unless="${proc.compResidenciaAnexado}"></i>
-              </td>
-              <td>
-                <i class="fas fa-check-circle text-success" th:if="${proc.compRendaAnexado}"></i>
-                <i class="fas fa-times-circle text-danger" th:unless="${proc.compRendaAnexado}"></i>
-              </td>
-              <td>
-                <i class="fas fa-check-circle text-success" th:if="${proc.procuracaoAnexado}"></i>
-                <i class="fas fa-times-circle text-danger" th:unless="${proc.procuracaoAnexado}"></i>
-              </td>
-              <td>
-                <i class="fas fa-check-circle text-success" th:if="${proc.declaracaoInsuficienciaAnexado}"></i>
-                <i class="fas fa-times-circle text-danger" th:unless="${proc.declaracaoInsuficienciaAnexado}"></i>
-              </td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(processos)}">
-              <td colspan="15" class="text-center">Nenhum processo encontrado com os filtros aplicados.</td>
-            </tr>
-          </tbody>
-        </table>
+        </div>
+      </form>
+    </fieldset>
+
+    <div class="card shadow mb-5">
+      <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">
+          <i class="fas fa-table mr-2"></i> Resultados do Relatório
+        </h6>
+      </div>
+      
+      <div class="card-body card-body-table">
+        <div class="table-container">
+          <table id="tabelaRelatorio" class="table table-hover w-100" cellspacing="0" style="width:100%">
+            <thead>
+              <tr>
+                <th class="d-none">ID</th>
+                <th>Nº Interno</th>
+                <th>Nº Processo</th>
+                <th>Início</th>
+                <th>Status</th>
+                <th>Paciente</th>
+                <th>Advogado</th>
+                <th>Médico</th>
+                <th>Local</th>
+                <th class="no-sort col-deferimentos">Deferimentos</th>
+                <th class="no-sort col-narrow">CPF</th>
+                <th class="no-sort col-narrow">Res.</th>
+                <th class="no-sort col-narrow">Ren.</th>
+                <th class="no-sort col-narrow">Pro.</th>
+                <th class="no-sort col-narrow">Ins.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="proc : ${processos}">
+                <td class="d-none" th:text="${proc.id}"></td>
+                <td class="font-weight-bold" style="color: var(--cor-secundaria);" th:text="${proc.numeroInterno}"></td>
+                <td th:text="${#strings.isEmpty(proc.numeroProcesso) ? '-' : proc.numeroProcesso}"></td>
+                <td th:text="${#temporals.format(proc.dataInicio,'dd/MM/yyyy')}"></td>
+                <td>
+                  <span class="badge badge-light border" th:text="${proc.status != null and (proc.status.name() == 'CONCLUIDO' or proc.status.name() == 'OBITO') ? 'ÓBITO' : (proc.status != null ? #strings.replace(proc.status.name(), '_', ' ') : '-')}"></span>
+                </td>
+                <td class="truncate-rel" th:text="${proc.paciente != null ? proc.paciente.nome : ''}"></td>
+                <td class="truncate-rel" th:text="${proc.advogado != null ? proc.advogado.nome : ''}"></td>
+                <td class="truncate-rel" th:text="${proc.medico != null ? proc.medico.nome : ''}"></td>
+                <td th:text="${proc.local != null ? proc.local.comarca : ''}"></td>
+                
+                <td class="col-deferimentos">
+                  <ul class="deferimento-list" th:if="${not #lists.isEmpty(proc.deferimentos)}">
+                    <li th:each="def : ${proc.deferimentos}">
+                      <strong th:text="${'#' + def.numeroDeferimento}"></strong> 
+                      <span class="small text-muted" th:text="${'(' + (def.dataDeferimento != null ? #temporals.format(def.dataDeferimento, 'dd/MM/yyyy') : '-') + ')'}"></span>: 
+                      <span th:text="${def.mensagem}"></span>
+                    </li>
+                  </ul>
+                  <span th:if="${#lists.isEmpty(proc.deferimentos)}" class="text-muted">-</span>
+                </td>
+
+                <td class="col-narrow">
+                  <i th:class="${proc.cpfAnexado ? 'fas fa-check-circle text-success' : 'fas fa-times-circle text-danger'}"></i>
+                </td>
+                <td class="col-narrow">
+                  <i th:class="${proc.compResidenciaAnexado ? 'fas fa-check-circle text-success' : 'fas fa-times-circle text-danger'}"></i>
+                </td>
+                <td class="col-narrow">
+                  <i th:class="${proc.compRendaAnexado ? 'fas fa-check-circle text-success' : 'fas fa-times-circle text-danger'}"></i>
+                </td>
+                <td class="col-narrow">
+                  <i th:class="${proc.procuracaoAnexado ? 'fas fa-check-circle text-success' : 'fas fa-times-circle text-danger'}"></i>
+                </td>
+                <td class="col-narrow">
+                  <i th:class="${proc.declaracaoInsuficienciaAnexado ? 'fas fa-check-circle text-success' : 'fas fa-times-circle text-danger'}"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -358,19 +397,25 @@
   <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+  <script src="https://cdn.datatables.net/fixedcolumns/4.3.0/js/dataTables.fixedColumns.min.js"></script>
+  
   <script>
     $(document).ready(function () {
-      $('#tabelaProcessos').DataTable({
+      $('#tabelaRelatorio').DataTable({
         language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json' },
         pageLength: 10,
-        lengthMenu: [5, 10, 25, 50],
+        lengthMenu: [10, 25, 50, 100],
         ordering: true,
         searching: true,
+        scrollX: true,         /* ATIVANDO SCROLL HORIZONTAL */
+        fixedColumns: {
+          left: 0,
+          right: 5             /* FIXANDO AS 5 ÚLTIMAS COLUNAS */
+        },
         columnDefs: [
-          { orderable: false, targets: [9, 10, 11, 12, 13, 14] }
+          { orderable: false, targets: 'no-sort' }
         ],
-        autoWidth: false,
-        scrollX: true
+        autoWidth: false
       });
     });
   </script>
