@@ -6,85 +6,209 @@
   <th:block th:replace="~{fragments/head :: top}"></th:block>
 
   <style>
-    /* Estilo para arredondar as bordas da tabela */
-    .table-rounded-corners {
-      border-collapse: separate;
-      /* Necessário para border-radius em tabelas */
-      border-spacing: 0;
-      /* Remove espaçamento entre células para bordas contínuas */
-      border-radius: .5rem;
-      /* Ajuste o valor para o quão arredondado você quer */
-      overflow: hidden;
-      /* Garante que o conteúdo não vaze das bordas arredondadas */
+    /* ==========================================================================
+       1. PALETA DE CORES E TEMA GLOBAL (PADRÃO DO SISTEMA)
+       ========================================================================== */
+    :root {
+      --cor-primaria: #166298;
+      --cor-secundaria: #192f51;
+      --cor-fundo-claro: #f8f9fc;
+      --cor-texto-escuro: #5a5c69;
+      --cor-borda-suave: #e3e6f0;
+      --cor-fundo-hover: #f1f3f8;
     }
 
-    /* Estilo para o cabeçalho da tabela */
-    .table-rounded-corners thead {
-      background-color: #e2e6ea;
-      /* Um cinza claro e elegante */
-      color: #343a40;
-      /* Cor do texto mais escura para contraste */
+    body {
+      background-color: #f1f5f9;
+      color: var(--cor-texto-escuro);
     }
 
-    /* Alinhamento vertical no meio para cabeçalhos */
-    .table-rounded-corners th {
-      vertical-align: middle;
+    /* ==========================================================================
+       2. CARD PRINCIPAL E CABEÇALHO
+       ========================================================================== */
+    .card.shadow {
+      border: none;
+      border-radius: 0.75rem;
+      box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.07) !important;
     }
 
-    /* Centralizar o conteúdo das células do corpo (geral para texto) */
-    .table-rounded-corners td {
-      text-align: center;
-      vertical-align: middle;
-      /* Alinha verticalmente no meio */
+    .card-header {
+      background-color: var(--cor-fundo-claro);
+      border-bottom: 2px solid var(--cor-primaria);
+      padding: 1rem 1.5rem;
+      border-top-left-radius: 0.75rem;
+      border-top-right-radius: 0.75rem;
     }
 
-    /* Estilo para botões circulares */
+    .card-header h6 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cor-primaria) !important;
+    }
+
+    .card-body-table {
+      padding: 0 !important;
+    }
+
+    /* ==========================================================================
+       3. BOTÕES (GERAL, PRIMÁRIO E OUTLINE CIRCULAR)
+       ========================================================================== */
+    .btn {
+      font-weight: 600 !important;
+      transition: all 0.2s ease-in-out !important;
+      border-radius: 0.375rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .btn-primary { background-color: var(--cor-primaria) !important; border-color: var(--cor-primaria) !important; color: white !important; }
+    .btn-primary:hover { background-color: var(--cor-secundaria) !important; border-color: var(--cor-secundaria) !important; }
+
+    .btn-outline-primary {
+      background-color: transparent !important;
+      border: 1px solid var(--cor-primaria) !important;
+      color: var(--cor-primaria) !important;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: var(--cor-primaria) !important;
+      color: white !important;
+    }
+
     .btn-circle {
-      width: 35px;
-      /* Define a largura */
-      height: 35px;
-      /* Define a altura */
-      padding: 0;
-      /* Remove o padding padrão */
-      border-radius: 50%;
-      /* Transforma em círculo */
-      display: flex;
-      /* Permite centralizar conteúdo com flexbox */
-      align-items: center;
-      /* Centraliza verticalmente */
-      justify-content: center;
-      /* Centraliza horizontalmente */
-      flex-shrink: 0;
-      /* Evita que o botão encolha */
+      width: 35px; height: 35px; padding: 0; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
 
-    /* Ajuste para botões pequenos circulares */
-    .btn-circle.btn-sm {
-      width: 30px;
-      /* Tamanho um pouco menor para 'btn-sm' */
-      height: 30px;
-      font-size: 0.8rem;
-      /* Ajusta o tamanho da fonte do ícone, se necessário */
+    .btn-circle.btn-sm { width: 32px; height: 32px; font-size: 0.8rem; }
+
+    /* ==========================================================================
+       4. TABELA ELEGANTE, SCROLL ISOLADO E CANTOS ARREDONDADOS
+       ========================================================================== */
+    .table-container {
+      border-radius: 0 0 0.75rem 0.75rem !important;
+      background-color: #fff !important;
+      padding-bottom: 0.5rem;
+      overflow: visible !important; 
     }
 
-    /* Garante que o TD da coluna de ações tenha altura suficiente para o flexbox e centralize seu conteúdo */
-    .table-rounded-corners td.actions-column {
-      display: flex;
-      /* Transforma a célula em um contêiner flexível */
-      align-items: center;
-      /* Centraliza verticalmente o item dentro da célula */
-      justify-content: center;
-      /* Centraliza horizontalmente o item dentro da célula */
-      height: 100%;
-      /* Permite que a célula se expanda para a altura da linha */
-      box-sizing: border-box;
-      /* Inclui padding e bordas no cálculo da largura/altura */
+    /* Scroll apenas na tabela (ignora pesquisa e paginação) */
+    .dataTables_wrapper > .row:nth-child(2) > .col-sm-12 {
+      overflow-x: auto !important;
+      overflow-y: visible !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
     }
 
-    /* Garante que os ícones dentro dos botões sejam centralizados */
-    .btn-circle i {
-      display: block;
-      /* Para que o ícone se comporte como um bloco dentro do flex do botão */
+    .dataTables_wrapper > .row:nth-child(2) { margin-left: 0 !important; margin-right: 0 !important; }
+    .dataTables_wrapper > .row:nth-child(3) { padding-top: 1rem !important; }
+
+    .table {
+      border: 1px solid var(--cor-borda-suave) !important;
+      width: 100% !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      background-color: #fff !important;
+      margin-bottom: 0 !important;
+      position: relative;
+    }
+
+    /* Cantos arredondados das células */
+    .table thead:first-child tr:first-child th:first-child { border-top-left-radius: 0.75rem !important; }
+    .table thead:first-child tr:first-child th:last-child { border-top-right-radius: 0.75rem !important; }
+    .table tbody:last-of-type tr:last-child td:first-child { border-bottom-left-radius: 0.75rem !important; }
+    .table tbody:last-of-type tr:last-child td:last-child { border-bottom-right-radius: 0.75rem !important; }
+
+    /* Ajuste de bordas internas verticais */
+    .table th, .table td {
+      border-left: none !important;
+      border-right: 1px solid var(--cor-borda-suave) !important;
+    }
+    .table th:last-child, .table td:last-child { border-right: none !important; }
+
+    .table th {
+      color: var(--cor-secundaria) !important;
+      font-weight: 700 !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 1rem 0.75rem !important;
+      text-transform: uppercase !important;
+      font-size: 0.75rem !important;
+      letter-spacing: 0.04em !important;
+      border-bottom: 2px solid var(--cor-borda-suave) !important;
+      border-top: none !important;
+      background-color: var(--cor-fundo-claro) !important;
+      word-break: break-word;
+      white-space: nowrap !important;
+    }
+
+    .table td {
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 0.75rem !important;
+      border-top: 1px solid var(--cor-borda-suave) !important;
+      color: var(--cor-texto-escuro) !important;
+      background-color: #fff !important;
+      font-size: 0.85rem;
+    }
+
+    .table tbody tr:hover td { background-color: var(--cor-fundo-hover) !important; transition: background-color 0.2s ease-in-out !important; }
+
+    /* ==========================================================================
+       5. LARGURAS, TRUNCATE E COLUNA FIXA (STICKY)
+       ========================================================================== */
+    .truncate {
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    .col-especificacoes { min-width: 250px; }
+    .col-fabricante { min-width: 150px; }
+
+    /* MÁGICA DA COLUNA FIXA */
+    .col-acoes-fixa {
+      position: sticky !important;
+      right: 0;
+      z-index: 1;
+      background-color: #fff !important;
+      box-shadow: -4px 0 8px rgba(0, 0, 0, 0.04);
+      min-width: 80px; 
+    }
+    
+    .table thead th.col-acoes-fixa {
+      background-color: var(--cor-fundo-claro) !important;
+      z-index: 2 !important;
+    }
+    
+    .table tbody tr:hover .col-acoes-fixa {
+      background-color: var(--cor-fundo-hover) !important;
+    }
+
+    /* ==========================================================================
+       6. DATATABLES ESTILIZADO
+       ========================================================================== */
+    div.dataTables_wrapper { padding: 1.5rem !important; font-size: 0.9rem !important; }
+    div.dataTables_wrapper label { font-weight: 600 !important; font-size: 0.9rem !important; color: var(--cor-secundaria) !important; margin-bottom: 0.5rem !important; display: inline-block !important; }
+    .dataTables_wrapper .dataTables_length select { width: auto !important; min-width: 60px !important; }
+    div.dataTables_wrapper .dataTables_length select, div.dataTables_wrapper .dataTables_filter input {
+      border-radius: 0.5rem !important; border: 1px solid var(--cor-borda-suave) !important; padding: 0.45rem 0.75rem !important;
+      font-size: 0.875rem !important; transition: border-color 0.3s ease, box-shadow 0.3s ease !important; background-color: #fff !important;
+    }
+    div.dataTables_wrapper .dataTables_length select:focus, div.dataTables_wrapper .dataTables_filter input:focus {
+      border-color: var(--cor-primaria) !important; box-shadow: 0 0 0 0.2rem rgba(22, 98, 152, 0.25) !important; outline: none !important;
+    }
+    .dataTables_wrapper .pagination .page-link {
+      color: var(--cor-primaria) !important; background-color: #f1f5f9 !important; border: 1px solid var(--cor-borda-suave) !important;
+      border-radius: 0.375rem !important; transition: all 0.2s ease-in-out !important; padding: 0.45rem 0.8rem !important; margin: 0 0.15rem !important;
+    }
+    .dataTables_wrapper .pagination .page-link:hover { background-color: var(--cor-primaria) !important; color: #fff !important; border-color: var(--cor-primaria) !important; }
+    .dataTables_wrapper .pagination .page-item.active .page-link {
+      background-color: var(--cor-primaria) !important; border-color: var(--cor-primaria) !important; color: #fff !important; font-weight: bold !important; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12) !important;
     }
   </style>
 </head>
@@ -102,50 +226,50 @@
       </a>
     </div>
 
-    <div class="card-body">
-      <div class="table-responsive">
-
-        <table id="tabelaProdutos" class="table table-bordered table-hover w-100 table-rounded-corners" cellspacing="0">
-          <thead class="thead-light">
+    <div class="card-body card-body-table">
+      
+      <div class="table-container">
+        <table id="tabelaProdutos" class="table table-hover w-100" cellspacing="0">
+          <thead>
             <tr>
-              <th class="text-center">ID</th>
-              <th class="text-center">Código</th>
-              <th class="text-center">Nome Item</th>
-              <th class="text-center">Unidade</th>
-              <th class="text-center">Sigla</th>
-              <th class="text-center">Grupo</th>
-              <th class="text-center">Data Cadastro</th>
-              <th class="text-center">Especificações</th>
-              <th class="text-center">Fabricante</th>
-              <th class="text-center">Modelo</th>
-              <th class="text-center">Ações</th>
+              <th style="width: 5%;">ID</th>
+              <th style="width: 10%;">Código</th>
+              <th>Nome Item</th>
+              <th>Unidade</th>
+              <th>Sigla</th>
+              <th>Grupo</th>
+              <th>Data Cadastro</th>
+              <th class="no-sort col-especificacoes">Especificações</th>
+              <th class="col-fabricante">Fabricante</th>
+              <th>Modelo</th>
+              <th class="no-sort col-acoes-fixa">Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr th:each="prod : ${produtos}">
-              <td th:text="${prod.id}"></td>
-              <td th:text="${prod.codigo}"></td>
-              <td th:text="${prod.nomeItem}"></td>
-              <td th:text="${prod.unidadeMedida}"></td>
-              <td th:text="${prod.siglaUnidade}"></td>
-              <td th:text="${prod.grupo}"></td>
-              <td class="data-format" th:text="${prod.dataCadastro}"></td>
-              <td th:text="${prod.especificacoes}"></td>
-              <td th:text="${prod.fabricante}"></td>
-              <td th:text="${prod.modelo}"></td>
-              <td class="actions-column">
-                <a th:href="@{|/produtos/editar/${prod.id}|}" class="btn btn-circle btn-sm btn-secondary shadow-sm"
-                  title="Editar">
-                  <i class="fas fa-edit"></i>
-                </a>
+              <td class="truncate" th:text="${prod.id}"></td>
+              <td class="truncate font-weight-bold" style="color: var(--cor-secundaria);" th:text="${prod.codigo}"></td>
+              <td class="truncate font-weight-bold" th:text="${prod.nomeItem}"></td>
+              <td class="truncate" th:text="${prod.unidadeMedida}"></td>
+              <td class="truncate" th:text="${prod.siglaUnidade}"></td>
+              <td class="truncate" th:text="${prod.grupo}"></td>
+              <td class="truncate data-format" th:text="${prod.dataCadastro}"></td>
+              <td class="truncate col-especificacoes" th:text="${prod.especificacoes}"></td>
+              <td class="truncate col-fabricante" th:text="${prod.fabricante}"></td>
+              <td class="truncate" th:text="${prod.modelo}"></td>
+              <td class="col-acoes-fixa">
+                <div class="d-flex justify-content-center">
+                  <a th:href="@{|/produtos/editar/${prod.id}|}" class="btn btn-circle btn-sm btn-outline-primary shadow-sm" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
-
       </div>
-    </div>
 
+    </div>
   </div>
 
   <th:block th:replace="~{fragments/foot :: bot}"></th:block>
@@ -157,68 +281,46 @@
 
   <script>
     $(document).ready(function () {
-      $('#tabelaProdutos').DataTable({
+      
+      var table = $('#tabelaProdutos').DataTable({
         language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json' },
         pageLength: 10,
         lengthMenu: [5, 10, 25, 50],
-        // Desabilitar ordenação na última coluna (Ações)
+        /* Removemos o scrollX: true pois agora o nosso CSS nativo cuida da rolagem de forma mais limpa */
         columnDefs: [
-          { orderable: false, targets: -1 }
-        ],
-        // Adiciona rolagem horizontal se a tabela for muito larga
-        scrollX: true
+          { orderable: false, targets: 'no-sort' } // A classe no-sort fará o trabalho
+        ]
       });
 
-      // Função de exemplo para confirmar exclusão com SweetAlert2 (se for usar o botão de excluir)
-      /*
-      function confirmarExclusaoProduto(id) {
-          Swal.fire({
-              title: 'Tem certeza?',
-              text: "Você não poderá reverter isso!",
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#d33',
-              cancelButtonColor: '#6c757d',
-              confirmButtonText: 'Sim, excluir!',
-              cancelButtonText: 'Cancelar'
-          }).then((result) => {
-              if (result.isConfirmed) {
-                  // Aqui você faria a requisição para o endpoint de exclusão, por exemplo:
-                  // window.location.href = `/produtos/excluir/${id}`;
-                  Swal.fire(
-                      'Excluído!',
-                      'O produto foi removido com sucesso.',
-                      'success'
-                  ).then(() => {
-                      location.reload(); 
-                  });
-              }
-          })
+      // Lógica de Tooltips (Truncate)
+      function addTooltipsToTruncatedCells() {
+        table.cells('.truncate').nodes().each(function (cell) {
+          var $cell = $(cell);
+          if (cell.scrollWidth > $cell.innerWidth()) {
+            $cell.attr('title', $cell.text());
+          } else {
+            $cell.removeAttr('title');
+          }
+        });
       }
-      */
+
+      table.on('draw.dt', function () {
+        addTooltipsToTruncatedCells();
+      });
+      setTimeout(addTooltipsToTruncatedCells, 500);
     });
     
+    // Função para formatar as datas
     function formatarDataString(dataStr) {
-      // Tenta identificar formatos comuns como yyyy-MM-dd ou dd-MM-yyyy
       const partes = dataStr.split("-");
-
-      // yyyy-MM-dd → dd/MM/yyyy
-      if (partes.length === 3 && partes[0].length === 4) {
-        return `${partes[2]}/${partes[1]}/${partes[0]}`;
-      }
-
-      // dd-MM-yyyy → dd/MM/yyyy
-      if (partes.length === 3 && partes[2].length === 4) {
-        return `${partes[0]}/${partes[1]}/${partes[2]}`;
-      }
-
-      return dataStr; // se não conseguir formatar, retorna como está
+      if (partes.length === 3 && partes[0].length === 4) { return `${partes[2]}/${partes[1]}/${partes[0]}`; }
+      if (partes.length === 3 && partes[2].length === 4) { return `${partes[0]}/${partes[1]}/${partes[2]}`; }
+      return dataStr;
     }
 
     document.querySelectorAll(".data-format").forEach(function (td) {
       td.textContent = formatarDataString(td.textContent.trim());
     });
-
   </script>
 </body>
 

@@ -1,72 +1,200 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
-<div th:replace="~{fragments/head :: top}"></div>
+<head th:replace="~{fragments/head :: top}"></head>
 
-<div class="card shadow mb-4">
-  <div class="card-header py-3">
-    <h6 class="m-0 font-weight-bold text-primary">
-      <i class="fas fa-envelope-open-text mr-2"></i>Configuração de Alertas - Resumo Diário
-    </h6>
-  </div>
-  <div class="card-body">
-    <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
+<style>
+  /* ==========================================================================
+     1. TEMA GLOBAL E FUNDO
+     ========================================================================== */
+  :root {
+    --cor-primaria: #166298;
+    --cor-secundaria: #192f51;
+    --cor-fundo-claro: #f8f9fc;
+    --cor-texto-escuro: #5a5c69;
+    --cor-borda-suave: #e3e6f0;
+  }
 
-    <form th:action="@{/intranet/alertas/config/salvar}" method="post">
-      <div class="form-group">
-        <label for="emailsDestino">E-mails destinatários</label>
-        <input type="text"
-               class="form-control"
-               id="emailsDestino"
-               name="emailsDestino"
-               th:value="${config.emailsDestino}"
-               placeholder="email1@dominio.com, email2@dominio.com"
-               required>
-        <small class="form-text text-muted">Separe múltiplos e-mails com vírgula.</small>
+  body {
+    background-color: #f1f5f9;
+    color: var(--cor-texto-escuro);
+  }
+
+  /* ==========================================================================
+     2. CARD PADRONIZADO
+     ========================================================================== */
+  .card.shadow {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.07) !important;
+    max-width: 800px; /* Limita a largura para melhor leitura em monitores UltraWide */
+    margin: auto;
+  }
+
+  .card-header {
+    background-color: var(--cor-fundo-claro);
+    border-bottom: 2px solid var(--cor-primaria);
+    padding: 1.25rem 1.5rem;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+  }
+
+  .card-header h6 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cor-primaria) !important;
+  }
+
+  /* ==========================================================================
+     3. FORMULÁRIOS ESTILIZADOS
+     ========================================================================= */
+  label {
+    font-weight: 700;
+    color: var(--cor-secundaria);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control {
+    border-radius: 0.5rem;
+    border: 1px solid var(--cor-borda-suave);
+    padding: 0.6rem 1rem;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .form-control:focus {
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 0.2rem rgba(22, 98, 152, 0.15);
+  }
+
+  /* Customizando Checkboxes */
+  .custom-control-label {
+    font-weight: 600;
+    text-transform: none;
+    font-size: 0.9rem;
+    color: var(--cor-texto-escuro);
+    cursor: pointer;
+    padding-top: 2px;
+  }
+
+  /* ==========================================================================
+     4. BOTÕES
+     ========================================================================== */
+  .btn {
+    font-weight: 700 !important;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.2s ease-in-out !important;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-primary {
+    background-color: var(--cor-primaria) !important;
+    border: none !important;
+  }
+
+  .btn-outline-success {
+    border-width: 2px;
+    font-weight: 700;
+  }
+
+  .alert {
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+  }
+</style>
+
+<div class="container py-5">
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0">
+        <i class="fas fa-envelope-open-text mr-2"></i>Configuração de Alertas - Resumo Diário
+      </h6>
+    </div>
+    
+    <div class="card-body p-4">
+      <div th:if="${sucesso}" class="alert alert-success shadow-sm mb-4" role="alert">
+        <i class="fas fa-check-circle mr-2"></i> <span th:text="${sucesso}">Configuração salva!</span>
       </div>
 
-      <div class="form-group">
-        <label for="diasSemAcesso">Dias mínimos sem acesso</label>
-        <input type="number"
-               class="form-control"
-               id="diasSemAcesso"
-               name="diasSemAcesso"
-               min="0"
-               th:value="${config.diasSemAcesso}"
-               required>
+      <form th:action="@{/intranet/alertas/config/salvar}" method="post">
+        
+        <div class="form-group mb-4">
+          <label for="emailsDestino">E-mails destinatários</label>
+          <input type="text"
+                 class="form-control"
+                 id="emailsDestino"
+                 name="emailsDestino"
+                 th:value="${config.emailsDestino}"
+                 placeholder="email1@dominio.com, email2@dominio.com"
+                 required>
+          <small class="form-text text-muted mt-2">
+            <i class="fas fa-info-circle mr-1"></i> Separe múltiplos e-mails com vírgula.
+          </small>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group mb-4">
+              <label for="diasSemAcesso">Dias mínimos sem acesso</label>
+              <input type="number"
+                     class="form-control"
+                     id="diasSemAcesso"
+                     name="diasSemAcesso"
+                     min="0"
+                     th:value="${config.diasSemAcesso}"
+                     required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group mb-4">
+              <label for="horarioEnvio">Horário do envio automático</label>
+              <input type="time"
+                     class="form-control"
+                     id="horarioEnvio"
+                     name="horarioEnvio"
+                     th:value="${config.horarioEnvio}"
+                     required>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-light p-3 rounded-lg mb-4">
+          <div class="custom-control custom-checkbox mb-2">
+            <input type="checkbox" class="custom-control-input" id="ativo" name="ativo" th:checked="${config.ativo}">
+            <label class="custom-control-label" for="ativo">Rotina diária ativa no horário configurado</label>
+          </div>
+
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="enviarSemResultados" name="enviarSemResultados" th:checked="${config.enviarSemResultados}">
+            <label class="custom-control-label" for="enviarSemResultados">Enviar e-mail mesmo sem processos pendentes</label>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between">
+          <button type="submit" class="btn btn-primary shadow-sm">
+            <i class="fas fa-save mr-2"></i>Salvar configuração
+          </button>
+        </div>
+      </form>
+
+      <hr class="my-4">
+
+      <div class="d-flex justify-content-end">
+        <form th:action="@{/intranet/alertas/config/enviar-teste}" method="post">
+          <button type="submit" class="btn btn-outline-success">
+            <i class="fas fa-paper-plane mr-2"></i>Enviar teste agora
+          </button>
+        </form>
       </div>
-
-      <div class="form-group">
-        <label for="horarioEnvio">Horário do envio automático</label>
-        <input type="time"
-               class="form-control"
-               id="horarioEnvio"
-               name="horarioEnvio"
-               th:value="${config.horarioEnvio}"
-               required>
-      </div>
-
-      <div class="form-group form-check">
-        <input type="checkbox" class="form-check-input" id="ativo" name="ativo" th:checked="${config.ativo}">
-        <label class="form-check-label" for="ativo">Rotina diária ativa no horário configurado</label>
-      </div>
-
-      <div class="form-group form-check">
-        <input type="checkbox" class="form-check-input" id="enviarSemResultados" name="enviarSemResultados" th:checked="${config.enviarSemResultados}">
-        <label class="form-check-label" for="enviarSemResultados">Enviar e-mail mesmo sem processos pendentes</label>
-      </div>
-
-      <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save mr-1"></i>Salvar configuração
-      </button>
-    </form>
-
-    <hr>
-
-    <form th:action="@{/intranet/alertas/config/enviar-teste}" method="post">
-      <button type="submit" class="btn btn-outline-success">
-        <i class="fas fa-paper-plane mr-1"></i>Enviar teste agora
-      </button>
-    </form>
+    </div>
   </div>
 </div>
 
