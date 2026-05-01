@@ -4,13 +4,324 @@
 <head th:replace="~{fragments/head :: top}"></head>
 
 <style>
+  /* ==========================================================================
+     1. PALETA DE CORES E TEMA GLOBAL (PADRÃO DO SISTEMA)
+     ========================================================================== */
+  :root {
+    --cor-primaria: #166298;
+    --cor-secundaria: #192f51;
+    --cor-fundo-claro: #f8f9fc;
+    --cor-texto-escuro: #5a5c69;
+    --cor-borda-suave: #e3e6f0;
+    --cor-fundo-hover: #f1f3f8;
+  }
+
+  body {
+    background-color: #f1f5f9;
+    color: var(--cor-texto-escuro);
+  }
+
+  /* ==========================================================================
+     2. CARD PRINCIPAL E CABEÇALHO
+     ========================================================================== */
+  .card.shadow {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.07) !important;
+  }
+
+  .card-header {
+    background-color: var(--cor-fundo-claro);
+    border-bottom: 2px solid var(--cor-primaria);
+    padding: 1rem 1.5rem;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+  }
+
+  .card-header h6 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cor-primaria) !important;
+  }
+
+  .card-body-table {
+    padding: 0 !important;
+  }
+
+  /* ==========================================================================
+     3. BOTÕES (GERAL, PRIMÁRIO, E OUTLINE)
+     ========================================================================== */
+  .btn {
+    font-weight: 600 !important;
+    transition: all 0.2s ease-in-out !important;
+    border-radius: 0.375rem;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .btn-primary {
+    background-color: var(--cor-primaria) !important;
+    border-color: var(--cor-primaria) !important;
+    color: white !important;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--cor-secundaria) !important;
+    border-color: var(--cor-secundaria) !important;
+  }
+
+  .btn-outline-primary {
+    background-color: transparent !important;
+    border: 1px solid var(--cor-primaria) !important;
+    color: var(--cor-primaria) !important;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: var(--cor-primaria) !important;
+    color: white !important;
+  }
+
+  .btn-outline-info {
+    background-color: transparent !important;
+    border: 1px solid #36b9cc !important;
+    color: #36b9cc !important;
+  }
+
+  .btn-outline-info:hover {
+    background-color: #36b9cc !important;
+    color: white !important;
+  }
+
+  .btn-circle {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .btn-circle.btn-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+
+  /* ==========================================================================
+     4. TABELA ELEGANTE E REFINADA
+     ========================================================================== */
+  
+  /* O container volta a ser apenas uma casca para segurar as bordas e o fundo */
+  .table-container {
+    border-radius: 0 0 0.75rem 0.75rem !important;
+    background-color: #fff !important;
+    padding-bottom: 0.5rem; /* Um espacinho extra no final */
+    overflow: visible !important; /* Permite que a paginação e pesquisa fiquem de fora do scroll */
+  }
+
+  /* ==========================================================================
+     MÁGICA DO SCROLL ISOLADO PARA O DATATABLES
+     ========================================================================== */
+  
+  /* Aplica o scroll APENAS na div que envolve a tabela, ignorando pesquisa e paginação */
+  .dataTables_wrapper > .row:nth-child(2) > .col-sm-12 {
+    overflow-x: auto !important;
+    overflow-y: visible !important; /* Vital para os botões e menus não cortarem */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Tira a margem negativa nativa da row para a rolagem ficar perfeita */
+  .dataTables_wrapper > .row:nth-child(2) {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Dá um respiro entre a tabela e os botões de paginação */
+  .dataTables_wrapper > .row:nth-child(3) {
+    padding-top: 1rem !important;
+  }
+
+  /* ==========================================================================
+     ESTRUTURA DA TABELA E BORDAS ARREDONDADAS
+     ========================================================================== */
+
+  .table {
+    border: 1px solid var(--cor-borda-suave) !important; /* Borda externa completa */
+    width: 100% !important;
+    border-collapse: separate !important; /* Necessário para cantos arredondados */
+    border-spacing: 0 !important;         /* Necessário para cantos arredondados */
+    background-color: #fff !important;
+    margin-bottom: 0 !important;
+    position: relative;
+  }
+
+  /* --- MÁGICA DOS CANTOS ARREDONDADOS --- */
+  .table thead:first-child tr:first-child th:first-child { border-top-left-radius: 0.75rem !important; }
+  .table thead:first-child tr:first-child th:last-child { border-top-right-radius: 0.75rem !important; }
+  .table tbody:last-of-type tr:last-child td:first-child { border-bottom-left-radius: 0.75rem !important; }
+  .table tbody:last-of-type tr:last-child td:last-child { border-bottom-right-radius: 0.75rem !important; }
+
+  /* Ajuste de bordas internas verticais para não duplicar com a borda externa */
+  .table th, .table td {
+    border-left: none !important;
+    border-right: 1px solid var(--cor-borda-suave) !important;
+  }
+  .table th:last-child, .table td:last-child {
+    border-right: none !important;
+  }
+
+  .table th {
+    color: var(--cor-secundaria) !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    padding: 1rem 0.75rem !important;
+    text-transform: uppercase !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.04em !important;
+    border-bottom: 2px solid var(--cor-borda-suave) !important;
+    border-top: none !important;
+    background-color: var(--cor-fundo-claro) !important;
+    word-break: break-word;
+  }
+
+  .table td {
+    text-align: center !important;
+    vertical-align: middle !important;
+    padding: 0.75rem !important;
+    border-top: 1px solid var(--cor-borda-suave) !important;
+    color: var(--cor-texto-escuro) !important;
+    background-color: #fff !important;
+    font-size: 0.85rem;
+  }
+
+  .table tbody tr:hover td {
+    background-color: var(--cor-fundo-hover) !important;
+    transition: background-color 0.2s ease-in-out !important;
+  }
+
+  .table.dataTable{
+border-radius: 10px !important;
+  }
+  /* ==========================================================================
+     LARGURAS, TRUNCATE E COLUNA FIXA (STICKY)
+     ========================================================================== */
+
+  .truncate {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Força a tabela a não "esmagar" o texto, criando a necessidade do scroll */
+  .table th, .table td.truncate {
+    white-space: nowrap !important;
+  }
+
+  /* Deixa as colunas de Obs e Deferimentos mais largas para aproveitar o scroll */
+  .col-deferimentos { min-width: 200px; }
+  .col-obs { min-width: 250px; }
+
+  /* MÁGICA DA COLUNA FIXA (STICKY ACTION COLUMN) */
+  .col-acoes-fixa {
+    position: sticky !important;
+    right: 0; /* Gruda no lado direito */
+    z-index: 1; /* Fica acima do texto que está rolando embaixo */
+    background-color: #fff !important; /* Fundo sólido para tampar o conteúdo de baixo */
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.04); /* Sombrinha suave à esquerda */
+    min-width: 110px; /* Garante espaço para os dois botões */
+  }
+
+  /* O cabeçalho da coluna fixa precisa de um z-index maior e a cor padrão de cabeçalho */
+  .table thead th.col-acoes-fixa {
+    background-color: var(--cor-fundo-claro) !important;
+    z-index: 2 !important;
+  }
+
+  /* Sincroniza a cor da coluna fixa quando a linha inteira sofrer hover */
+  .table tbody tr:hover .col-acoes-fixa {
+    background-color: var(--cor-fundo-hover) !important;
+  }
+
+  /* ==========================================================================
+     5. DATATABLES MODERNO E ELEGANTE
+     ========================================================================== */
+  div.dataTables_wrapper {
+    padding: 1.5rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  div.dataTables_wrapper label {
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    color: var(--cor-secundaria) !important;
+    margin-bottom: 0.5rem !important;
+    display: inline-block !important;
+  }
+
+  .dataTables_wrapper .dataTables_length select {
+    width: auto !important;
+    min-width: 60px !important;
+  }
+
+  div.dataTables_wrapper .dataTables_length select,
+  div.dataTables_wrapper .dataTables_filter input {
+    border-radius: 0.5rem !important;
+    border: 1px solid var(--cor-borda-suave) !important;
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
+    background-color: #fff !important;
+  }
+
+  div.dataTables_wrapper .dataTables_length select:focus,
+  div.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: var(--cor-primaria) !important;
+    box-shadow: 0 0 0 0.2rem rgba(22, 98, 152, 0.25) !important;
+    outline: none !important;
+  }
+
+  .dataTables_wrapper .pagination .page-link {
+    color: var(--cor-primaria) !important;
+    background-color: #f1f5f9 !important;
+    border: 1px solid var(--cor-borda-suave) !important;
+    border-radius: 0.375rem !important;
+    transition: all 0.2s ease-in-out !important;
+    padding: 0.45rem 0.8rem !important;
+    margin: 0 0.15rem !important;
+  }
+
+  .dataTables_wrapper .pagination .page-link:hover {
+    background-color: var(--cor-primaria) !important;
+    color: #fff !important;
+    border-color: var(--cor-primaria) !important;
+  }
+
+  .dataTables_wrapper .pagination .page-item.active .page-link {
+    background-color: var(--cor-primaria) !important;
+    border-color: var(--cor-primaria) !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  /* ==========================================================================
+     6. ESPECÍFICOS DESTA PÁGINA (Colunas, Overlay e Modal)
+     ========================================================================== */
   .page-loading-overlay {
     min-height: 260px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    color: #4e73df;
+    color: var(--cor-primaria);
     gap: .75rem;
   }
 
@@ -19,174 +330,62 @@
     height: 2.2rem;
   }
 
-  /* Estilo para arredondar as bordas da tabela */
-  .table-rounded-corners {
-    border-collapse: separate;
-    /* Necessário para border-radius em tabelas */
-    border-spacing: 0;
-    /* Remove espaçamento entre células para bordas contínuas */
-    border-radius: .5rem;
-    /* Ajuste o valor para o quão arredondado você quer */
-    overflow: hidden;
-    /* Garante que o conteúdo não vaze das bordas arredondadas */
-  }
-
-  /* Estilo para o cabeçalho da tabela */
-  .table-rounded-corners thead {
-    background-color: #e2e6ea;
-    /* Um cinza claro e elegante */
-    color: #343a40;
-    /* Cor do texto mais escura para contraste */
-  }
-
-  /* Centralizar o conteúdo das células do cabeçalho */
-  .table-rounded-corners th {
-    text-align: center;
-    vertical-align: middle;
-    /* Alinha verticalmente no meio */
-  }
-
-  /* Centralizar o conteúdo das células do corpo e alinhar verticalmente no meio */
-  .table-rounded-corners td {
-    text-align: center;
-    /* Mantém a centralização horizontal para texto */
-    vertical-align: middle;
-    /* Alinha verticalmente no meio */
-    /* Reduz o padding para tabelas com muitas colunas */
-    padding: 0.5rem;
-    /* Ajuste conforme necessário */
-  }
-
-  /* Diminui o tamanho da fonte para todo o corpo da tabela */
-  .table-rounded-corners tbody {
-    font-size: 0.85rem;
-    /* Reduz a fonte do corpo da tabela */
-  }
-
-  /* Ajuste para botões circulares */
-  .btn-circle {
-    width: 35px;
-    /* Define a largura */
-    height: 35px;
-    /* Define a altura */
-    padding: 0;
-    /* Remove o padding padrão */
-    border-radius: 50%;
-    /* Transforma em círculo */
-    display: flex;
-    /* Permite centralizar conteúdo com flexbox */
-    align-items: center;
-    /* Centraliza verticalmente */
-    justify-content: center;
-    /* Centraliza horizontalmente */
-    flex-shrink: 0;
-    /* Evita que o botão encolha */
-  }
-
-  /* Ajuste para botões pequenos circulares */
-  .btn-circle.btn-sm {
-    width: 30px;
-    /* Tamanho um pouco menor para 'btn-sm' */
-    height: 30px;
-    font-size: 0.8rem;
-    /* Ajusta o tamanho da fonte do ícone, se necessário */
-  }
-
-  /* Garante que o TD da coluna de ações tenha altura suficiente para o flexbox e centraliza */
-  /* Estas propriedades são cruciais para a centralização interna do conteúdo flex */
-  .table-rounded-corners td.d-flex {
-    display: flex;
-    /* Torna a célula um container flex */
-    align-items: center;
-    /* Centraliza os itens verticalmente */
-    justify-content: center;
-    /* Centraliza os itens horizontalmente */
-    height: 100%;
-    /* Garante que o container flex ocupe a altura total da célula */
-    box-sizing: border-box;
-    /* Inclui padding e bordas no cálculo da largura/altura */
-  }
-
-  /* Garante que os ícones dentro dos botões sejam centralizados */
-  .btn-circle i {
-    display: block;
-    /* Para que o ícone se comporte como um bloco dentro do flex do botão */
-  }
-
-  /* --- Estilos para fixar largura de colunas específicas --- */
-  /* Você pode ajustar os valores de 'width' conforme a necessidade e conteúdo de cada coluna */
+  /* Fixar larguras (As regras antigas foram adaptadas) */
   #tabelaProcessos th:nth-child(1),
-  /* ID */
   #tabelaProcessos td:nth-child(1) {
-    width: 5%;
-    /* Exemplo: ID pode ser menor */
+    width: 4%;
   }
 
+  /* ID */
   #tabelaProcessos th:nth-child(2),
-  /* Interno */
   #tabelaProcessos td:nth-child(2) {
     width: 8%;
   }
 
+  /* Interno */
   #tabelaProcessos th:nth-child(3),
-  /* Processo */
   #tabelaProcessos td:nth-child(3) {
-    width: 10%;
+    width: 9%;
   }
 
+  /* Processo */
   #tabelaProcessos th:nth-child(7),
-  /* Início */
   #tabelaProcessos td:nth-child(7) {
     width: 8%;
   }
 
+  /* Início */
   #tabelaProcessos th:nth-child(8),
-  /* Status */
   #tabelaProcessos td:nth-child(8) {
     width: 8%;
   }
 
+  /* Status */
   #tabelaProcessos th:nth-child(14),
-  /* Deferimentos */
   #tabelaProcessos td:nth-child(14) {
-    width: 12%;
-    max-width: 200px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    width: 10%;
+    max-width: 150px;
   }
 
+  /* Deferimentos */
   #tabelaProcessos th:nth-child(15),
-  /* Obs */
   #tabelaProcessos td:nth-child(15) {
     width: 8%;
-    /* Ou um valor maior se a Obs for relevante */
-    max-width: 150px;
-    /* Limita a largura máxima */
-    white-space: nowrap;
-    /* Evita que o texto quebre */
-    overflow: hidden;
-    /* Esconde o texto que excede */
-    text-overflow: ellipsis;
-    /* Adiciona "..." */
+    max-width: 120px;
   }
 
+  /* Obs */
   #tabelaProcessos th:nth-child(16),
-  /* Ações */
   #tabelaProcessos td:nth-child(16) {
     width: 7%;
-    /* Ações costumam ser compactas */
     min-width: 80px;
-    /* Garante espaço mínimo para os botões */
   }
 
-  /* Ocultar colunas em telas menores para otimizar espaço */
-  /* Você pode ajustar os breakpoints (md, lg, xl) */
+  /* Ações */
+
   @media (max-width: 991.98px) {
 
-    /* md breakpoint */
     #tabelaProcessos th:nth-child(6),
-    /* Médico */
     #tabelaProcessos td:nth-child(6) {
       display: none;
     }
@@ -194,278 +393,84 @@
 
   @media (max-width: 767.98px) {
 
-    /* sm breakpoint */
     #tabelaProcessos th:nth-child(5),
-    /* Advogado */
     #tabelaProcessos td:nth-child(5),
     #tabelaProcessos th:nth-child(12),
-    /* Local */
     #tabelaProcessos td:nth-child(12) {
       display: none;
     }
   }
-</style>
 
-<div id="processosLoading" class="page-loading-overlay">
-  <div class="spinner-border" role="status" aria-hidden="true"></div>
-  <div class="small font-weight-bold">Carregando tabela de processos...</div>
-</div>
-
-<div id="processosContent" class="d-none">
-<div class="card shadow mb-4 table-rounded-corners">
-  <div class="card-header py-3 d-sm-flex align-items-center justify-content-between mb-4">
-    <h6 class="m-0 font-weight-bold text-primary">
-      <i class="fas fa-clipboard-list mr-2"></i> Listar Processos
-    </h6>
-    <a th:href="@{/processos/cadastrar}" class="btn btn-primary">
-      <i class="fas fa-plus mr-1"></i> Novo Processo
-    </a>
-  </div>
-
-  <div class="card-body">
-    <form method="get" th:action="@{/processos/listar}" class="mb-3">
-      <div class="form-row align-items-end">
-        <div class="form-group col-md-3">
-          <label for="diasSemAcesso">Dias sem acesso</label>
-          <input type="number" min="0" class="form-control" id="diasSemAcesso" name="diasSemAcesso"
-                 th:value="${diasSemAcesso}">
-        </div>
-        <div class="form-group col-md-3">
-          <label for="diasSemEdicao">Dias sem edição</label>
-          <input type="number" min="0" class="form-control" id="diasSemEdicao" name="diasSemEdicao"
-                 th:value="${diasSemEdicao}">
-        </div>
-        <div class="form-group col-md-3">
-          <label for="status">Status</label>
-          <select class="form-control" id="status" name="status">
-            <option value="">Todos</option>
-            <option th:each="s : ${statusValues}" th:value="${s}"
-                    th:text="${s.name() == 'OBITO' ? 'ÓBITO' : #strings.replace(s.name(), '_', ' ')}"
-                    th:selected="${statusSelecionado != null and statusSelecionado == s}"></option>
-          </select>
-        </div>
-        <div class="form-group col-md-3">
-          <button type="submit" class="btn btn-primary mr-2">
-            <i class="fas fa-filter mr-1"></i>Filtrar
-          </button>
-          <a th:href="@{/processos/exportar-excel(diasSemAcesso=${diasSemAcesso},diasSemEdicao=${diasSemEdicao},status=${statusSelecionado})}"
-             class="btn btn-success mr-2">
-            <i class="fas fa-file-excel mr-1"></i>Exportar Excel
-          </a>
-          <a th:href="@{/processos/listar}" class="btn btn-outline-secondary">Limpar</a>
-        </div>
-      </div>
-    </form>
-
-    <div class="table-responsive">
-      <table id="tabelaProcessos" class="table table-bordered table-hover w-100 table-rounded-corners" cellspacing="0">
-        <thead class="thead-light">
-          <tr>
-            <th class="text-center">ID</th>
-            <th class="text-center">Interno</th>
-            <th class="text-center">Processo</th>
-            <th class="text-center">Paciente</th>
-            <th class="text-center">Advogado</th>
-            <th class="text-center">Médico</th>
-            <th class="text-center">Início</th>
-            <th class="text-center">Status</th>
-            <th class="text-center">Último acesso</th>
-            <th class="text-center">Usuário</th>
-            <th class="text-center">Dias sem acesso</th>
-            <th class="text-center">Local</th>
-            <th class="text-center">Produtos</th>
-            <th class="text-center">Deferimentos</th>
-            <th class="text-center">Obs</th>
-            <th class="text-center">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr th:if="${processos == null or #lists.isEmpty(processos)}">
-            <td colspan="16" class="text-center">Nenhum processo encontrado</td>
-          </tr>
-          <tr th:each="proc : ${processos}">
-            <td th:text="${proc.id}"></td>
-            <td th:text="${proc.numeroInterno}"></td>
-            <td th:text="${proc.numeroProcesso}"></td>
-            <td th:text="${proc.paciente.nome}"></td>
-            <!-- Advogado opcional -->
-            <td th:text="${proc.advogado != null ? proc.advogado.nome : '–'}"></td>
-            <!-- Médico opcional -->
-            <td th:text="${proc.medico != null ? proc.medico.nome : '–'}"></td>
-            <td th:text="${#temporals.format(proc.dataInicio, 'dd/MM/yyyy')}"></td>
-            <td th:text="${proc.status != null and (proc.status.name() == 'CONCLUIDO' or proc.status.name() == 'OBITO') ? 'ÓBITO' : (proc.status != null ? #strings.replace(proc.status.name(), '_', ' ') : '–')}"></td>
-            <td th:text="${proc.ultimoAcessoEm != null ? #temporals.format(proc.ultimoAcessoEm, 'dd/MM/yyyy HH:mm') : 'Nunca acessado'}"></td>
-            <td th:text="${proc.ultimoAcessoPor != null and !#strings.isEmpty(proc.ultimoAcessoPor) ? proc.ultimoAcessoPor : '–'}"></td>
-            <td th:text="${diasSemAcessoMap.containsKey(proc.id) ? diasSemAcessoMap.get(proc.id) + ' dias' : '—'}"></td>
-            <!-- Local opcional -->
-            <td th:text="${proc.local != null 
-                          ? proc.local.comarca + ' – ' + proc.local.localizacao 
-                          : '–'}"></td>
-            <td>
-              <ul class="mb-0 pl-3 text-left">
-                <li th:each="item : ${proc.itens}">
-                  <span th:text="${item.produto.nomeItem}"></span>
-                  &nbsp;– Qtd: <span th:text="${item.quantidade}"></span>
-                  &nbsp;– Env.: <span th:text="${#temporals.format(item.dataEnvio, 'dd/MM/yyyy')}"></span>
-                </li>
-              </ul>
-            </td>
-            <td>
-              <ul class="mb-0 pl-3 text-left">
-                <li th:if="${#lists.isEmpty(proc.deferimentos)}">–</li>
-                <li th:each="def : ${proc.deferimentos}">
-                  <span th:text="${'#' + def.numeroDeferimento}">#1</span>
-                  -
-                  <span th:text="${def.tipo != null and def.tipo.name() == 'GRUPO_PROD' ? 'Grupo Prod' : (def.tipo != null and def.tipo.name() == 'JUIZ' ? 'Juiz' : '–')}">Grupo Prod</span>
-                </li>
-              </ul>
-            </td>
-            <td th:text="${proc.obs}"></td>
-
-            <style>
-              /* Ajuste para a célula da coluna de Ações */
-              #tabelaProcessos td:nth-child(16) {
-                text-align: center;
-                vertical-align: middle;
-                white-space: nowrap;
-              }
-              .btn-circle {
-                width: 35px;
-                height: 35px;
-                padding: 0;
-                border-radius: 50%;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-              }
-            </style>
-
-            <td>
-              <a th:href="@{/processos/editar/{id}(id=${proc.id})}"
-                class="btn btn-circle btn-sm btn-secondary me-1"
-                title="Editar">
-                <i class="fas fa-edit"></i>
-              </a>
-              <button class="btn btn-circle btn-sm btn-info"
-                      data-toggle="modal"
-                      data-target="#modalVerProcesso"
-                      th:attr="data-id=${proc.id}"
-                      title="Ver Detalhes">
-                <i class="fas fa-eye"></i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-    </div>
-  </div>
-</div>
-</div>
-
-<style>
-  /* ... (seus estilos existentes para a tabela) ... */
-
-  /* --- Estilos para o Modal de Detalhes (Estilo Documento Formal) --- */
+  /* Estilos do Modal de Detalhes (Documento Formal) */
   #modalVerProcesso .modal-dialog {
     max-width: 900px;
-    /* Definindo uma largura máxima mais controlada para o modal */
   }
 
   #modalVerProcesso .modal-content {
     border-radius: 0.5rem;
-    /* Bordas levemente arredondadas */
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    /* Sombra suave para profundidade */
+    border: none;
   }
 
   #modalVerProcesso .modal-header {
-    background-color: #f0f2f5;
-    /* Um cinza muito claro, quase branco */
-    color: #343a40;
-    /* Texto do cabeçalho em cinza escuro */
-    border-bottom: 1px solid #e0e0e0;
-    /* Borda inferior sutil */
+    background-color: var(--cor-fundo-claro);
+    border-bottom: 1px solid var(--cor-borda-suave);
     padding: 1.25rem 1.5rem;
-    /* Padding generoso */
   }
 
   #modalVerProcesso .modal-title {
-    font-weight: 600;
-    /* Título mais encorpado */
+    font-weight: 700;
     font-size: 1.25rem;
-    /* Tamanho da fonte padrão para títulos */
+    color: var(--cor-primaria);
   }
 
   #modalVerProcesso .close {
     color: #6c757d;
-    /* Cor do botão de fechar mais discreta */
     opacity: 0.7;
-    /* Transparência para o X de fechar */
   }
 
   #modalVerProcesso .close:hover {
     opacity: 1;
   }
 
-
   #modalVerProcesso .modal-body {
     padding: 2rem;
-    /* Mais padding interno para sensação de documento */
     background-color: #ffffff;
-    /* Fundo branco puro */
     font-family: 'Arial', sans-serif;
-    /* Fonte mais clássica e formal */
     color: #343a40;
-    /* Cor do texto principal */
   }
 
   #conteudoProcesso p {
     margin-bottom: 0.75rem;
-    /* Espaçamento entre parágrafos de detalhes */
     font-size: 0.95rem;
-    /* Tamanho de fonte padrão */
     line-height: 1.6;
-    /* Altura da linha para melhor leitura */
   }
 
   #conteudoProcesso p strong {
     color: #212529;
-    /* Cor quase preta para os rótulos (negrito) */
     display: inline-block;
-    /* Permite controlar a largura, se necessário */
     min-width: 120px;
-    /* Garante que os rótulos tenham uma largura mínima para alinhamento */
     vertical-align: top;
-    /* Alinha o rótulo ao topo se o conteúdo for longo */
   }
 
   #conteudoProcesso hr {
     border-top: 1px solid #dcdcdc;
-    /* Linha divisória mais clara */
     margin-top: 2rem;
     margin-bottom: 2rem;
   }
 
   #conteudoProcesso h5 {
-    color: #495057;
-    /* Um cinza médio para títulos de seção */
-    font-weight: 600;
+    color: var(--cor-secundaria);
+    font-weight: 700;
     margin-bottom: 1.25rem;
     font-size: 1.1rem;
-    /* Tamanho para títulos de seção */
     border-bottom: 1px solid #efefef;
-    /* Borda inferior sutil para os títulos */
     padding-bottom: 0.5rem;
   }
 
-  /* Estilo para a lista de produtos */
   #conteudoProcesso ul {
     list-style-type: none;
-    /* Removendo marcadores padrão */
     padding-left: 0;
-    /* Removendo recuo padrão */
     margin-bottom: 1.5rem;
   }
 
@@ -473,42 +478,25 @@
     margin-bottom: 0.4rem;
     font-size: 0.95rem;
     position: relative;
-    /* Para posicionar um marcador customizado */
     padding-left: 1.2rem;
-    /* Espaço para o marcador customizado */
   }
 
   #conteudoProcesso ul li::before {
     content: '\2022';
-    /* Ponto (bullet) Unicode */
-    color: #6c757d;
-    /* Cor do ponto */
+    color: var(--cor-primaria);
     font-weight: bold;
     display: inline-block;
     width: 1em;
     margin-left: -1.2em;
-    /* Alinha o ponto fora do padding-left */
   }
 
-
-  /* Estilo para o contêiner de Logs (com scroll) */
   .logs-container {
     max-height: 300px;
-    /* Altura máxima para a área de logs (um pouco mais alta) */
     overflow-y: auto;
-    border: 1px solid #e9ecef;
-    /* Uma borda leve */
+    border: 1px solid var(--cor-borda-suave);
     padding: 1.25rem;
     background-color: #fdfdfd;
-    /* Fundo quase branco para os logs */
-    border-radius: 0.25rem;
-  }
-
-  .logs-container ul {
-    list-style-type: none;
-    padding-left: 0;
-    margin-bottom: 0;
-    /* Remover margem extra da ul interna */
+    border-radius: 0.35rem;
   }
 
   .logs-container ul li {
@@ -517,7 +505,6 @@
     line-height: 1.5;
     color: #495057;
     border-bottom: 1px dashed #e0e0e0;
-    /* Linha tracejada mais clara */
     padding-bottom: 0.6rem;
   }
 
@@ -528,159 +515,326 @@
 
   .logs-container ul li strong {
     color: #343a40;
-    /* Rótulos dos logs em cinza escuro */
   }
 
-  /* Ícones no título das seções (mais sutis) */
   #conteudoProcesso h5 i {
-    color: #6c757d;
-    /* Ícones em cinza sutil */
+    color: var(--cor-primaria);
     margin-right: 0.5rem;
     font-size: 0.9em;
-    /* Ícones um pouco menores que o texto do título */
+  }
+
+  .page-loading-overlay {
+    min-height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--cor-primaria);
+    gap: .75rem;
+  }
+
+  .page-loading-overlay .spinner-border {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  /* Classes auxiliares para controle de largura nas colunas (Imune a mudanças de ordem) */
+  .col-deferimentos {
+    max-width: 150px;
+  }
+
+  .col-obs {
+    max-width: 120px;
+  }
+
+  .col-acoes {
+    width: 7%;
+    min-width: 80px;
   }
 </style>
 
-<div class="modal fade" id="modalVerProcesso" tabindex="-1" role="dialog" aria-labelledby="modalVerLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="modalVerLabel">Detalhes do Processo</h5>
-        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+<body>
+  <div id="processosLoading" class="page-loading-overlay">
+    <div class="spinner-border" role="status" aria-hidden="true"></div>
+    <div class="small font-weight-bold">Carregando tabela de processos...</div>
+  </div>
+
+  <div id="processosContent" class="d-none">
+    <div class="card shadow mb-5">
+
+      <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">
+          <i class="fas fa-clipboard-list mr-2"></i> Listar Processos
+        </h6>
+        <a th:href="@{/processos/cadastrar}" class="btn btn-primary shadow-sm">
+          <i class="fas fa-plus mr-1"></i> Novo Processo
+        </a>
       </div>
-      <div class="modal-body">
-        <div id="conteudoProcesso">
-          <p class="text-muted">Carregando informações do processo...</p>
+
+      <div class="card-body card-body-table">
+
+        <div class="p-4 border-bottom bg-white">
+          <form method="get" th:action="@{/processos/listar}" class="mb-0">
+            <div class="form-row align-items-end">
+              <div class="form-group col-xl-2 col-lg-3 col-md-4 mb-3 mb-md-0">
+                <label for="diasSemAcesso" class="small font-weight-bold text-muted text-uppercase mb-1">Dias sem
+                  acesso</label>
+                <input type="number" min="0" class="form-control" id="diasSemAcesso" name="diasSemAcesso"
+                  th:value="${diasSemAcesso}">
+              </div>
+              <div class="form-group col-xl-2 col-lg-3 col-md-4 mb-3 mb-md-0">
+                <label for="diasSemEdicao" class="small font-weight-bold text-muted text-uppercase mb-1">Dias sem
+                  edição</label>
+                <input type="number" min="0" class="form-control" id="diasSemEdicao" name="diasSemEdicao"
+                  th:value="${diasSemEdicao}">
+              </div>
+              <div class="form-group col-xl-2 col-lg-3 col-md-4 mb-3 mb-md-0">
+                <label for="status" class="small font-weight-bold text-muted text-uppercase mb-1">Status</label>
+                <select class="form-control" id="status" name="status">
+                  <option value="">Todos</option>
+                  <option th:each="s : ${statusValues}" th:value="${s}"
+                    th:text="${s.name() == 'OBITO' ? 'ÓBITO' : #strings.replace(s.name(), '_', ' ')}"
+                    th:selected="${statusSelecionado != null and statusSelecionado == s}"></option>
+                </select>
+              </div>
+              <div class="form-group col-xl-6 col-lg-12 col-md-12 text-xl-right text-lg-left mb-0 mt-3 mt-xl-0">
+                <button type="submit" class="btn btn-primary shadow-sm mr-2">
+                  <i class="fas fa-filter mr-1"></i> Filtrar
+                </button>
+                <a th:href="@{/processos/exportar-excel(diasSemAcesso=${diasSemAcesso},diasSemEdicao=${diasSemEdicao},status=${statusSelecionado})}"
+                  class="btn btn-success shadow-sm mr-2">
+                  <i class="fas fa-file-excel mr-1"></i> Excel
+                </a>
+                <a th:href="@{/processos/listar}" class="btn btn-outline-secondary">Limpar</a>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="table-container">
+          <table id="tabelaProcessos" class="table table-hover w-100" cellspacing="0">
+            <thead>
+              <tr>
+                <th style="width: 10%;">Processo</th>
+                <th>Paciente</th>
+                <th class="d-none d-md-table-cell">Advogado</th> 
+                <th class="d-none d-lg-table-cell">Médico</th> 
+                <th style="width: 8%;">Início</th>
+                <th style="width: 8%;">Status</th>
+                <th>Último acesso</th>
+                <th>Usuário</th>
+                <th>Dias sem acesso</th>
+                <th class="d-none d-md-table-cell">Local</th>
+                <th class="no-sort">Produtos</th>
+                <th class="no-sort col-deferimentos">Deferimentos</th>
+                <th class="no-sort col-obs">Obs</th>
+                <th class="no-sort col-acoes-fixa">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${processos == null or #lists.isEmpty(processos)}">
+                <td colspan="14" class="text-center py-4 text-muted">Nenhum processo encontrado.</td>
+              </tr>
+              <tr th:each="proc : ${processos}">
+                <td class="truncate font-weight-bold" style="color: var(--cor-secundaria);" th:text="${proc.numeroProcesso}"></td>
+                
+                <td class="truncate" th:text="${proc.paciente.nome}"></td>
+                
+                <td class="truncate d-none d-md-table-cell" th:text="${proc.advogado != null ? proc.advogado.nome : '–'}"></td>
+                
+                <td class="truncate d-none d-lg-table-cell" th:text="${proc.medico != null ? proc.medico.nome : '–'}"></td>
+                
+                <td class="truncate" th:text="${#temporals.format(proc.dataInicio, 'dd/MM/yyyy')}"></td>
+                
+                <td class="truncate">
+                  <span class="badge" 
+                        th:classappend="${proc.status != null and (proc.status.name() == 'CONCLUIDO' or proc.status.name() == 'OBITO') ? 'badge-danger' : 'badge-secondary'}"
+                        style="padding: 0.4rem 0.6rem;"
+                        th:text="${proc.status != null and (proc.status.name() == 'CONCLUIDO' or proc.status.name() == 'OBITO') ? 'ÓBITO' : (proc.status != null ? #strings.replace(proc.status.name(), '_', ' ') : '–')}">
+                  </span>
+                </td>
+                
+                <td class="truncate" th:text="${proc.ultimoAcessoEm != null ? #temporals.format(proc.ultimoAcessoEm, 'dd/MM/yyyy HH:mm') : 'Nunca acessado'}"></td>
+                
+                <td class="truncate" th:text="${proc.ultimoAcessoPor != null and !#strings.isEmpty(proc.ultimoAcessoPor) ? proc.ultimoAcessoPor : '–'}"></td>
+                
+                <td class="truncate font-weight-bold text-danger" th:text="${diasSemAcessoMap.containsKey(proc.id) ? diasSemAcessoMap.get(proc.id) + ' dias' : '—'}"></td>
+                
+                <td class="truncate d-none d-md-table-cell" th:text="${proc.local != null ? proc.local.comarca + ' – ' + proc.local.localizacao : '–'}"></td>
+                
+                <td>
+                  <ul class="mb-0 pl-3 text-left small">
+                    <li th:each="item : ${proc.itens}">
+                      <span th:text="${item.produto.nomeItem}"></span> (Qtd: <span th:text="${item.quantidade}"></span>)
+                    </li>
+                  </ul>
+                </td>
+                
+                <td class="truncate col-deferimentos">
+                  <ul class="mb-0 pl-3 text-left small">
+                    <li th:if="${#lists.isEmpty(proc.deferimentos)}">–</li>
+                    <li th:each="def : ${proc.deferimentos}">
+                      <span th:text="${'#' + def.numeroDeferimento}"></span> - <span th:text="${def.tipo != null and def.tipo.name() == 'GRUPO_PROD' ? 'G. Prod' : (def.tipo != null and def.tipo.name() == 'JUIZ' ? 'Juiz' : '–')}"></span>
+                    </li>
+                  </ul>
+                </td>
+                
+                <td class="truncate col-obs" th:text="${proc.obs}"></td>
+                
+                <td class="col-acoes-fixa">
+                  <div class="d-flex justify-content-center align-items-center gap-2">
+                    <a th:href="@{/processos/editar/{id}(id=${proc.id})}" class="btn btn-circle btn-sm btn-outline-primary" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <button class="btn btn-circle btn-sm btn-outline-info ml-1" data-toggle="modal" data-target="#modalVerProcesso" th:attr="data-id=${proc.id}" title="Ver Detalhes">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<div th:replace="~{fragments/foot :: bot}"></div>
-<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <div class="modal fade" id="modalVerProcesso" tabindex="-1" role="dialog" aria-labelledby="modalVerLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalVerLabel"><i class="fas fa-file-signature mr-2"></i>Detalhes do Processo</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="conteudoProcesso">
+            <p class="text-muted"><i class="fas fa-circle-notch fa-spin mr-2"></i>Carregando informações do processo...
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<script>
-  $(document).ready(function () {
-    const loadingEl = document.getElementById('processosLoading');
-    const contentEl = document.getElementById('processosContent');
+  <div th:replace="~{fragments/foot :: bot}"></div>
+  <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    function finalizarCarregamentoTabela() {
-      if (loadingEl) loadingEl.classList.add('d-none');
-      if (contentEl) contentEl.classList.remove('d-none');
-    }
+  <script>
+    $(document).ready(function () {
+      const loadingEl = document.getElementById('processosLoading');
+      const contentEl = document.getElementById('processosContent');
 
-    $('#tabelaProcessos').DataTable({
-      language: { url: '/datatables/i18n/pt-BR.json' },
-      pageLength: 10,
-      lengthMenu: [10, 25, 50, 100],
-      deferRender: true,
-      processing: true,
-      stateSave: true,
-      columnDefs: [
-        { orderable: false, targets: [12, 13, 14, 15] } // Produtos, Deferimentos, Obs, Ações
-      ],
-      initComplete: function () {
-        finalizarCarregamentoTabela();
-      }
-    });
-
-    // Fallback de segurança caso algum plugin demore/falhe
-    setTimeout(finalizarCarregamentoTabela, 2500);
-
-    $('#modalVerProcesso').on('show.bs.modal', function (e) {
-      const button = $(e.relatedTarget);
-      const procId = button.data('id');
-      const modalBody = document.getElementById('conteudoProcesso');
-      modalBody.innerHTML = "<p class='text-muted'>Buscando informações...</p>";
-
-      // Função auxiliar para fallback “–”
-      function safe(val) {
-        return (val !== null && val !== undefined && val !== '') ? val : '–';
+      function finalizarCarregamentoTabela() {
+        if (loadingEl) loadingEl.classList.add('d-none');
+        if (contentEl) contentEl.classList.remove('d-none');
       }
 
-      // Formata datas ou retorna “–”
-      function formatDate(dateString) {
-        if (!dateString) return '–';
-        try {
-          return new Date(dateString)
-                   .toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        } catch {
-          return 'Data Inválida';
+      // Variável table adicionada para usar a função de truncar depois
+      var table = $('#tabelaProcessos').DataTable({
+        language: { url: '/datatables/i18n/pt-BR.json' },
+        pageLength: 10,
+        lengthMenu: [10, 25, 50, 100],
+        deferRender: true,
+        processing: true,
+        stateSave: true,
+        columnDefs: [
+          { orderable: false, targets: 'no-sort' } // Agora ele lê a classe HTML automaticamente!
+        ],
+        initComplete: function () {
+          finalizarCarregamentoTabela();
         }
+      });
+
+      // ==========================================
+      // Lógica do Tooltip (Truncate) Trazida da Pág. Padrão
+      // ==========================================
+      function addTooltipsToTruncatedCells() {
+        table.cells('.truncate').nodes().each(function (cell) {
+          var $cell = $(cell);
+          if (cell.scrollWidth > $cell.innerWidth()) {
+            $cell.attr('title', $cell.text());
+          } else {
+            $cell.removeAttr('title');
+          }
+        });
       }
 
-      fetch(`/api/processos/${procId}/detalhes`)
-        .then(res => {
-          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-          return res.json();
-        })
-        .then(data => {
-          const camposBooleanos = [
-            "CPF Anexado", "Comp. Residência", "Comp. Renda",
-            "Procuração", "Decl. Insuficiência"
-          ];
+      table.on('draw.dt', function () {
+        addTooltipsToTruncatedCells();
+      });
+      // Um leve delay inicial pois os dados podem ainda estar se acomodando
+      setTimeout(addTooltipsToTruncatedCells, 500);
 
-          console.log("Raw dataInicio:", data.dataInicio);
+      // Fallback de carregamento
+      setTimeout(finalizarCarregamentoTabela, 2500);
 
-          // Gera lista de logs com fallback
-          const logsHtml = (data.logs || []).map(log => {
-            let antigo = log.valorAntigo;
-            let novo   = log.valorNovo;
-            if (camposBooleanos.includes(log.campo)) {
-              antigo = (log.valorAntigo === "true" ? "Anexado" : "Não anexado");
-              novo   = (log.valorNovo   === "true" ? "Anexado" : "Não anexado");
-            }
-            return `<li><strong>${safe(log.campo)}</strong>: 
-                      <span>${safe(antigo)}</span> → <span>${safe(novo)}</span> 
-                      (${safe(log.data)})
-                    </li>`;
-          }).join('') || '<li>Nenhum log de alteração.</li>';
+      // ==========================================
+      // Lógica do Modal MANTIDA INTEGRALMENTE
+      // ==========================================
+      $('#modalVerProcesso').on('show.bs.modal', function (e) {
+        const button = $(e.relatedTarget);
+        const procId = button.data('id');
+        const modalBody = document.getElementById('conteudoProcesso');
+        modalBody.innerHTML = "<p class='text-muted'><i class='fas fa-circle-notch fa-spin mr-2'></i>Buscando informações...</p>";
 
-          // Gera lista de produtos com fallback
-          const produtosHtml = (data.itens || []).map(item =>
-            `<li>${safe(item.produto)} – Qtd: ${safe(item.quantidade)} – Enviado: ${formatDate(item.dataEnvio)}</li>`
-          ).join('') || '<li>Nenhum produto associado.</li>';
+        function safe(val) { return (val !== null && val !== undefined && val !== '') ? val : '–'; }
+        function formatDate(dateString) {
+          if (!dateString) return '–';
+          try {
+            return new Date(dateString).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+          } catch { return 'Data Inválida'; }
+        }
 
-          // Monta o HTML do modal
-          const html = `
-            <p><strong>Interno:</strong> ${safe(data.numeroInterno)}</p>
-            <p><strong>Processo:</strong> ${safe(data.numeroProcesso)}</p>
-            <p><strong>Paciente:</strong> ${data.paciente
-              ? `${safe(data.paciente.nome)} - CPF: ${safe(data.paciente.cpf)}`
-              : '–'}</p>
-            <p><strong>Advogado:</strong> ${data.advogado
-              ? `${safe(data.advogado.nome)} - OAB: ${safe(data.advogado.oab)}`
-              : '–'}</p>
-            <p><strong>Médico:</strong> ${data.medico
-              ? `${safe(data.medico.nome)} - CRM: ${safe(data.medico.crm)}`
-              : '–'}</p>
-            <p><strong>Status:</strong> ${data.status === 'CONCLUIDO' || data.status === 'OBITO' ? 'ÓBITO' : safe(data.status)}</p>
-            <p><strong>Data Início:</strong> ${formatDate(data.dataInicio)}</p>
-            <p><strong>Local:</strong> ${data.local
-              ? `${safe(data.local.comarca)} – ${safe(data.local.localizacao)}`
-              : '–'}</p>
-            <p><strong>Observações:</strong> ${safe(data.obs)}</p>
-            <hr>
-            <h5><i class="fas fa-file-alt"></i> Detalhes Adicionais:</h5>
-            <ul>${produtosHtml}</ul>
-            <hr>
-            <h5><i class="fas fa-list-ul"></i> Histórico de Alterações:</h5>
-            <div class="logs-container"><ul>${logsHtml}</ul></div>
-          `;
-          modalBody.innerHTML = html;
-        })
-        .catch(err => {
-          modalBody.innerHTML = "<div class='alert alert-danger'>Erro ao carregar dados do processo. Por favor, tente novamente.</div>";
-          console.error("Erro ao buscar detalhes:", err);
-        });
+        fetch(`/api/processos/${procId}/detalhes`)
+          .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+          })
+          .then(data => {
+            const camposBooleanos = ["CPF Anexado", "Comp. Residência", "Comp. Renda", "Procuração", "Decl. Insuficiência"];
+            const logsHtml = (data.logs || []).map(log => {
+              let antigo = log.valorAntigo; let novo = log.valorNovo;
+              if (camposBooleanos.includes(log.campo)) {
+                antigo = (log.valorAntigo === "true" ? "Anexado" : "Não anexado");
+                novo = (log.valorNovo === "true" ? "Anexado" : "Não anexado");
+              }
+              return `<li><strong>${safe(log.campo)}</strong>: <span>${safe(antigo)}</span> → <span>${safe(novo)}</span> (${safe(log.data)})</li>`;
+            }).join('') || '<li>Nenhum log de alteração.</li>';
+
+            const produtosHtml = (data.itens || []).map(item =>
+              `<li>${safe(item.produto)} – Qtd: ${safe(item.quantidade)} – Enviado: ${formatDate(item.dataEnvio)}</li>`
+            ).join('') || '<li>Nenhum produto associado.</li>';
+
+            const html = `
+              <p><strong>Interno:</strong> ${safe(data.numeroInterno)}</p>
+              <p><strong>Processo:</strong> ${safe(data.numeroProcesso)}</p>
+              <p><strong>Paciente:</strong> ${data.paciente ? `${safe(data.paciente.nome)} - CPF: ${safe(data.paciente.cpf)}` : '–'}</p>
+              <p><strong>Advogado:</strong> ${data.advogado ? `${safe(data.advogado.nome)} - OAB: ${safe(data.advogado.oab)}` : '–'}</p>
+              <p><strong>Médico:</strong> ${data.medico ? `${safe(data.medico.nome)} - CRM: ${safe(data.medico.crm)}` : '–'}</p>
+              <p><strong>Status:</strong> ${data.status === 'CONCLUIDO' || data.status === 'OBITO' ? 'ÓBITO' : safe(data.status)}</p>
+              <p><strong>Data Início:</strong> ${formatDate(data.dataInicio)}</p>
+              <p><strong>Local:</strong> ${data.local ? `${safe(data.local.comarca)} – ${safe(data.local.localizacao)}` : '–'}</p>
+              <p><strong>Observações:</strong> ${safe(data.obs)}</p>
+              <hr>
+              <h5><i class="fas fa-file-alt"></i> Detalhes Adicionais:</h5>
+              <ul>${produtosHtml}</ul>
+              <hr>
+              <h5><i class="fas fa-list-ul"></i> Histórico de Alterações:</h5>
+              <div class="logs-container"><ul>${logsHtml}</ul></div>
+            `;
+            modalBody.innerHTML = html;
+          })
+          .catch(err => {
+            modalBody.innerHTML = "<div class='alert alert-danger'>Erro ao carregar dados do processo. Por favor, tente novamente.</div>";
+            console.error("Erro ao buscar detalhes:", err);
+          });
+      });
     });
-  });
-</script>
-
+  </script>
+</body>
 
 </html>

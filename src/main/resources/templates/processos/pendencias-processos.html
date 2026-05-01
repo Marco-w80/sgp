@@ -3,72 +3,334 @@
 <head>
   <title th:text="${tituloPendencias}">Pendências de Processos</title>
   <th:block th:replace="~{fragments/head :: top}"></th:block>
+
+  <style>
+    /* ==========================================================================
+       1. PALETA DE CORES E TEMA GLOBAL (PADRÃO DO SISTEMA)
+       ========================================================================== */
+    :root {
+      --cor-primaria: #166298;
+      --cor-secundaria: #192f51;
+      --cor-fundo-claro: #f8f9fc;
+      --cor-texto-escuro: #5a5c69;
+      --cor-borda-suave: #e3e6f0;
+      --cor-fundo-hover: #f1f3f8;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      color: var(--cor-texto-escuro);
+    }
+
+    /* ==========================================================================
+       2. CARD PRINCIPAL E CABEÇALHO
+       ========================================================================== */
+    .card.shadow {
+      border: none;
+      border-radius: 0.75rem;
+      box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.07) !important;
+    }
+
+    .card-header {
+      background-color: var(--cor-fundo-claro);
+      border-bottom: 2px solid var(--cor-primaria);
+      padding: 1rem 1.5rem;
+      border-top-left-radius: 0.75rem;
+      border-top-right-radius: 0.75rem;
+    }
+
+    .card-header h6 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cor-primaria) !important;
+    }
+
+    .card-body-table {
+      padding: 0 !important;
+    }
+
+    /* ==========================================================================
+       3. BOTÕES E BADGES (GERAL, PRIMÁRIO, E OUTLINE)
+       ========================================================================== */
+    .btn {
+      font-weight: 600 !important;
+      transition: all 0.2s ease-in-out !important;
+      border-radius: 0.375rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .btn-primary { background-color: var(--cor-primaria) !important; border-color: var(--cor-primaria) !important; color: white !important; }
+    .btn-primary:hover { background-color: var(--cor-secundaria) !important; border-color: var(--cor-secundaria) !important; }
+    
+    .btn-outline-primary { background-color: transparent !important; border: 1px solid var(--cor-primaria) !important; color: var(--cor-primaria) !important; }
+    .btn-outline-primary:hover { background-color: var(--cor-primaria) !important; color: white !important; }
+
+    .btn-circle {
+      width: 35px; height: 35px; padding: 0; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .btn-circle.btn-sm { width: 32px; height: 32px; font-size: 0.8rem; }
+
+    /* Soft Badges */
+    .badge-soft-warning { background-color: #fdf3d8; color: #d98a00; font-weight: 700; padding: 0.4rem 0.75rem; border-radius: 0.35rem; font-size: 0.75rem; display: inline-block; }
+    .badge-soft-danger { background-color: #f8d7da; color: #721c24; font-weight: 700; padding: 0.4rem 0.75rem; border-radius: 0.35rem; font-size: 0.75rem; display: inline-block; }
+    .badge-soft-secondary { background-color: #e3e6f0; color: #5a5c69; font-weight: 700; padding: 0.4rem 0.75rem; border-radius: 0.35rem; font-size: 0.75rem; display: inline-block; }
+    .badge-soft-info { background-color: #d1ecf1; color: #0c5460; font-weight: 700; padding: 0.4rem 0.75rem; border-radius: 0.35rem; font-size: 0.75rem; display: inline-block; }
+
+    /* ==========================================================================
+       4. TABELA ELEGANTE, SCROLL ISOLADO E CANTOS ARREDONDADOS
+       ========================================================================== */
+    .table-container {
+      border-radius: 0 0 0.75rem 0.75rem !important;
+      background-color: #fff !important;
+      padding-bottom: 0.5rem; 
+      overflow: visible !important; 
+    }
+
+    .dataTables_wrapper > .row:nth-child(2) > .col-sm-12 {
+      overflow-x: auto !important;
+      overflow-y: visible !important; 
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+    .dataTables_wrapper > .row:nth-child(2) { margin-left: 0 !important; margin-right: 0 !important; }
+    .dataTables_wrapper > .row:nth-child(3) { padding-top: 1rem !important; }
+
+    .table {
+      border: 1px solid var(--cor-borda-suave) !important;
+      width: 100% !important;
+      border-collapse: separate !important; 
+      border-spacing: 0 !important;         
+      background-color: #fff !important;
+      margin-bottom: 0 !important;
+      position: relative;
+    }
+
+    /* Cantos arredondados das células */
+    .table thead:first-child tr:first-child th:first-child { border-top-left-radius: 0.75rem !important; }
+    .table thead:first-child tr:first-child th:last-child { border-top-right-radius: 0.75rem !important; }
+    .table tbody:last-of-type tr:last-child td:first-child { border-bottom-left-radius: 0.75rem !important; }
+    .table tbody:last-of-type tr:last-child td:last-child { border-bottom-right-radius: 0.75rem !important; }
+
+    .table th, .table td {
+      border-left: none !important;
+      border-right: 1px solid var(--cor-borda-suave) !important;
+    }
+    .table th:last-child, .table td:last-child { border-right: none !important; }
+
+    .table th {
+      color: var(--cor-secundaria) !important;
+      font-weight: 700 !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 1rem 0.75rem !important;
+      text-transform: uppercase !important;
+      font-size: 0.75rem !important;
+      letter-spacing: 0.04em !important;
+      border-bottom: 2px solid var(--cor-borda-suave) !important;
+      border-top: none !important;
+      background-color: var(--cor-fundo-claro) !important;
+      word-break: break-word;
+      white-space: nowrap !important;
+    }
+
+    .table td {
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 0.75rem !important;
+      border-top: 1px solid var(--cor-borda-suave) !important;
+      color: var(--cor-texto-escuro) !important;
+      background-color: #fff !important;
+      font-size: 0.85rem;
+    }
+
+    .table tbody tr:hover td { background-color: var(--cor-fundo-hover) !important; transition: background-color 0.2s ease-in-out !important; }
+
+    /* ==========================================================================
+       5. DATATABLES E ESTILOS DE COLUNA / SCROLL
+       ========================================================================== */
+    div.dataTables_wrapper { padding: 1.5rem !important; font-size: 0.9rem !important; }
+    div.dataTables_wrapper label { font-weight: 600 !important; font-size: 0.9rem !important; color: var(--cor-secundaria) !important; margin-bottom: 0.5rem !important; display: inline-block !important; }
+    .dataTables_wrapper .dataTables_length select { width: auto !important; min-width: 60px !important; }
+    div.dataTables_wrapper .dataTables_length select, div.dataTables_wrapper .dataTables_filter input {
+      border-radius: 0.5rem !important; border: 1px solid var(--cor-borda-suave) !important; padding: 0.45rem 0.75rem !important;
+      font-size: 0.875rem !important; transition: border-color 0.3s ease, box-shadow 0.3s ease !important; background-color: #fff !important;
+    }
+    div.dataTables_wrapper .dataTables_length select:focus, div.dataTables_wrapper .dataTables_filter input:focus {
+      border-color: var(--cor-primaria) !important; box-shadow: 0 0 0 0.2rem rgba(22, 98, 152, 0.25) !important; outline: none !important;
+    }
+    .dataTables_wrapper .pagination .page-link {
+      color: var(--cor-primaria) !important; background-color: #f1f5f9 !important; border: 1px solid var(--cor-borda-suave) !important;
+      border-radius: 0.375rem !important; transition: all 0.2s ease-in-out !important; padding: 0.45rem 0.8rem !important; margin: 0 0.15rem !important;
+    }
+    .dataTables_wrapper .pagination .page-link:hover { background-color: var(--cor-primaria) !important; color: #fff !important; border-color: var(--cor-primaria) !important; }
+    .dataTables_wrapper .pagination .page-item.active .page-link {
+      background-color: var(--cor-primaria) !important; border-color: var(--cor-primaria) !important; color: #fff !important; font-weight: bold !important; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .truncate {
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    /* Lista limpa para Documentos Faltantes */
+    .doc-list { margin: 0; padding-left: 1.2rem; color: var(--cor-texto-escuro); text-align: left; }
+    .doc-list li { margin-bottom: 0.2rem; }
+    .doc-list li::marker { color: var(--cor-primaria); }
+
+    .col-documentos { min-width: 220px; }
+
+    /* MÁGICA DA COLUNA FIXA (STICKY ACTION COLUMN) */
+    .col-acoes-fixa {
+      position: sticky !important;
+      right: 0;
+      z-index: 1;
+      background-color: #fff !important;
+      box-shadow: -4px 0 8px rgba(0, 0, 0, 0.04);
+      min-width: 80px; 
+    }
+    .table thead th.col-acoes-fixa {
+      background-color: var(--cor-fundo-claro) !important;
+      z-index: 2 !important;
+    }
+    .table tbody tr:hover .col-acoes-fixa {
+      background-color: var(--cor-fundo-hover) !important;
+    }
+  </style>
 </head>
+
 <body>
-  <div class="card shadow mb-4">
+  <div class="card shadow mb-5">
+    
     <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
-      <h6 class="m-0 font-weight-bold text-primary" th:text="${tituloPendencias}">Pendências de Processos</h6>
-      <span class="badge badge-warning p-2" th:text="'Total: ' + ${totalPendencias}">Total: 0</span>
+      <h6 class="m-0 font-weight-bold text-primary">
+        <i class="fas fa-exclamation-triangle mr-2"></i> <span th:text="${tituloPendencias}">Pendências de Processos</span>
+      </h6>
+      <span class="badge-soft-warning px-3 py-2" style="font-size: 0.85rem;" th:text="'Total: ' + ${totalPendencias}">Total: 0</span>
     </div>
-    <div class="card-body">
-      <div class="mb-3">
-        <a class="btn btn-sm mr-1"
+
+    <div class="card-body card-body-table">
+      
+      <div class="p-4 border-bottom bg-white d-flex flex-wrap gap-2">
+        <a class="btn px-4 py-2 shadow-sm mr-2"
            th:classappend="${tipoSelecionado == 'sem-numero-processo'} ? 'btn-primary' : 'btn-outline-primary'"
-           th:href="@{/processos/pendencias(tipo='sem-numero-processo')}">Sem número de processo</a>
-        <a class="btn btn-sm"
+           th:href="@{/processos/pendencias(tipo='sem-numero-processo')}">
+           <i class="fas fa-hashtag mr-1"></i> Sem número de processo
+        </a>
+        <a class="btn px-4 py-2 shadow-sm"
            th:classappend="${tipoSelecionado == 'documentacao'} ? 'btn-primary' : 'btn-outline-primary'"
-           th:href="@{/processos/pendencias(tipo='documentacao')}">Pendência documental</a>
+           th:href="@{/processos/pendencias(tipo='documentacao')}">
+           <i class="fas fa-file-invoice mr-1"></i> Pendência documental
+        </a>
       </div>
 
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover" id="tabelaPendencias" width="100%">
+      <div class="table-container">
+        <table id="tabelaPendencias" class="table table-hover w-100" cellspacing="0">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Interno</th>
-              <th>Número do processo</th>
+              <th style="width: 5%;">ID</th>
+              <th style="width: 8%;">Interno</th>
+              <th style="width: 10%;">Número do Processo</th>
               <th>Paciente</th>
-              <th>Advogado</th>
-              <th>Médico</th>
-              <th>Início</th>
-              <th>Status</th>
-              <th>Pendência</th>
-              <th>Documentos faltantes</th>
-              <th>Ações</th>
+              <th class="d-none d-lg-table-cell">Advogado</th>
+              <th class="d-none d-lg-table-cell">Médico</th>
+              <th style="width: 8%;">Início</th>
+              <th style="width: 8%;">Status</th>
+              <th class="no-sort">Pendência</th>
+              <th class="no-sort col-documentos">Documentos faltantes</th>
+              <th class="no-sort col-acoes-fixa">Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr th:if="${#lists.isEmpty(pendencias)}">
-              <td colspan="11" class="text-center text-muted">Nenhum processo encontrado para o filtro selecionado.</td>
+              <td colspan="11" class="text-center py-4 text-muted">Nenhum processo encontrado para o filtro selecionado.</td>
             </tr>
             <tr th:each="item : ${pendencias}">
-              <td th:text="${item.processo.id}">1</td>
-              <td th:text="${item.processo.numeroInterno}">PROC-001</td>
-              <td th:text="${#strings.isEmpty(item.processo.numeroProcesso) ? '-' : item.processo.numeroProcesso}">-</td>
-              <td th:text="${item.processo.paciente != null ? item.processo.paciente.nome : '-'}">Paciente</td>
-              <td th:text="${item.processo.advogado != null ? item.processo.advogado.nome : '-'}">Advogado</td>
-              <td th:text="${item.processo.medico != null ? item.processo.medico.nome : '-'}">Médico</td>
-              <td th:text="${item.processo.dataInicio != null ? #temporals.format(item.processo.dataInicio, 'dd/MM/yyyy') : '-'}">01/01/2026</td>
-              <td th:text="${item.processo.status != null ? item.processo.status : '-'}">ABERTO</td>
-              <td th:text="${item.tipoPendencia}">Pendência documental</td>
-              <td>
+              <td class="truncate" th:text="${item.processo.id}">1</td>
+              <td class="truncate font-weight-bold" style="color: var(--cor-secundaria);" th:text="${item.processo.numeroInterno}">PROC-001</td>
+              <td class="truncate font-weight-bold" th:text="${#strings.isEmpty(item.processo.numeroProcesso) ? '-' : item.processo.numeroProcesso}">-</td>
+              <td class="truncate" th:text="${item.processo.paciente != null ? item.processo.paciente.nome : '-'}">Paciente</td>
+              <td class="truncate d-none d-lg-table-cell" th:text="${item.processo.advogado != null ? item.processo.advogado.nome : '-'}">Advogado</td>
+              <td class="truncate d-none d-lg-table-cell" th:text="${item.processo.medico != null ? item.processo.medico.nome : '-'}">Médico</td>
+              <td class="truncate" th:text="${item.processo.dataInicio != null ? #temporals.format(item.processo.dataInicio, 'dd/MM/yyyy') : '-'}">01/01/2026</td>
+              <td class="truncate">
+                <span class="badge" 
+                      th:classappend="${item.processo.status != null and (item.processo.status == 'CONCLUIDO' or item.processo.status == 'OBITO') ? 'badge-soft-danger' : 'badge-soft-secondary'}"
+                      th:text="${item.processo.status != null ? item.processo.status : '-'}">
+                </span>
+              </td>
+              <td class="truncate">
+                <span class="badge-soft-info" th:text="${item.tipoPendencia}">Pendência</span>
+              </td>
+              <td class="truncate col-documentos">
                 <span th:if="${#lists.isEmpty(item.documentosFaltantes)}">-</span>
-                <ul class="mb-0 pl-3" th:unless="${#lists.isEmpty(item.documentosFaltantes)}">
+                <ul class="doc-list small" th:unless="${#lists.isEmpty(item.documentosFaltantes)}">
                   <li th:each="doc : ${item.documentosFaltantes}" th:text="${doc}">CPF</li>
                 </ul>
               </td>
-              <td>
-                <a th:href="@{/processos/editar/{id}(id=${item.processo.id})}" class="btn btn-sm btn-secondary">
-                  <i class="fas fa-edit"></i>
-                </a>
+              <td class="col-acoes-fixa">
+                <div class="d-flex justify-content-center align-items-center">
+                  <a th:href="@{/processos/editar/{id}(id=${item.processo.id})}" class="btn btn-circle btn-sm btn-outline-primary shadow-sm" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
     </div>
   </div>
 
   <th:block th:replace="~{fragments/foot :: bot}"></th:block>
+  
+  <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      
+      // Inicialização do DataTables
+      var table = $('#tabelaPendencias').DataTable({
+        language: { url: '/datatables/i18n/pt-BR.json' },
+        pageLength: 10,
+        lengthMenu: [10, 25, 50, 100],
+        deferRender: true,
+        stateSave: true,
+        columnDefs: [
+          { orderable: false, targets: 'no-sort' } // Identifica as colunas que não devem ser ordenadas usando a classe 'no-sort'
+        ]
+      });
+
+      // Lógica nativa de Truncate/Tooltips
+      function addTooltipsToTruncatedCells() {
+        table.cells('.truncate').nodes().each(function (cell) {
+          var $cell = $(cell);
+          if (cell.scrollWidth > $cell.innerWidth()) {
+            $cell.attr('title', $cell.text());
+          } else {
+            $cell.removeAttr('title');
+          }
+        });
+      }
+
+      table.on('draw.dt', function () {
+        addTooltipsToTruncatedCells();
+      });
+      
+      // Pequeno delay para a renderização inicial
+      setTimeout(addTooltipsToTruncatedCells, 500);
+
+    });
+  </script>
 </body>
 </html>
