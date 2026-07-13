@@ -1,5 +1,25 @@
 ﻿# CHANGELOG â€” SGP (Sistema Grupo Prod)
 
+## [2026-07-13] - Página amigável de erro
+
+### Funcionalidade
+- Criada uma página padrão para erros HTTP e falhas inesperadas, seguindo as cores e o logotipo do SGP.
+- A página apresenta uma causa provável em linguagem simples e gera um código único de suporte.
+- O usuário pode copiar um resumo seguro contendo código, data, status e página acessada para enviar à equipe responsável.
+- Detalhes internos, mensagens SQL e stack traces não são apresentados na interface; a exceção completa permanece registrada no log pelo código de suporte.
+
+## [2026-07-13] - Correção do status Óbito em Processos
+
+### Correções
+- Corrigido o erro ao salvar um processo com status `OBITO` na edição.
+- Corrigido o filtro da listagem para localizar processos persistidos como `OBITO`.
+- Os selects de cadastro, edição e filtro agora enviam explicitamente o nome da constante (`OBITO`), mantendo o rótulo visual `Óbito`.
+
+### Banco de dados
+- A lista permitida nas colunas `processos.status` e `processos_excluidos.status` passou a incluir `OBITO`.
+- Registros legados `CONCLUIDO`, que já eram apresentados como Óbito pela aplicação, são normalizados para `OBITO` pelo script `docs/sql/2026-07-13-normalizar-status-obito.sql`.
+- A constante `CONCLUIDO` permanece no enum Java somente para compatibilidade de leitura durante implantações graduais.
+
 ## [2026-04-29] - Ajuste de status e deferimento em Processos
 
 ### Descricao

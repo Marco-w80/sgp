@@ -445,6 +445,14 @@ Base path: `/maintenance`
     - valores aceitos: `sem-numero-processo`, `documentacao`
   - View: `processos/pendencias-processos`
 
+## Atualização 2026-07-13 - Página de erro
+
+### Rota interna `ANY /error`
+- Destino padrão do mecanismo de erros do Spring Boot.
+- Pode ser acessada sem autenticação para também cobrir sessão expirada e falhas durante o login.
+- Renderiza `error/erro` com status HTTP, causa provável, código de suporte e resumo copiável.
+- Não expõe mensagem original da exceção, stack trace, consulta SQL ou dados de autenticação.
+
 ## Atualizacao 2026-04-29 - Status de Processos
 - Nao houve criacao de novas rotas/endpoints nesta alteracao.
 - Ajuste funcional aplicado nas mesmas rotas do modulo de processos e relatorios, com novo status `OBITO` no fluxo de formulario.

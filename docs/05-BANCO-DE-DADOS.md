@@ -38,7 +38,7 @@ Campos:
 - `doenca_id` (FK -> `doenca.id` (ou tabela equivalente), NOT NULL)
 - `local_id` (FK -> `locais.id`, NULL)
 - `data_inicio` (date, NOT NULL)
-- `status` (varchar enum, NOT NULL) — `StatusProcesso` (ABERTO, EM_ANDAMENTO, CONCLUIDO, SUSPENSO)
+- `status` (varchar enum, NOT NULL) — `StatusProcesso` (ABERTO, EM_ANDAMENTO, OBITO, CONCLUIDO, SUSPENSO)
 - `tipo_hospital` (varchar enum, NULL) — `TipoHospital` (SUS, CONVENIO, PARTICULAR)
 - Flags de documentação (boolean, NOT NULL, default false):
   - `cpf_anexado`
@@ -310,7 +310,7 @@ Uso:
 
 ## Enums (Valores Persistidos)
 
-- `StatusProcesso`: ABERTO, EM_ANDAMENTO, CONCLUIDO, SUSPENSO
+- `StatusProcesso`: ABERTO, EM_ANDAMENTO, OBITO, CONCLUIDO, SUSPENSO
 - `TipoHospital`: SUS, CONVENIO, PARTICULAR
 - `Sexo`: MASCULINO, FEMININO, OUTRO
 - `GrupoProduto`: MEDICAMENTOS, OUTROS
@@ -368,3 +368,11 @@ Persistir parametros da rotina diaria de resumo de processos pendentes por e-mai
 ### Tabela `deferimentos`
 - Sem mudanca de schema.
 - Registro de deferimento na edicao passou a nao depender de selecao manual de tipo na interface.
+
+## Atualização 2026-07-13 - Status `OBITO`
+
+### Tabelas `processos` e `processos_excluidos`
+- As colunas `status` passam a aceitar `OBITO`, além dos valores preexistentes.
+- O identificador oficial para novos salvamentos e filtros é `OBITO`; `ÓBITO` é somente o rótulo de interface.
+- Os valores legados `CONCLUIDO`, que a aplicação já apresentava como Óbito, são normalizados para `OBITO`.
+- A alteração é não destrutiva e está em `docs/sql/2026-07-13-normalizar-status-obito.sql`.

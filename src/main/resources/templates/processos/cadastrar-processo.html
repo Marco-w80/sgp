@@ -306,8 +306,8 @@
             <label for="status">Status<span class="text-danger">*</span></label>
             <select class="form-control" id="status" name="status" required>
               <option value="">Selecione</option>
-              <option th:each="s : ${statusValues}" th:value="${s}"
-                th:text="${s.name() == 'OBITO' ? 'ÓBITO' : #strings.replace(s.name(), '_', ' ')}"></option>
+              <option th:each="s : ${statusValues}" th:value="${s.name()}"
+                th:text="${s.name() == 'OBITO' ? 'Óbito' : #strings.replace(s.name(), '_', ' ')}"></option>
             </select>
             <div class="invalid-feedback">
               Por favor, selecione um status.

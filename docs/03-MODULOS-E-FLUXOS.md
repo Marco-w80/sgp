@@ -432,3 +432,18 @@ Sempre atualizar também a documentação correspondente em:
 ### Modulo Deferimentos
 - Na tela de edicao, o deferimento passou a aceitar entrada livre de mensagem.
 - A interface nao exige mais escolha manual de tipo para registrar novo deferimento.
+
+## Atualização 2026-07-13 - Persistência e filtro do status Óbito
+
+### Módulo Processos
+- Cadastro, edição e filtro enviam o identificador interno `OBITO`; a interface exibe o rótulo `Óbito`.
+- Ao salvar a edição, `OBITO` é persistido sem conversão para o texto visual.
+- A listagem compara o filtro com o enum persistido e mantém `OBITO` selecionado após a consulta.
+- Registros legados `CONCLUIDO`, anteriormente exibidos como Óbito, são normalizados para `OBITO` pela migração documentada.
+
+## Atualização 2026-07-13 - Tratamento amigável de erros
+
+- Erros encaminhados pelo Spring Boot para `/error` utilizam uma página visual própria do SGP.
+- O usuário recebe uma explicação provável baseada no status HTTP e no tipo geral da falha.
+- Cada ocorrência recebe um código de suporte, também gravado no log junto da exceção completa.
+- O texto copiável contém somente informações seguras: código, data e hora, status, página e causa provável.

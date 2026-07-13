@@ -229,8 +229,8 @@
             <div class="form-group col-md-2">
               <label for="status">Status<span class="text-danger">*</span></label>
               <select class="form-control" name="status" required>
-                <option th:each="s : ${statusValues}" th:value="${s}"
-                  th:text="${s.name() == 'OBITO' ? 'ÓBITO' : #strings.replace(s.name(), '_', ' ')}"
+                <option th:each="s : ${statusValues}" th:value="${s.name()}"
+                  th:text="${s.name() == 'OBITO' ? 'Óbito' : #strings.replace(s.name(), '_', ' ')}"
                   th:selected="${processo.status == s}"></option>
               </select>
             </div>

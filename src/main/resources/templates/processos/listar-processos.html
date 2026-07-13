@@ -592,8 +592,8 @@ border-radius: 10px !important;
                 <label for="status" class="small font-weight-bold text-muted text-uppercase mb-1">Status</label>
                 <select class="form-control" id="status" name="status">
                   <option value="">Todos</option>
-                  <option th:each="s : ${statusValues}" th:value="${s}"
-                    th:text="${s.name() == 'OBITO' ? 'ÓBITO' : #strings.replace(s.name(), '_', ' ')}"
+                  <option th:each="s : ${statusValues}" th:value="${s.name()}"
+                    th:text="${s.name() == 'OBITO' ? 'Óbito' : #strings.replace(s.name(), '_', ' ')}"
                     th:selected="${statusSelecionado != null and statusSelecionado == s}"></option>
                 </select>
               </div>
