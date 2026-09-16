@@ -159,6 +159,22 @@
             <span>Alertas</span>
           </a>
         </li>
+
+        <!-- Modulo de Licitacoes -->
+        <li class="nav-item" sec:authorize="hasAnyRole('USUARIO','ADMIN')">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLicitacoes"
+            aria-expanded="false" aria-controls="collapseLicitacoes">
+            <i class="fas fa-fw fa-file-contract"></i>
+            <span>Licita&ccedil;&otilde;es</span>
+          </a>
+          <div id="collapseLicitacoes" class="collapse" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" th:href="@{/licitacoes}">Dashboard</a>
+              <a class="collapse-item" th:href="@{/licitacoes/nova}">Cadastrar</a>
+              <a class="collapse-item" th:href="@{/licitacoes/portfolio}">Portf&oacute;lio e Fornecedores</a>
+            </div>
+          </div>
+        </li>
         <!-- Menu: Relatórios -->
         <li class="nav-item" sec:authorize="hasAnyRole('USUARIO','ADMIN')">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRelatorios"

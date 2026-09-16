@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><th:block th:replace="~{fragments/head :: top}"></th:block><link rel="stylesheet" th:href="@{/css/licitacoes.css}"></head>
+<body>
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div><h1 class="h3 mb-1 text-gray-800">Licita&ccedil;&otilde;es</h1><p class="text-muted mb-0">Acompanhamento do cadastro &agrave; participa&ccedil;&atilde;o</p></div>
+  <a class="btn btn-primary" th:href="@{/licitacoes/nova}"><i class="fas fa-plus mr-1"></i> Nova licita&ccedil;&atilde;o</a>
+</div>
+<div class="alert alert-success" th:if="${mensagem}" th:text="${mensagem}"></div><div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+<div class="row mb-3">
+  <div class="col-md-4 mb-2"><div class="card border-left-primary shadow-sm h-100"><div class="card-body"><small class="text-uppercase text-muted">Ativas</small><div class="h4 mb-0" th:text="${dashboard.total}">0</div></div></div></div>
+  <div class="col-md-4 mb-2"><div class="card border-left-danger shadow-sm h-100"><div class="card-body"><small class="text-uppercase text-muted">Em andamento</small><div class="h4 mb-0" th:text="${dashboard.emAndamento}">0</div></div></div></div>
+  <div class="col-md-4 mb-2"><div class="card border-left-warning shadow-sm h-100"><div class="card-body"><small class="text-uppercase text-muted">Pr&oacute;ximos 7 dias</small><div class="h4 mb-0" th:text="${dashboard.urgentes}">0</div></div></div></div>
+</div>
+<form class="card shadow-sm mb-3" method="get" th:action="@{/licitacoes}"><div class="card-body py-3"><div class="form-row align-items-center"><div class="col"><input class="form-control" name="busca" th:value="${busca}" placeholder="Buscar por &oacute;rg&atilde;o, edital, objeto ou item"></div><div class="col-auto"><div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" id="arquivadas" name="arquivadas" value="true" th:checked="${arquivadas}"><label class="custom-control-label" for="arquivadas">Arquivadas</label></div></div><div class="col-auto"><button class="btn btn-outline-primary"><i class="fas fa-search"></i> Buscar</button></div></div></div></form>
+<div class="kanban" id="licitacao-kanban" role="region" aria-label="Etapas das licitações" tabindex="0">
+  <section class="kanban-column" th:each="etapa : ${etapas}" th:attr="data-etapa=${etapa.name()}">
+    <header><span th:text="${etapa.descricao}">Etapa</span><span class="badge badge-light" th:text="${#lists.size(dashboard.colunas.get(etapa.name()))}">0</span></header>
+    <div class="kanban-list">
+      <article class="licitacao-card" draggable="true" th:each="card : ${dashboard.colunas.get(etapa.name())}" th:attr="data-id=${card.licitacao.id},data-etapa=${card.licitacao.etapaAtual.name()}">
+        <div class="licitacao-card-top"><div class="licitacao-orgao"><i class="fas fa-building" aria-hidden="true"></i><strong th:text="${card.licitacao.orgao}">&Oacute;rg&atilde;o</strong></div><span class="urgencia" th:classappend="${' urgencia-'+card.urgencia.name().toLowerCase()}"><i class="fas fa-clock" aria-hidden="true"></i><span th:text="${card.urgencia.name() == 'CRITICO' ? 'URGENTE' : #strings.replace(card.urgencia.name(),'_',' ')}">PRAZO</span></span></div>
+        <div class="licitacao-edital"><span><i class="fas fa-file-alt" aria-hidden="true"></i> Edital <span th:text="${card.licitacao.numeroEdital}">00/0000</span></span><span th:if="${card.licitacao.modalidade != null and !#strings.isEmpty(card.licitacao.modalidade)}"><i class="fas fa-gavel" aria-hidden="true"></i> <span th:text="${card.licitacao.modalidade}">Modalidade</span></span></div>
+        <div class="licitacao-objeto"><i class="fas fa-align-left" aria-hidden="true"></i><p class="objeto-clamp" th:text="${card.licitacao.objeto}">Objeto</p></div>
+        <div class="card-meta"><span class="card-meta-item"><i class="fas fa-boxes" aria-hidden="true"></i><span><b th:text="${#lists.size(card.licitacao.itens)}">0</b> itens</span></span><span class="card-meta-item"><i class="far fa-calendar-alt" aria-hidden="true"></i><span th:text="${#temporals.format(card.licitacao.dataDisputa,'dd/MM HH:mm')}"></span></span></div>
+        <div class="licitacao-card-actions"><a class="btn btn-sm btn-outline-primary" th:href="@{/licitacoes/{id}(id=${card.licitacao.id})}"><i class="far fa-eye mr-1" aria-hidden="true"></i> Ver detalhes</a><form sec:authorize="hasRole('ADMIN')" method="post" th:action="@{/licitacoes/{id}/excluir(id=${card.licitacao.id})}" data-confirmacao-titulo="Excluir licitação?" data-confirmacao="A licitação e todos os dados relacionados serão excluídos permanentemente." data-confirmacao-botao="Sim, excluir"><button class="btn btn-sm btn-outline-danger" title="Excluir licitação" aria-label="Excluir licitação"><i class="fas fa-trash-alt" aria-hidden="true"></i></button></form></div>
+      </article>
+      <div class="kanban-empty" th:if="${#lists.isEmpty(dashboard.colunas.get(etapa.name()))}">Nenhuma licita&ccedil;&atilde;o</div>
+    </div>
+  </section>
+  <section class="kanban-column andamento"><header><span>Em andamento</span><span class="badge badge-light" th:text="${#lists.size(dashboard.colunas.get('EM_ANDAMENTO'))}">0</span></header><div class="kanban-list">
+    <article class="licitacao-card" draggable="false" th:each="card : ${dashboard.colunas.get('EM_ANDAMENTO')}"><div class="licitacao-card-top"><div class="licitacao-orgao"><i class="fas fa-building" aria-hidden="true"></i><strong th:text="${card.licitacao.orgao}">&Oacute;rg&atilde;o</strong></div><span class="urgencia urgencia-atrasado"><i class="fas fa-play-circle" aria-hidden="true"></i><span>EM ANDAMENTO</span></span></div><div class="licitacao-edital"><span><i class="fas fa-file-alt" aria-hidden="true"></i> Edital <span th:text="${card.licitacao.numeroEdital}"></span></span><span><i class="fas fa-columns" aria-hidden="true"></i> <span th:text="${card.licitacao.etapaAtual.descricao}"></span></span></div><div class="licitacao-objeto"><i class="fas fa-align-left" aria-hidden="true"></i><p class="objeto-clamp" th:text="${card.licitacao.objeto}"></p></div><div class="card-meta"><span class="card-meta-item"><i class="fas fa-boxes" aria-hidden="true"></i><span><b th:text="${#lists.size(card.licitacao.itens)}">0</b> itens</span></span><span class="card-meta-item"><i class="far fa-calendar-alt" aria-hidden="true"></i><span th:text="${#temporals.format(card.licitacao.dataDisputa,'dd/MM HH:mm')}"></span></span></div><div class="licitacao-card-actions"><a class="btn btn-sm btn-outline-primary" th:href="@{/licitacoes/{id}(id=${card.licitacao.id})}"><i class="far fa-eye mr-1" aria-hidden="true"></i> Ver detalhes</a></div></article>
+    <div class="kanban-empty" th:if="${#lists.isEmpty(dashboard.colunas.get('EM_ANDAMENTO'))}">Nenhuma licita&ccedil;&atilde;o</div>
+  </div></section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script th:inline="javascript">window.licitacoesCsrf={token:/*[[${_csrf.token}]]*/'',header:/*[[${_csrf.headerName}]]*/'X-CSRF-TOKEN'};</script>
+<script th:src="@{/js/licitacoes.js}"></script><th:block th:replace="~{fragments/foot :: bot}"></th:block>
+</body></html>

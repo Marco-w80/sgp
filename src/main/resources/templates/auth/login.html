@@ -103,7 +103,7 @@
     <h2 class="mb-2">Bem-vindo ao SGP</h2>
     <p class="text-muted mb-4">Acesso restrito à intranet</p>
 
-    <form th:action="@{/login}" method="post">
+    <form id="login-form" th:action="@{/login}" method="post">
       <div class="mb-3 text-start">
         <label class="form-label">E-mail</label>
         <div class="input-group">
@@ -120,11 +120,43 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary w-100 mt-3">Entrar</button>
+      <button id="login-submit" type="submit" class="btn btn-primary w-100 mt-3">
+        <span id="login-submit-label">Entrar</span>
+      </button>
 
       <div th:if="${param.error}" class="error-message">Login inválido</div>
     </form>
   </div>
+
+  <script>
+    (() => {
+      const form = document.getElementById('login-form');
+      const submitButton = document.getElementById('login-submit');
+      const submitLabel = document.getElementById('login-submit-label');
+      let submitting = false;
+
+      const resetSubmitButton = () => {
+        submitting = false;
+        submitButton.disabled = false;
+        submitButton.removeAttribute('aria-busy');
+        submitLabel.textContent = 'Entrar';
+      };
+
+      form.addEventListener('submit', event => {
+        if (submitting) {
+          event.preventDefault();
+          return;
+        }
+
+        submitting = true;
+        submitButton.disabled = true;
+        submitButton.setAttribute('aria-busy', 'true');
+        submitLabel.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Entrando...';
+      });
+
+      window.addEventListener('pageshow', resetSubmitButton);
+    })();
+  </script>
 
 </body>
 

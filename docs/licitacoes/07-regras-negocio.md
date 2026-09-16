@@ -1,0 +1,30 @@
+# Regras de negócio
+
+- Órgão, número do edital, objeto e data/hora da disputa são obrigatórios.
+- A etapa inicial é Cadastro e arquivada inicia falsa.
+- Só é possível avançar ou retornar uma etapa; saltos são rejeitados no service.
+- Aprovação → Definição exige todos os itens decididos.
+- Apenas item aprovado recebe resultado; valores: Ganho, Perdido ou Cancelado.
+- Arquivar não exclui e tira o registro da consulta ativa.
+- Exclusão permanente remove dependências por cascata e arquivos físicos pelo service.
+- A busca inclui órgão, edital, objeto, número e descrição do item.
+- Disputa menor ou igual ao instante atual aparece em Em andamento sem mudança de etapa.
+- Urgência: `<0` Atrasado; `0..3` Crítico; `4..7` Atenção; `>7` No prazo.
+- Itens têm descrição obrigatória; número ausente na importação recebe sequência.
+- Cotações exigem fornecedor (cadastro ou nome livre), valor e data.
+- O nome do fornecedor é copiado na cotação para preservar o histórico se o cadastro for removido.
+- CSV: UTF-8 BOM, separador `;`, escape padrão de campos.
+- Anexo: extensão permitida e tamanho máximo de 20 MB.
+- IDs relacionados são validados para impedir operar item/anexo/cotação de outra licitação.
+- A consulta ao PNCP pré-preenche o formulário e mantém os itens apenas em espera; nada é persistido até o usuário salvar a nova licitação.
+- O usuário deve conferir os dados importados e pode editar qualquer campo antes de salvar. O cadastro manual continua permitido sem consulta ao PNCP.
+- Ao salvar, cabeçalho e itens do PNCP são gravados na mesma transação. Se a validação ou a inclusão de algum item falhar, a licitação também não é criada.
+- Todos os itens retornados pelo PNCP são cadastrados. Na aba Cadastro da página seguinte, o usuário seleciona quais avançam para Cotação; os demais permanecem armazenados, mas ficam fora de Cotação, Aprovação, Definição, Participação e da exportação de cotações.
+- O avanço de Cadastro para Cotação exige ao menos um item selecionado e deve ser feito na página da licitação; o Kanban não contorna essa escolha.
+- Os itens só são aceitos quando o link usado na consulta coincide com o link presente no formulário. Alterar o link descarta a importação pendente.
+- O link de importação deve usar HTTPS, o domínio exato `pncp.gov.br` e o caminho `/app/editais/{cnpj}/{ano}/{sequencial}`; barra final, query string e hash são aceitos.
+- CNPJ exige 14 dígitos, ano exige 4 dígitos e sequencial aceita somente dígitos. Links externos ou fora do formato são rejeitados antes de qualquer chamada de rede.
+- `dataEncerramentoProposta` é usada provisoriamente como `dataDisputa`, no horário de Brasília, e o formulário exibe um aviso para conferência.
+- O `numeroControlePNCP` é informativo na resposta da consulta e não é persistido nesta versão.
+- A busca de dados gerais pode usar o índice do próprio portal como caminho rápido, mas o resultado só é aceito após conferir exatamente CNPJ, ano, sequencial e URL interna da compra; a API detalhada permanece como contingência.
+- Dados gerais e itens são obtidos em paralelo, porém só são aplicados juntos. Respostas completas são mantidas em cache de memória por 5 minutos para evitar repetir chamadas lentas do mesmo edital.
