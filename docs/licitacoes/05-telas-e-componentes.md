@@ -18,6 +18,6 @@ O overlay atualiza cada etapa assim que ela termina. Como os itens podem levar m
 
 ## Portfólio
 
-`portfolio.html`: abas Estoque e Diversos/Fornecedores, pesquisa, CRUD inline, expansão de fornecedor e importação em massa de itens.
+`portfolio.html`: abas Estoque e Diversos/Fornecedores, pesquisa, CRUD inline, expansão de fornecedor e importação em massa de itens. O cadastro de fornecedor permite consulta opcional por CNPJ em fonte pública para preencher os dados; se a consulta falhar, o formulário manual permanece disponível.
 
 `licitacoes.css` define Kanban, badges, stepper, cards de decisão e responsividade. `licitacoes.js` implementa drag-and-drop, prévia tabular e consulta assíncrona do PNCP com CSRF e mensagens inline (sem `alert()`).

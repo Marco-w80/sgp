@@ -182,6 +182,27 @@
     if(!alvo)return;
     window.setTimeout(()=>{if(alvo.classList.contains('show')){alvo.scrollIntoView({behavior:'smooth',block:'nearest'});const primeiroCampo=alvo.querySelector('input:not([type="hidden"])');if(primeiroCampo)primeiroCampo.focus()}},350);
   }));
+  const botaoBuscarCnpj=document.getElementById('buscar-fornecedor-cnpj'),mensagemCnpj=document.getElementById('mensagem-consulta-cnpj');
+  if(botaoBuscarCnpj&&mensagemCnpj){
+    const campo=id=>document.getElementById(id);
+    const mostrar=(texto,tipo)=>{mensagemCnpj.textContent=texto;mensagemCnpj.className='alert mb-0 alert-'+tipo};
+    botaoBuscarCnpj.addEventListener('click',async()=>{
+      const cnpj=campo('fornecedor-cnpj').value.trim();
+      if(!cnpj){mostrar('Informe o CNPJ que deseja consultar.','warning');campo('fornecedor-cnpj').focus();return}
+      const textoOriginal=botaoBuscarCnpj.innerHTML;botaoBuscarCnpj.disabled=true;botaoBuscarCnpj.innerHTML='<i class="fas fa-spinner fa-spin mr-1"></i> Buscando...';
+      const headers={'Content-Type':'application/json'},token=document.querySelector('meta[name="_csrf"]'),header=document.querySelector('meta[name="_csrf_header"]');
+      if(token&&header)headers[header.content]=token.content;
+      try{
+        const respostaHttp=await fetch('/api/licitacoes/fornecedores/consultar-cnpj',{method:'POST',headers,body:JSON.stringify({cnpj})});
+        let resposta={};try{resposta=await respostaHttp.json()}catch(ignorado){}
+        if(!respostaHttp.ok)throw new Error(resposta.error||'Não foi possível consultar esse CNPJ.');
+        campo('fornecedor-cnpj').value=resposta.cnpj||cnpj;
+        ['nome','contato','resumo','observacoes'].forEach(nome=>{const entrada=campo('fornecedor-'+nome);if(entrada&&resposta[nome])entrada.value=resposta[nome]});
+        mostrar('Dados encontrados. Confira as informações e clique em cadastrar.','success');campo('fornecedor-nome').focus();
+      }catch(erro){const texto=erro.message||'Consulta indisponível.';mostrar(texto+(/manual/i.test(texto)?'':' Você pode continuar o cadastro manualmente.'),'warning')}
+      finally{botaoBuscarCnpj.disabled=false;botaoBuscarCnpj.innerHTML=textoOriginal}
+    });
+  }
   const selecionarTodosCotacao=document.getElementById('selecionar-todos-cotacao'),caixasCotacao=[...document.querySelectorAll('.item-cotacao-selecao:not(:disabled)')],contadorCotacao=document.getElementById('contador-itens-cotacao'),formAvancarCotacao=document.getElementById('form-avancar-cotacao'),botaoAvancarCotacao=document.getElementById('avancar-cotacao');
   if(formAvancarCotacao){
     const atualizarSelecaoCotacao=()=>{

@@ -24,6 +24,7 @@ Todas exigem autenticação. Rotas mutáveis usam POST e CSRF.
 | POST/GET | `/licitacoes/{id}/anexos`, `/licitacoes/{id}/anexos/{anexoId}` | Upload/download |
 | POST | `/licitacoes/{id}/anexos/{anexoId}/excluir` | Excluir anexo |
 | GET | `/licitacoes/portfolio` | Estoque e fornecedores |
+| POST | `/api/licitacoes/fornecedores/consultar-cnpj` | Consulta pública opcional de dados cadastrais por CNPJ |
 | POST | `/licitacoes/portfolio/estoque[...]` | CRUD de estoque |
 | POST | `/licitacoes/portfolio/fornecedores[...]` | CRUD de fornecedores/itens/importação |
 

@@ -11,6 +11,7 @@ public class LicitacaoAnexo {
     @ManyToOne(fetch=FetchType.LAZY,optional=false) @JoinColumn(name="licitacao_id",nullable=false) private Licitacao licitacao;
     @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="item_id") private LicitacaoItem item;
     @Enumerated(EnumType.STRING) @Column(length=30) private EtapaLicitacao etapa;
+    @Column(name="nome_exibicao",nullable=false,length=255) private String nomeExibicao;
     @Column(name="nome_original",nullable=false,length=255) private String nomeOriginal;
     @Column(name="nome_armazenado",nullable=false,unique=true,length=255) private String nomeArmazenado;
     @Column(nullable=false,length=1000) private String caminho;
@@ -24,6 +25,7 @@ public class LicitacaoAnexo {
     public Licitacao getLicitacao(){return licitacao;} public void setLicitacao(Licitacao licitacao){this.licitacao=licitacao;}
     public LicitacaoItem getItem(){return item;} public void setItem(LicitacaoItem item){this.item=item;}
     public EtapaLicitacao getEtapa(){return etapa;} public void setEtapa(EtapaLicitacao etapa){this.etapa=etapa;}
+    public String getNomeExibicao(){return nomeExibicao==null||nomeExibicao.isBlank()?nomeOriginal:nomeExibicao;} public void setNomeExibicao(String nomeExibicao){this.nomeExibicao=nomeExibicao;}
     public String getNomeOriginal(){return nomeOriginal;} public void setNomeOriginal(String nomeOriginal){this.nomeOriginal=nomeOriginal;}
     public String getNomeArmazenado(){return nomeArmazenado;} public void setNomeArmazenado(String nomeArmazenado){this.nomeArmazenado=nomeArmazenado;}
     public String getCaminho(){return caminho;} public void setCaminho(String caminho){this.caminho=caminho;}

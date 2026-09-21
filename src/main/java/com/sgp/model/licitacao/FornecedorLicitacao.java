@@ -10,6 +10,7 @@ import java.util.List;
 @Table(name="lic_fornecedores",indexes=@Index(name="idx_lic_forn_nome",columnList="nome"))
 public class FornecedorLicitacao {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id;
+    @Column(unique=true,length=14) private String cnpj;
     @Column(nullable=false,length=180) private String nome;
     @Column(length=255) private String contato;
     @Column(length=1000) private String resumo;
@@ -23,6 +24,8 @@ public class FornecedorLicitacao {
     @PrePersist void aoCriar(){LocalDateTime a=LocalDateTime.now();criadoEm=criadoEm==null?a:criadoEm;atualizadoEm=a;}
     @PreUpdate void aoAtualizar(){atualizadoEm=LocalDateTime.now();}
     public Long getId(){return id;} public void setId(Long id){this.id=id;}
+    public String getCnpj(){return cnpj;} public void setCnpj(String cnpj){this.cnpj=cnpj;}
+    public String getCnpjFormatado(){return cnpj==null||cnpj.length()!=14?cnpj:cnpj.substring(0,2)+"."+cnpj.substring(2,5)+"."+cnpj.substring(5,8)+"/"+cnpj.substring(8,12)+"-"+cnpj.substring(12);}
     public String getNome(){return nome;} public void setNome(String nome){this.nome=nome;}
     public String getContato(){return contato;} public void setContato(String contato){this.contato=contato;}
     public String getResumo(){return resumo;} public void setResumo(String resumo){this.resumo=resumo;}
