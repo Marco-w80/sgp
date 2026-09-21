@@ -150,6 +150,134 @@
   }
   const kanban=document.getElementById('licitacao-kanban');
   if(kanban){
+    const navegacao=document.getElementById('kanban-navigation');
+    const guia=document.getElementById('kanban-stage-guide');
+    const trilhaGuia=document.getElementById('kanban-stage-guide-track');
+    const colunasKanban=Array.from(kanban.querySelectorAll('.kanban-column'));
+    const primeiroCabecalho=colunasKanban.length?colunasKanban[0].querySelector('header'):null;
+    let atualizarGuia=()=>{};
+    let medirGuia=()=>{};
+    if(guia&&trilhaGuia&&primeiroCabecalho){
+      document.body.appendChild(guia);
+      const rotulos=colunasKanban.map(coluna=>{
+        const rotulo=coluna.querySelector('header').cloneNode(true);
+        rotulo.classList.add('kanban-stage-label');
+        if(coluna.classList.contains('andamento'))rotulo.classList.add('andamento');
+        trilhaGuia.appendChild(rotulo);
+        return rotulo;
+      });
+      atualizarGuia=()=>{
+        const quadro=kanban.getBoundingClientRect();
+        const barraSuperior=navegacao&&!navegacao.hidden?navegacao.getBoundingClientRect():null;
+        const topoVisivel=barraSuperior&&barraSuperior.bottom>0?barraSuperior.bottom:0;
+        const cabecalhoSaiu=primeiroCabecalho.getBoundingClientRect().bottom<=topoVisivel+1;
+        const quadroVisivel=quadro.bottom>topoVisivel+primeiroCabecalho.offsetHeight&&quadro.top<window.innerHeight;
+        guia.style.top=topoVisivel+'px';
+        guia.style.left=quadro.left+'px';
+        guia.style.width=kanban.clientWidth+'px';
+        trilhaGuia.style.transform='translateX('+-kanban.scrollLeft+'px)';
+        guia.classList.toggle('is-visible',cabecalhoSaiu&&quadroVisivel);
+      };
+      medirGuia=()=>{
+        const estilo=window.getComputedStyle(kanban);
+        trilhaGuia.style.gap=estilo.columnGap;
+        rotulos.forEach((rotulo,indice)=>{rotulo.style.width=colunasKanban[indice].getBoundingClientRect().width+'px'});
+        atualizarGuia();
+      };
+      window.addEventListener('scroll',atualizarGuia,{passive:true});
+      document.addEventListener('scroll',atualizarGuia,{capture:true,passive:true});
+      window.addEventListener('resize',medirGuia);
+      if(window.ResizeObserver)new ResizeObserver(medirGuia).observe(kanban);
+      window.requestAnimationFrame(medirGuia);
+    }
+    const barra=document.getElementById('kanban-scrollbar');
+    const conteudoBarra=document.getElementById('kanban-scrollbar-content');
+    const voltar=document.getElementById('kanban-voltar');
+    const avancar=document.getElementById('kanban-avancar');
+    if(navegacao&&barra&&conteudoBarra&&voltar&&avancar){
+      const espacoNavegacao=document.createElement('div');
+      navegacao.before(espacoNavegacao);
+      const atualizarNavegacaoFixa=()=>{
+        const quadro=kanban.getBoundingClientRect();
+        const jaFixa=navegacao.classList.contains('is-fixed');
+        if(jaFixa){
+          navegacao.style.left=quadro.left+'px';
+          navegacao.style.width=quadro.width+'px';
+        }
+        const altura=navegacao.hidden?0:navegacao.getBoundingClientRect().height;
+        const fixar=!navegacao.hidden&&espacoNavegacao.getBoundingClientRect().top<=0&&quadro.bottom>altura;
+        if(fixar){
+          espacoNavegacao.style.height=altura+'px';
+          if(!jaFixa){
+            document.body.appendChild(navegacao);
+            navegacao.classList.add('is-fixed');
+          }
+          navegacao.style.left=quadro.left+'px';
+          navegacao.style.width=quadro.width+'px';
+        }else{
+          if(jaFixa){
+            espacoNavegacao.after(navegacao);
+            navegacao.classList.remove('is-fixed');
+            navegacao.style.left='';
+            navegacao.style.width='';
+          }
+          espacoNavegacao.style.height='';
+        }
+        atualizarGuia();
+      };
+      const limite=elemento=>Math.max(0,elemento.scrollWidth-elemento.clientWidth);
+      let posicaoProgramaticaBarra=null;
+      const sincronizarBarra=()=>{
+        const maxKanban=limite(kanban),maxBarra=limite(barra);
+        const destino=maxKanban?kanban.scrollLeft/maxKanban*maxBarra:0;
+        if(Math.abs(barra.scrollLeft-destino)>1){
+          posicaoProgramaticaBarra=destino;
+          barra.scrollLeft=destino;
+        }
+        voltar.disabled=kanban.scrollLeft<=1;
+        avancar.disabled=kanban.scrollLeft>=maxKanban-1;
+      };
+      const sincronizarKanban=()=>{
+        if(posicaoProgramaticaBarra!==null&&Math.abs(barra.scrollLeft-posicaoProgramaticaBarra)<=1){
+          posicaoProgramaticaBarra=null;
+          return;
+        }
+        posicaoProgramaticaBarra=null;
+        const maxBarra=limite(barra),maxKanban=limite(kanban);
+        const destino=maxBarra?barra.scrollLeft/maxBarra*maxKanban:0;
+        if(Math.abs(kanban.scrollLeft-destino)>1)kanban.scrollLeft=destino;
+      };
+      const atualizarNavegacao=()=>{
+        conteudoBarra.style.width=Math.ceil(kanban.scrollWidth)+'px';
+        const temRolagem=limite(kanban)>1;
+        navegacao.hidden=!temRolagem;
+        kanban.classList.toggle('has-top-navigation',temRolagem);
+        if(temRolagem)sincronizarBarra();
+        atualizarNavegacaoFixa();
+        medirGuia();
+      };
+      const rolarColuna=direcao=>{
+        const colunas=Array.from(kanban.querySelectorAll('.kanban-column'));
+        if(!colunas.length)return;
+        const origem=colunas[0].offsetLeft;
+        const posicoes=colunas.map(coluna=>coluna.offsetLeft-origem);
+        const atual=kanban.scrollLeft;
+        const destino=direcao>0
+          ?posicoes.find(posicao=>posicao>atual+1)
+          :posicoes.reverse().find(posicao=>posicao<atual-1);
+        kanban.scrollLeft=Math.max(0,Math.min(limite(kanban),destino===undefined?(direcao>0?limite(kanban):0):destino));
+        sincronizarBarra();
+      };
+      barra.addEventListener('scroll',sincronizarKanban);
+      kanban.addEventListener('scroll',sincronizarBarra);
+      window.addEventListener('scroll',atualizarNavegacaoFixa,{passive:true});
+      document.addEventListener('scroll',atualizarNavegacaoFixa,{capture:true,passive:true});
+      voltar.addEventListener('click',()=>rolarColuna(-1));
+      avancar.addEventListener('click',()=>rolarColuna(1));
+      window.addEventListener('resize',atualizarNavegacao);
+      if(window.ResizeObserver)new ResizeObserver(atualizarNavegacao).observe(kanban);
+      window.requestAnimationFrame(atualizarNavegacao);
+    }
     let dragged=null;
     kanban.querySelectorAll('.licitacao-card[draggable="true"]').forEach(card=>{
       card.addEventListener('dragstart',()=>{dragged=card;card.classList.add('dragging')});
