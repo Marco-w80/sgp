@@ -104,8 +104,42 @@ class PncpControllerTest {
                         .contentType("application/json")
                         .content("{\"link\":\"https://pncp.gov.br/app/editais/46374500000194/2026/7477\"}"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItens").value(1))
                 .andExpect(jsonPath("$.itens[0].numeroItem").value(1))
                 .andExpect(jsonPath("$.itens[0].descricao").value("Medicamento"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void consultaSomenteNumerosInformadosAntesDaBusca() throws Exception {
+        var itens = java.util.stream.IntStream.rangeClosed(1, 150)
+                .mapToObj(numero -> new PncpService.ItemPncp(numero, "Item " + numero,
+                        BigDecimal.ONE, "UN", null)).toList();
+        when(pncp.buscarItensContratacaoPncp(anyString())).thenReturn(itens);
+
+        mvc.perform(post(ENDPOINT_ITENS).with(csrf())
+                        .contentType("application/json")
+                        .content("{\"link\":\"https://pncp.gov.br/app/editais/46374500000194/2026/7477\",\"numerosItens\":\"1 10 23 70\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItens").value(150))
+                .andExpect(jsonPath("$.itens.length()").value(4))
+                .andExpect(jsonPath("$.itens[0].numeroItem").value(1))
+                .andExpect(jsonPath("$.itens[1].numeroItem").value(10))
+                .andExpect(jsonPath("$.itens[2].numeroItem").value(23))
+                .andExpect(jsonPath("$.itens[3].numeroItem").value(70));
+    }
+
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void rejeitaNumeroAusenteSemRetornarItensParciais() throws Exception {
+        when(pncp.buscarItensContratacaoPncp(anyString())).thenReturn(List.of(
+                new PncpService.ItemPncp(1, "Item 1", BigDecimal.ONE, "UN", null)));
+
+        mvc.perform(post(ENDPOINT_ITENS).with(csrf())
+                        .contentType("application/json")
+                        .content("{\"link\":\"https://pncp.gov.br/app/editais/46374500000194/2026/7477\",\"numerosItens\":\"1, 70\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Itens não encontrados no PNCP: 70."));
     }
 
     @Test

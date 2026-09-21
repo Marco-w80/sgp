@@ -15,6 +15,7 @@
   const botaoPncp=document.getElementById('buscar-dados-pncp'),mensagemPncp=document.getElementById('mensagem-pncp'),avisoDataPncp=document.getElementById('aviso-data-pncp'),carregandoPncp=document.getElementById('carregando-pncp'),previewItensPncp=document.getElementById('preview-itens-pncp'),corpoItensPncp=document.getElementById('corpo-itens-pncp'),totalItensPncp=document.getElementById('total-itens-pncp'),itensPncpJson=document.getElementById('itensPncpJson'),linkItensPncp=document.getElementById('linkItensPncp');
   if(botaoPncp&&mensagemPncp){
     const campo=id=>document.getElementById(id);
+    const entradaNumerosPncp=campo('numeros-itens-pncp'),ajudaItensPncp=campo('ajuda-itens-pncp');
     const mostrar=(texto,tipo)=>{mensagemPncp.textContent=texto;mensagemPncp.className='alert mt-3 mb-0 alert-'+tipo};
     const resumoCarregamento=campo('resumo-carregamento-pncp'),avisoDemora=campo('aviso-demora-pncp');
     const iconesEtapa={pending:'fa-circle',active:'fa-spinner fa-spin',done:'fa-check',error:'fa-exclamation'};
@@ -34,11 +35,11 @@
       if(avisoDemora)avisoDemora.classList.add('d-none');
     };
     const linkPncpValido=link=>{try{const url=new URL(link);return url.protocol==='https:'&&url.hostname==='pncp.gov.br'&&/^\/app\/editais\/\d{14}\/\d{4}\/\d+\/?$/.test(url.pathname)}catch(ignorado){return false}};
-    const consultarPncp=async(endpoint,link)=>{
+    const consultarPncp=async(endpoint,link,numerosItens)=>{
       const headers={'Content-Type':'application/json'};
       const token=document.querySelector('meta[name="_csrf"]'),header=document.querySelector('meta[name="_csrf_header"]');
       if(token&&header)headers[header.content]=token.content;
-      const respostaHttp=await fetch(endpoint,{method:'POST',headers,body:JSON.stringify({link})});
+      const respostaHttp=await fetch(endpoint,{method:'POST',headers,body:JSON.stringify({link,numerosItens})});
       let resposta={};try{resposta=await respostaHttp.json()}catch(ignorado){}
       if(!respostaHttp.ok)throw new Error(resposta.error||'O PNCP não respondeu corretamente.');
       return resposta;
@@ -50,8 +51,8 @@
       if(texto&&texto!=='O PNCP não respondeu corretamente.')return texto;
       return tipo==='dados'?'Falha ao consultar os dados gerais.':'Falha ao consultar os itens.';
     };
-    const limparItens=()=>{if(itensPncpJson)itensPncpJson.value='';if(linkItensPncp)linkItensPncp.value='';if(corpoItensPncp)corpoItensPncp.textContent='';if(totalItensPncp)totalItensPncp.textContent='0 itens';if(previewItensPncp)previewItensPncp.classList.add('d-none')};
-    const exibirItens=itens=>{
+    const limparItens=()=>{if(itensPncpJson)itensPncpJson.value='';if(linkItensPncp)linkItensPncp.value='';if(corpoItensPncp)corpoItensPncp.textContent='';if(totalItensPncp)totalItensPncp.textContent='0 itens';if(previewItensPncp)previewItensPncp.classList.add('d-none');if(ajudaItensPncp)ajudaItensPncp.textContent='Todos os itens serão carregados. Após salvar, escolha na página seguinte quais seguirão para Cotação.'};
+    const exibirItens=(itens,total)=>{
       if(!previewItensPncp||!corpoItensPncp||!itens.length)return;
       const formatar=valor=>valor===null||valor===undefined?'—':new Intl.NumberFormat('pt-BR',{maximumFractionDigits:4}).format(valor);
       const fragmento=document.createDocumentFragment();
@@ -60,12 +61,27 @@
         [item.numeroItem,item.descricao,formatar(item.quantidade),item.unidade,formatar(item.valorReferencia)].forEach(valor=>{const celula=document.createElement('td');celula.textContent=valor===null||valor===undefined?'':String(valor);linha.appendChild(celula)});
         fragmento.appendChild(linha);
       });
-      corpoItensPncp.appendChild(fragmento);if(totalItensPncp)totalItensPncp.textContent=itens.length+' itens';previewItensPncp.classList.remove('d-none');
+      corpoItensPncp.appendChild(fragmento);if(totalItensPncp)totalItensPncp.textContent=total>itens.length?itens.length+' de '+total+' itens':itens.length+' itens';previewItensPncp.classList.remove('d-none');
     };
     const entradaLink=campo('linkEdital');
     if(entradaLink)entradaLink.addEventListener('input',()=>{if(linkItensPncp&&linkItensPncp.value&&entradaLink.value.trim()!==linkItensPncp.value)limparItens()});
+    if(entradaNumerosPncp)entradaNumerosPncp.addEventListener('input',()=>{if(itensPncpJson&&itensPncpJson.value){limparItens();mostrar('Números alterados. Busque novamente no PNCP antes de salvar.','warning')}});
+    const formularioCadastro=botaoPncp.closest('form');
+    if(formularioCadastro&&entradaNumerosPncp)formularioCadastro.addEventListener('submit',evento=>{
+      if(entradaNumerosPncp.value.trim()&&(!itensPncpJson.value||linkItensPncp.value!==entradaLink.value.trim())){
+        evento.preventDefault();mostrar('Busque novamente no PNCP para aplicar os números dos itens antes de salvar.','danger');entradaNumerosPncp.focus();
+      }
+    });
     botaoPncp.addEventListener('click',async()=>{
       const link=campo('linkEdital').value.trim();
+      const numerosSolicitados=entradaNumerosPncp?entradaNumerosPncp.value.trim():'';
+      if(numerosSolicitados){
+        const numeros=numerosSolicitados.split(/[\s,;]+/).map(Number);
+        if(!/^\d+(?:[\s,;]+\d+)*$/.test(numerosSolicitados)||numerosSolicitados.length>2000||numeros.some(numero=>!Number.isSafeInteger(numero)||numero<1)){
+          mostrar('Informe apenas números de itens válidos, separados por espaço, vírgula ou ponto e vírgula.','danger');
+          entradaNumerosPncp.focus();return;
+        }
+      }
       if(!linkPncpValido(link)){mostrar('Informe um link válido do PNCP.','danger');avisoDataPncp.classList.add('d-none');return}
       const rotulo=botaoPncp.querySelector('span'),rotuloOriginal=rotulo.textContent;
       botaoPncp.disabled=true;rotulo.textContent='Buscando...';mensagemPncp.classList.add('d-none');avisoDataPncp.classList.add('d-none');
@@ -91,15 +107,16 @@
         },erro=>{
           dadosFinalizados=true;atualizarEtapa('dados','error',resumirErro('dados',erro));return {tipo:'dados',erro};
         })];
-        if(podeImportarItens)consultas.push(consultarPncp('/api/licitacoes/pncp/consultar/itens',link).then(valor=>{
+        if(podeImportarItens)consultas.push(consultarPncp('/api/licitacoes/pncp/consultar/itens',link,numerosSolicitados).then(valor=>{
           itensFinalizados=true;const quantidade=Array.isArray(valor.itens)?valor.itens.length:0;
-          atualizarEtapa('itens','done',quantidade+' itens recebidos');
+          atualizarEtapa('itens','done',quantidade+(numerosSolicitados?' itens selecionados':' itens recebidos'));
           if(resumoCarregamento&&!dadosFinalizados)resumoCarregamento.textContent='Itens recebidos. Aguardando os dados gerais...';
           return {tipo:'itens',valor};
         },erro=>{
           itensFinalizados=true;atualizarEtapa('itens','error',resumirErro('itens',erro));return {tipo:'itens',erro};
         }));
         const resultados=await Promise.all(consultas);
+        if((entradaNumerosPncp&&entradaNumerosPncp.value.trim()!==numerosSolicitados)||entradaLink.value.trim()!==link)throw new Error('Link ou números alterados durante a consulta. Busque novamente no PNCP.');
         const resultadoDados=resultados.find(resultado=>resultado.tipo==='dados');
         const resultadoItens=resultados.find(resultado=>resultado.tipo==='itens');
         const erros=[];
@@ -116,7 +133,7 @@
         }
 
         if(podeImportarItens&&itensCarregados){
-          atualizarEtapa('itens','done',itens.length+' itens recebidos');
+          atualizarEtapa('itens','done',itens.length+(numerosSolicitados?' itens selecionados':' itens recebidos'));
         }else if(podeImportarItens){
           houveErro=true;const erroItens=resumirErro('itens',resultadoItens&&resultadoItens.erro);
           erros.push(erroItens);atualizarEtapa('itens','error',erroItens);
@@ -132,11 +149,11 @@
             const entrada=campo(nome),valor=dados[nome];
             if(entrada&&valor!==null&&valor!==undefined&&valor!=='')entrada.value=valor;
           });
-          if(podeImportarItens){limparItens();itensPncpJson.value=JSON.stringify(itens);linkItensPncp.value=link;exibirItens(itens)}
+          if(podeImportarItens){limparItens();itensPncpJson.value=JSON.stringify(itens);linkItensPncp.value=link;exibirItens(itens,resultadoItens.valor.totalItens);if(numerosSolicitados&&ajudaItensPncp)ajudaItensPncp.textContent='Somente os itens informados serão cadastrados. Após salvar, confirme quais seguirão para Cotação.'}
           if(dados.dataDisputa)avisoDataPncp.classList.remove('d-none');
           atualizarEtapa('formulario','done','Formulário preenchido por completo');
           if(resumoCarregamento)resumoCarregamento.textContent='Consulta concluída';
-          mostrar(podeImportarItens?'Dados e '+itens.length+' itens carregados do PNCP. Confira as informações antes de cadastrar.':'Dados carregados do PNCP. Confira as informações antes de salvar.','success');
+          mostrar(podeImportarItens?'Dados e '+itens.length+(numerosSolicitados?' itens selecionados':' itens')+' carregados do PNCP. Confira as informações antes de cadastrar.':'Dados carregados do PNCP. Confira as informações antes de salvar.','success');
         }
       }catch(erro){
         houveErro=true;atualizarEtapa('formulario','error','Falha inesperada ao processar a resposta');
