@@ -83,29 +83,28 @@
       </div>
       <div class="kanban" id="licitacao-kanban" role="region" aria-label="Etapas das licitações" tabindex="0">
   <section class="kanban-column" th:each="etapa : ${etapas}" th:attr="data-etapa=${etapa.name()}">
-    <header><span th:text="${etapa.descricao}">Etapa</span><span class="badge badge-light" th:text="${#lists.size(dashboard.colunas.get(etapa.name()))}">0</span></header>
+    <header><span class="kanban-column-title"><i class="fas" th:classappend="${etapa.name() == 'CADASTRO' ? ' fa-file-alt' : (etapa.name() == 'COTACAO' ? ' fa-search-dollar' : (etapa.name() == 'APROVACAO' ? ' fa-check-circle' : (etapa.name() == 'DEFINICAO' ? ' fa-bullseye' : ' fa-handshake')))}" aria-hidden="true"></i><span th:text="${etapa.descricao}">Etapa</span></span><span class="badge badge-light" th:text="${#lists.size(dashboard.colunas.get(etapa.name()))}">0</span></header>
     <div class="kanban-list">
       <article class="licitacao-card" draggable="true" th:each="card : ${dashboard.colunas.get(etapa.name())}" th:attr="data-id=${card.licitacao.id},data-etapa=${card.licitacao.etapaAtual.name()}">
         <div class="licitacao-card-top">
           <span class="licitacao-drag-handle" title="Arraste para outra etapa" aria-hidden="true"><i class="fas fa-grip-vertical"></i></span>
           <strong class="licitacao-orgao" th:text="${card.licitacao.orgao}" th:title="${card.licitacao.orgao}">Órgão</strong>
-          <span class="urgencia" th:classappend="${' urgencia-'+card.urgencia.name().toLowerCase()}"
-            th:text="${card.urgencia.name() == 'CRITICO' ? 'Urgente' : (card.urgencia.name() == 'ATENCAO' ? 'Atenção' : (card.urgencia.name() == 'NO_PRAZO' ? 'No prazo' : 'Atrasado'))}">Prazo</span>
+          <span class="urgencia" th:classappend="${' urgencia-'+card.urgencia.name().toLowerCase()}"><i class="fas fa-clock" aria-hidden="true"></i><span th:text="${card.urgencia.name() == 'CRITICO' ? 'Urgente' : (card.urgencia.name() == 'ATENCAO' ? 'Atenção' : (card.urgencia.name() == 'NO_PRAZO' ? 'No prazo' : 'Atrasado'))}">Prazo</span></span>
         </div>
         <div class="licitacao-edital">
-          <span>Edital <strong th:text="${card.licitacao.numeroEdital}">00/0000</strong></span>
-          <span th:if="${card.licitacao.modalidade != null and !#strings.isEmpty(card.licitacao.modalidade)}" th:text="${card.licitacao.modalidade}">Modalidade</span>
+          <span><i class="fas fa-file-alt" aria-hidden="true"></i>Edital <strong th:text="${card.licitacao.numeroEdital}">00/0000</strong></span>
+          <span th:if="${card.licitacao.modalidade != null and !#strings.isEmpty(card.licitacao.modalidade)}"><i class="fas fa-gavel" aria-hidden="true"></i><span th:text="${card.licitacao.modalidade}">Modalidade</span></span>
         </div>
         <div class="licitacao-objeto">
-          <span class="licitacao-card-label">Objeto</span>
+          <span class="licitacao-card-label"><i class="fas fa-align-left" aria-hidden="true"></i>Objeto</span>
           <p class="objeto-clamp" th:text="${card.licitacao.objeto}" th:title="${card.licitacao.objeto}">Objeto</p>
         </div>
         <div class="card-meta">
-          <span><strong th:text="${#lists.size(card.licitacao.itens)}">0</strong> itens</span>
-          <span>Disputa <strong th:text="${#temporals.format(card.licitacao.dataDisputa,'dd/MM HH:mm')}"></strong></span>
+          <span class="card-meta-item"><i class="fas fa-boxes" aria-hidden="true"></i><span><strong th:text="${#lists.size(card.licitacao.itens)}">0</strong> itens</span></span>
+          <span class="card-meta-item"><i class="far fa-calendar-alt" aria-hidden="true"></i><span>Disputa <strong th:text="${#temporals.format(card.licitacao.dataDisputa,'dd/MM HH:mm')}"></strong></span></span>
         </div>
         <div class="licitacao-card-actions">
-          <a class="btn btn-sm btn-outline-primary" th:href="@{/licitacoes/{id}(id=${card.licitacao.id})}">Ver detalhes <i class="fas fa-arrow-right ml-1" aria-hidden="true"></i></a>
+          <a class="btn btn-sm btn-outline-primary" th:href="@{/licitacoes/{id}(id=${card.licitacao.id})}"><i class="far fa-eye mr-1" aria-hidden="true"></i>Ver detalhes</a>
           <form sec:authorize="hasRole('ADMIN')" method="post" th:action="@{/licitacoes/{id}/excluir(id=${card.licitacao.id})}"
             data-confirmacao-titulo="Excluir licitação?" data-confirmacao="A licitação e todos os dados relacionados serão excluídos permanentemente." data-confirmacao-botao="Sim, excluir">
             <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir licitação" aria-label="Excluir licitação"><i class="fas fa-trash-alt" aria-hidden="true"></i></button>
@@ -115,26 +114,30 @@
       <div class="kanban-empty" th:if="${#lists.isEmpty(dashboard.colunas.get(etapa.name()))}">Nenhuma licita&ccedil;&atilde;o</div>
     </div>
   </section>
-  <section class="kanban-column andamento"><header><span>Em andamento</span><span class="badge badge-light" th:text="${#lists.size(dashboard.colunas.get('EM_ANDAMENTO'))}">0</span></header><div class="kanban-list">
+  <section class="kanban-column andamento"><header><span class="kanban-column-title"><i class="fas fa-play-circle" aria-hidden="true"></i><span>Em andamento</span></span><span class="badge badge-light" th:text="${#lists.size(dashboard.colunas.get('EM_ANDAMENTO'))}">0</span></header><div class="kanban-list">
     <article class="licitacao-card" draggable="false" th:each="card : ${dashboard.colunas.get('EM_ANDAMENTO')}">
       <div class="licitacao-card-top">
         <strong class="licitacao-orgao" th:text="${card.licitacao.orgao}" th:title="${card.licitacao.orgao}">Órgão</strong>
-        <span class="urgencia urgencia-em-andamento">Em andamento</span>
+        <span class="urgencia urgencia-em-andamento"><i class="fas fa-play-circle" aria-hidden="true"></i>Em andamento</span>
       </div>
       <div class="licitacao-edital">
-        <span>Edital <strong th:text="${card.licitacao.numeroEdital}">00/0000</strong></span>
-        <span th:text="${card.licitacao.etapaAtual.descricao}">Etapa</span>
+        <span><i class="fas fa-file-alt" aria-hidden="true"></i>Edital <strong th:text="${card.licitacao.numeroEdital}">00/0000</strong></span>
+        <span><i class="fas fa-columns" aria-hidden="true"></i><span th:text="${card.licitacao.etapaAtual.descricao}">Etapa</span></span>
       </div>
       <div class="licitacao-objeto">
-        <span class="licitacao-card-label">Objeto</span>
+        <span class="licitacao-card-label"><i class="fas fa-align-left" aria-hidden="true"></i>Objeto</span>
         <p class="objeto-clamp" th:text="${card.licitacao.objeto}" th:title="${card.licitacao.objeto}">Objeto</p>
       </div>
       <div class="card-meta">
-        <span><strong th:text="${#lists.size(card.licitacao.itens)}">0</strong> itens</span>
-        <span>Disputa <strong th:text="${#temporals.format(card.licitacao.dataDisputa,'dd/MM HH:mm')}"></strong></span>
+        <span class="card-meta-item"><i class="fas fa-boxes" aria-hidden="true"></i><span><strong th:text="${#lists.size(card.licitacao.itens)}">0</strong> itens</span></span>
+        <span class="card-meta-item"><i class="far fa-calendar-alt" aria-hidden="true"></i><span>Disputa <strong th:text="${#temporals.format(card.licitacao.dataDisputa,'dd/MM HH:mm')}"></strong></span></span>
       </div>
       <div class="licitacao-card-actions">
-        <a class="btn btn-sm btn-outline-primary" th:href="@{/licitacoes/{id}(id=${card.licitacao.id})}">Ver detalhes <i class="fas fa-arrow-right ml-1" aria-hidden="true"></i></a>
+        <a class="btn btn-sm btn-outline-primary" th:href="@{/licitacoes/{id}(id=${card.licitacao.id})}"><i class="far fa-eye mr-1" aria-hidden="true"></i>Ver detalhes</a>
+        <form sec:authorize="hasRole('ADMIN')" method="post" th:action="@{/licitacoes/{id}/excluir(id=${card.licitacao.id})}"
+          data-confirmacao-titulo="Excluir licitação?" data-confirmacao="A licitação e todos os dados relacionados serão excluídos permanentemente." data-confirmacao-botao="Sim, excluir">
+          <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir licitação" aria-label="Excluir licitação"><i class="fas fa-trash-alt" aria-hidden="true"></i></button>
+        </form>
       </div>
     </article>
     <div class="kanban-empty" th:if="${#lists.isEmpty(dashboard.colunas.get('EM_ANDAMENTO'))}">Nenhuma licita&ccedil;&atilde;o</div>

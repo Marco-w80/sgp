@@ -209,28 +209,41 @@ class PncpServiceTest {
     }
 
     @Test
-    void confirmaQuantidadeAntesDeAceitarPrimeiraPaginaCheia() throws Exception {
+    void carregaTodasAsPaginasDeUmEditalComMaisDeCemItens() throws Exception {
         when(http.send(any(HttpRequest.class), anyStringBodyHandler())).thenAnswer(invocacao -> {
             HttpRequest request = invocacao.getArgument(0);
-            if (request.uri().getPath().endsWith("/itens/quantidade")) {
-                return resposta(200, "51");
-            }
-            if (request.uri().getRawQuery() != null) {
-                return resposta(200, respostaItens(50));
-            }
-            return resposta(200, respostaItens(51));
+            String query = request.uri().getRawQuery();
+            if (query.contains("pagina=1&")) return resposta(200, respostaItens(1, 50));
+            if (query.contains("pagina=2&")) return resposta(200, respostaItens(51, 100));
+            if (query.contains("pagina=3&")) return resposta(200, respostaItens(101, 114));
+            return resposta(500, "{}");
         });
 
         var itens = service.buscarItensContratacaoPncp(LINK);
 
-        assertThat(itens).hasSize(51);
-        assertThat(itens.get(50).numeroItem()).isEqualTo(51);
+        assertThat(itens).hasSize(114);
+        assertThat(itens.get(113).numeroItem()).isEqualTo(114);
         var captor = org.mockito.ArgumentCaptor.forClass(HttpRequest.class);
         verify(http, org.mockito.Mockito.times(3)).send(captor.capture(), anyStringBodyHandler());
         assertThat(captor.getAllValues()).extracting(request -> request.uri().toString()).containsExactly(
                 "https://pncp.gov.br/api/pncp/v1/orgaos/46374500000194/compras/2026/7477/itens?pagina=1&tamanhoPagina=50",
-                "https://pncp.gov.br/api/pncp/v1/orgaos/46374500000194/compras/2026/7477/itens/quantidade",
-                "https://pncp.gov.br/api/pncp/v1/orgaos/46374500000194/compras/2026/7477/itens");
+                "https://pncp.gov.br/api/pncp/v1/orgaos/46374500000194/compras/2026/7477/itens?pagina=2&tamanhoPagina=50",
+                "https://pncp.gov.br/api/pncp/v1/orgaos/46374500000194/compras/2026/7477/itens?pagina=3&tamanhoPagina=50");
+    }
+
+    @Test
+    void naoAceitaImportacaoParcialSePaginaPosteriorFalhar() throws Exception {
+        when(http.send(any(HttpRequest.class), anyStringBodyHandler())).thenAnswer(invocacao -> {
+            HttpRequest request = invocacao.getArgument(0);
+            return request.uri().getRawQuery().contains("pagina=1&")
+                    ? resposta(200, respostaItens(1, 50)) : resposta(503, "{}");
+        });
+
+        assertThatThrownBy(() -> service.buscarItensContratacaoPncp(LINK))
+                .isInstanceOfSatisfying(PncpService.PncpConsultaException.class, erro -> {
+                    assertThat(erro.getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+                    assertThat(erro).hasMessageContaining("página 2");
+                });
     }
 
     @Test
@@ -319,7 +332,11 @@ class PncpServiceTest {
     }
 
     private String respostaItens(int quantidade) {
-        return IntStream.rangeClosed(1, quantidade)
+        return respostaItens(1, quantidade);
+    }
+
+    private String respostaItens(int inicio, int fim) {
+        return IntStream.rangeClosed(inicio, fim)
                 .mapToObj(numero -> "{\"numeroItem\":" + numero
                         + ",\"descricao\":\"Item " + numero
                         + "\",\"quantidade\":1,\"unidadeMedida\":\"UN\",\"valorUnitarioEstimado\":1}")

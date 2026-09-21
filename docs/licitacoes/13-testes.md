@@ -8,7 +8,7 @@ Testes automatizados:
 - `LicitacaoAnexoServiceTest`: upload, download, exclusão, formato inválido e limite de 20 MB;
 - `PortfolioServiceTest`: CRUD, pesquisa e importação em lote;
 - `LegacySqliteDryRunServiceTest`: contagem read-only de um SQLite real temporário;
-- `PncpServiceTest`: mapeamento do exemplo oficial, link com barra/query/hash, bloqueio de formato inválido e site externo sem acesso à rede, 404, timeout, JSON inesperado, validação exata do resultado do índice do portal, contingência pela API detalhada, nova tentativa curta do índice, paginação com conferência da quantidade total e cache das respostas completas;
+- `PncpServiceTest`: mapeamento do exemplo oficial, link com barra/query/hash, bloqueio de formato inválido e site externo sem acesso à rede, 404, timeout, JSON inesperado, validação exata do resultado do índice do portal, contingência pela API detalhada, nova tentativa curta do índice, paginação de editais com mais de cem itens, rejeição de lista parcial e cache das respostas completas;
 - `PncpControllerTest`: autenticação, CSRF, contrato JSON de sucesso e erro amigável sem stack trace;
 - testes existentes do SGP continuam na mesma suíte.
 

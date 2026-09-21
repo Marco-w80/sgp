@@ -138,7 +138,8 @@ public class PncpService {
         HttpResponse<String> respostaItens = consultar(apiItens, referencia,
                 "/itens?pagina=1&tamanhoPagina=" + TAMANHO_PAGINA_ITENS, "dos itens");
         if (respostaItens.statusCode() == HttpStatus.NOT_FOUND.value()) {
-            return guardarCache(cacheItens, chave, List.of());
+            throw new PncpConsultaException(HttpStatus.NOT_FOUND,
+                    "Não foi possível localizar os itens dessa contratação no PNCP.");
         }
         if (respostaItens.statusCode() < 200 || respostaItens.statusCode() >= 300) {
             LOG.warn("PNCP respondeu HTTP {} ao consultar itens de {}/{}/{}",
@@ -149,38 +150,30 @@ public class PncpService {
         if (primeiraPagina.size() < TAMANHO_PAGINA_ITENS) {
             return guardarCache(cacheItens, chave, primeiraPagina);
         }
-
-        int quantidadeTotal = buscarQuantidadeItens(referencia);
-        if (quantidadeTotal <= primeiraPagina.size()) {
-            return guardarCache(cacheItens, chave, primeiraPagina);
-        }
-
-        HttpResponse<String> respostaCompleta = consultar(apiItens, referencia, "/itens", "de todos os itens");
-        if (respostaCompleta.statusCode() < 200 || respostaCompleta.statusCode() >= 300) {
-            throw indisponivel("Não foi possível consultar todos os itens no PNCP.");
-        }
-        List<ItemPncp> todosOsItens = mapearItens(respostaCompleta.body());
-        if (todosOsItens.size() != quantidadeTotal) {
-            throw respostaInesperada();
-        }
-        return guardarCache(cacheItens, chave, todosOsItens);
-    }
-
-    private int buscarQuantidadeItens(ReferenciaPncp referencia) {
-        HttpResponse<String> resposta = consultar(apiItens, referencia, "/itens/quantidade", "da quantidade de itens");
-        if (resposta.statusCode() < 200 || resposta.statusCode() >= 300) {
-            throw indisponivel("Não foi possível confirmar a quantidade de itens no PNCP.");
-        }
-        try {
-            JsonNode valor = json.readTree(resposta.body());
-            int quantidade = valor == null ? -1 : valor.asInt(-1);
-            if (quantidade < 0 || quantidade > LIMITE_ITENS) {
-                throw respostaInesperada();
+        List<ItemPncp> todosOsItens = new ArrayList<>(primeiraPagina);
+        Set<Integer> numeros = new HashSet<>();
+        for (ItemPncp item : primeiraPagina) numeros.add(item.numeroItem());
+        for (int pagina = 2; todosOsItens.size() <= LIMITE_ITENS; pagina++) {
+            HttpResponse<String> resposta = consultar(apiItens, referencia,
+                    "/itens?pagina=" + pagina + "&tamanhoPagina=" + TAMANHO_PAGINA_ITENS,
+                    "da página " + pagina + " dos itens");
+            if (resposta.statusCode() < 200 || resposta.statusCode() >= 300) {
+                LOG.warn("PNCP respondeu HTTP {} na página {} de itens da contratação {}/{}/{}",
+                        resposta.statusCode(), pagina, referencia.cnpj(), referencia.ano(),
+                        referencia.sequencial());
+                throw indisponivel("Não foi possível consultar a página " + pagina + " dos itens no PNCP.");
             }
-            return quantidade;
-        } catch (JsonProcessingException e) {
-            throw respostaInesperada();
+            List<ItemPncp> itensDaPagina = mapearItens(resposta.body());
+            for (ItemPncp item : itensDaPagina) {
+                if (!numeros.add(item.numeroItem())) throw respostaInesperada();
+            }
+            if (todosOsItens.size() + itensDaPagina.size() > LIMITE_ITENS) throw respostaInesperada();
+            todosOsItens.addAll(itensDaPagina);
+            if (itensDaPagina.size() < TAMANHO_PAGINA_ITENS) {
+                return guardarCache(cacheItens, chave, List.copyOf(todosOsItens));
+            }
         }
+        throw respostaInesperada();
     }
 
     private String chave(ReferenciaPncp referencia) {

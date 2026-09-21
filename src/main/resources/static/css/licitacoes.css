@@ -26,22 +26,26 @@
   z-index: 5;
   display: flex;
   align-items: center;
-  gap: .5rem;
-  padding: .35rem .25rem .55rem;
-  background: #fff;
-  border-bottom: 1px solid var(--lic-border);
+  gap: .75rem;
+  padding: .55rem .75rem;
+  background: #f8f9fc;
+  border: 1px solid #d9e3ee;
+  border-radius: .5rem;
+  box-shadow: 0 .15rem .4rem rgba(25, 47, 81, .08);
 }
-.kanban-navigation.is-fixed { position: fixed; top: 0; z-index: 6; }
+.kanban-navigation.is-fixed { position: fixed; top: 0; z-index: 6; box-shadow: 0 .35rem .8rem rgba(25, 47, 81, .16); }
 .kanban-navigation[hidden] { display: none !important; }
-.kanban-navigation .btn { flex: 0 0 34px; width: 34px; height: 34px; color: var(--lic-blue); border: 1px solid var(--lic-border); }
-.kanban-navigation .btn:hover:not(:disabled) { background: #e8f2fb; border-color: #b8cada; }
-.kanban-navigation .btn:disabled { opacity: .4; }
-.kanban-scrollbar { flex: 1 1 auto; min-width: 0; height: 20px; overflow-x: scroll; overflow-y: hidden; scrollbar-color: #9aa8ba #edf0f5; scrollbar-width: thin; }
+.kanban-navigation .btn { flex: 0 0 36px; width: 36px; height: 36px; color: var(--lic-blue); background: #fff; border: 1px solid #c8d9e8; border-radius: .45rem; }
+.kanban-navigation .btn:hover:not(:disabled) { color: #fff; background: var(--lic-blue); border-color: var(--lic-blue); }
+.kanban-navigation .btn:focus { box-shadow: 0 0 0 .2rem rgba(22, 98, 152, .2); }
+.kanban-navigation .btn:disabled { opacity: .45; }
+.kanban-scrollbar { flex: 1 1 auto; min-width: 0; height: 20px; overflow-x: scroll; overflow-y: hidden; scrollbar-color: var(--lic-blue) #e4edf5; scrollbar-width: thin; }
+.kanban-scrollbar:focus { outline: 2px solid rgba(22, 98, 152, .3); outline-offset: 2px; border-radius: .25rem; }
 .kanban-scrollbar > div { height: 1px; }
-.kanban-scrollbar::-webkit-scrollbar { height: 10px; }
-.kanban-scrollbar::-webkit-scrollbar-track { background: #edf0f5; border-radius: 10px; }
-.kanban-scrollbar::-webkit-scrollbar-thumb { background: #9aa8ba; border-radius: 10px; }
-.kanban-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--lic-blue); }
+.kanban-scrollbar::-webkit-scrollbar { height: 12px; }
+.kanban-scrollbar::-webkit-scrollbar-track { background: #e4edf5; border-radius: 10rem; }
+.kanban-scrollbar::-webkit-scrollbar-thumb { background: var(--lic-blue); border: 2px solid #e4edf5; border-radius: 10rem; }
+.kanban-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--lic-dark); }
 .kanban.has-top-navigation { scrollbar-width: none; scroll-snap-type: none; }
 .kanban.has-top-navigation::-webkit-scrollbar { display: none; }
 
@@ -101,7 +105,7 @@
   background: #fff;
   border: 1px solid var(--lic-border);
   border-radius: .65rem;
-  padding: 1rem;
+  overflow: hidden;
   margin-bottom: .9rem;
   box-shadow: 0 .15rem .45rem rgba(25, 47, 81, .09);
   cursor: grab;
@@ -117,6 +121,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   gap: .5rem;
+  padding: .85rem .9rem;
 }
 
 .licitacao-card[draggable="true"] .licitacao-card-top { grid-template-columns: auto minmax(0, 1fr) auto; }
@@ -150,20 +155,24 @@
 }
 
 .licitacao-edital {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .2rem .45rem;
-  margin-top: .65rem;
+  display: grid;
+  gap: .3rem;
+  padding: .7rem .9rem;
+  border-top: 1px solid #e8edf3;
+  background: #fbfcfe;
   color: #69788b;
   font-size: .8rem;
   line-height: 1.4;
 }
 
 .licitacao-edital strong { color: var(--lic-dark); font-weight: 600; }
-.licitacao-edital span + span::before { content: "·"; margin-right: .45rem; color: #a0a9b9; }
+.licitacao-edital > span { display: flex; align-items: baseline; gap: .3rem; min-width: 0; }
+.licitacao-edital > span > i { flex: 0 0 1rem; width: 1rem; color: var(--lic-blue); }
+.licitacao-edital > span > span { min-width: 0; overflow-wrap: anywhere; }
 
 .licitacao-objeto {
-  margin: .75rem 0;
+  padding: .7rem .9rem;
+  border-top: 1px solid #e8edf3;
   color: #53657d;
 }
 
@@ -176,6 +185,7 @@
   letter-spacing: .04em;
   text-transform: uppercase;
 }
+.licitacao-card-label i { margin-right: .3rem; color: var(--lic-blue); }
 
 .objeto-clamp {
   display: -webkit-box;
@@ -188,25 +198,28 @@
 }
 
 .card-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: .25rem .75rem;
+  display: grid;
+  grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr);
+  gap: .5rem;
+  padding: .7rem .9rem;
+  border-top: 1px solid #e8edf3;
+  background: #f7f9fc;
   color: #69788b;
   font-size: .78rem;
 }
 
 .card-meta strong { color: var(--lic-dark); font-weight: 700; }
+.card-meta-item { display: flex; align-items: baseline; gap: .3rem; min-width: 0; }
+.card-meta-item i { flex: 0 0 1rem; width: 1rem; color: var(--lic-blue); }
 
 .licitacao-card-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: .75rem;
-  border-top: 1px solid #edf0f5;
-  margin-top: .85rem;
-  padding-top: .8rem;
+  border-top: 1px solid #e8edf3;
+  padding: .55rem .9rem;
+  background: #fbfcfe;
 }
 
 .licitacao-card-actions .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; }
@@ -218,7 +231,6 @@
 .licitacoes-dashboard .licitacao-card-actions .btn-outline-danger:focus { color: #fff; border-color: #e74a3b; background: #e74a3b; }
 
 .urgencia { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; align-self: start; min-height: 24px; border-radius: 10rem; font-size: .7rem; line-height: 1; font-weight: 700; padding: .35rem .55rem; white-space: nowrap; flex: 0 0 auto; }
-.urgencia::before { content: ""; width: .38rem; height: .38rem; border-radius: 50%; background: currentColor; }
 .urgencia-atrasado { background: #f8d7da; color: #842029; }
 .urgencia-critico { background: #fdeae8; color: #a72d23; }
 .urgencia-atencao { background: #fff3cd; color: #664d03; }
@@ -388,29 +400,34 @@
   font-weight: 600;
 }
 .licitacoes-dashboard .lic-dashboard-board-search .btn { flex: 0 0 auto; }
-.licitacoes-dashboard .lic-dashboard-board { padding: 1rem 1.25rem .25rem; }
+.licitacoes-dashboard .lic-dashboard-board { padding: 1.35rem 1.25rem .25rem; }
 
 .licitacoes-dashboard .kanban-column > header,
 .kanban-stage-label {
-  background: #f8f9fc;
-  color: var(--lic-blue);
-  border-bottom: 2px solid var(--lic-blue);
-  font-size: .95rem;
+  background: var(--lic-dark);
+  color: #fff;
+  border-bottom: 3px solid #3477a5;
+  font-size: .84rem;
+  letter-spacing: .045em;
+  text-transform: uppercase;
 }
 
 .licitacoes-dashboard .kanban-column.andamento > header,
 .kanban-stage-label.andamento {
-  background: #f8f9fc;
-  color: #8b2635;
-  border-bottom-color: #e74a3b;
+  background: #8b2635;
+  color: #fff;
+  border-bottom-color: #cf6976;
 }
 
 .licitacoes-dashboard .kanban-column > header .badge,
 .kanban-stage-label .badge {
-  color: var(--lic-dark);
-  background: #e8eef6;
+  color: #fff;
+  background: rgba(255, 255, 255, .18);
+  border: 1px solid rgba(255, 255, 255, .2);
   font-size: .8rem;
 }
+.kanban-column-title { display: inline-flex; align-items: center; gap: .5rem; min-width: 0; }
+.kanban-column-title > i { width: 1rem; text-align: center; }
 
 @media (max-width: 1199.98px) {
   .licitacoes-dashboard .lic-dashboard-board-search { flex-basis: 100%; max-width: none; margin-left: 0; }
@@ -420,7 +437,7 @@
   .licitacoes-dashboard .lic-dashboard-actions { width: 100%; }
   .licitacoes-dashboard .lic-dashboard-actions .btn { flex: 1 1 auto; }
   .licitacoes-dashboard .lic-dashboard-overview { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .licitacoes-dashboard .lic-dashboard-board { padding: .75rem .5rem .25rem; }
+  .licitacoes-dashboard .lic-dashboard-board { padding: 1rem .5rem .25rem; }
 }
 
 @media (max-width: 575.98px) {

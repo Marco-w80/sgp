@@ -46,7 +46,8 @@
     const resumirErro=(tipo,erro)=>{
       const texto=erro&&erro.message?erro.message:'';
       if(/prazo|timeout|não respondeu/i.test(texto))return tipo==='dados'?'Dados gerais não responderam no prazo.':'Itens não responderam no prazo.';
-      if(/localizar|não encontrad/i.test(texto))return 'Licitação não encontrada no PNCP.';
+      if(/localizar essa contratação|contratação não encontrada/i.test(texto))return 'Licitação não encontrada no PNCP.';
+      if(texto&&texto!=='O PNCP não respondeu corretamente.')return texto;
       return tipo==='dados'?'Falha ao consultar os dados gerais.':'Falha ao consultar os itens.';
     };
     const limparItens=()=>{if(itensPncpJson)itensPncpJson.value='';if(linkItensPncp)linkItensPncp.value='';if(corpoItensPncp)corpoItensPncp.textContent='';if(totalItensPncp)totalItensPncp.textContent='0 itens';if(previewItensPncp)previewItensPncp.classList.add('d-none')};
@@ -208,15 +209,11 @@
         const fixar=!navegacao.hidden&&espacoNavegacao.getBoundingClientRect().top<=0&&quadro.bottom>altura;
         if(fixar){
           espacoNavegacao.style.height=altura+'px';
-          if(!jaFixa){
-            document.body.appendChild(navegacao);
-            navegacao.classList.add('is-fixed');
-          }
+          if(!jaFixa)navegacao.classList.add('is-fixed');
           navegacao.style.left=quadro.left+'px';
           navegacao.style.width=quadro.width+'px';
         }else{
           if(jaFixa){
-            espacoNavegacao.after(navegacao);
             navegacao.classList.remove('is-fixed');
             navegacao.style.left='';
             navegacao.style.width='';
