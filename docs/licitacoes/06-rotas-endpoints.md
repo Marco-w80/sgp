@@ -5,6 +5,7 @@ Todas exigem autenticação. Rotas mutáveis usam POST e CSRF.
 | Método | Rota | Ação |
 |---|---|---|
 | GET | `/licitacoes` | Dashboard; `busca`, `arquivadas` |
+| GET/POST | `/licitacoes/importacao-legado` | Formulário e carga transacional dos seis CSVs legados; somente ADMIN |
 | GET/POST | `/licitacoes/nova`, `/licitacoes` | Formulário/criação |
 | POST | `/api/licitacoes/pncp/consultar` | Valida um link de edital do PNCP e retorna dados para pré-preenchimento |
 | POST | `/licitacoes/{id}/etapa` | Altera a etapa; em Cadastro → Cotação recebe os `itemIds` selecionados |

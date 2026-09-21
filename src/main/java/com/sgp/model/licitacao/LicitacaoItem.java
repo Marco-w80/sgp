@@ -31,7 +31,7 @@ public class LicitacaoItem {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true) @OrderBy("dataCotacao DESC")
     private List<CotacaoLicitacao> cotacoes = new ArrayList<>();
 
-    @PrePersist void aoCriar() { LocalDateTime agora=LocalDateTime.now(); criadoEm=criadoEm==null?agora:criadoEm; atualizadoEm=agora; if(quantidade==null) quantidade=BigDecimal.ONE; if(unidade==null||unidade.isBlank()) unidade="UN"; }
+    @PrePersist void aoCriar() { LocalDateTime agora=LocalDateTime.now(); criadoEm=criadoEm==null?agora:criadoEm; atualizadoEm=atualizadoEm==null?agora:atualizadoEm; if(quantidade==null) quantidade=BigDecimal.ONE; if(unidade==null||unidade.isBlank()) unidade="UN"; }
     @PreUpdate void aoAtualizar() { atualizadoEm=LocalDateTime.now(); }
     public Long getId(){return id;} public void setId(Long id){this.id=id;}
     public Licitacao getLicitacao(){return licitacao;} public void setLicitacao(Licitacao licitacao){this.licitacao=licitacao;}

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 public interface CotacaoLicitacaoRepository extends JpaRepository<CotacaoLicitacao,Long>{
+    List<CotacaoLicitacao> findByItemId(Long itemId);
     List<CotacaoLicitacao> findByItemLicitacaoIdOrderByItemNumeroItemAscDataCotacaoDesc(Long licitacaoId);
     Optional<CotacaoLicitacao> findByLegadoId(Long legadoId);
     @Modifying @Query("update CotacaoLicitacao c set c.fornecedor=null where c.fornecedor.id=:id")

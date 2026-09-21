@@ -4,7 +4,10 @@
 <body>
 <div class="d-flex align-items-center justify-content-between mb-4">
   <div><h1 class="h3 mb-1 text-gray-800">Licita&ccedil;&otilde;es</h1><p class="text-muted mb-0">Acompanhamento do cadastro &agrave; participa&ccedil;&atilde;o</p></div>
-  <a class="btn btn-primary" th:href="@{/licitacoes/nova}"><i class="fas fa-plus mr-1"></i> Nova licita&ccedil;&atilde;o</a>
+  <div>
+    <a sec:authorize="hasRole('ADMIN')" class="btn btn-outline-secondary mr-2" th:href="@{/licitacoes/importacao-legado}"><i class="fas fa-file-import mr-1"></i> Importar legado</a>
+    <a class="btn btn-primary" th:href="@{/licitacoes/nova}"><i class="fas fa-plus mr-1"></i> Nova licita&ccedil;&atilde;o</a>
+  </div>
 </div>
 <div class="alert alert-success" th:if="${mensagem}" th:text="${mensagem}"></div><div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
 <div class="row mb-3">

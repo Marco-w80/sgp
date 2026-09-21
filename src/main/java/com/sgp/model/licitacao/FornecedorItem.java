@@ -15,7 +15,7 @@ public class FornecedorItem {
     @Column(name="criado_em",nullable=false) private LocalDateTime criadoEm;
     @Column(name="atualizado_em",nullable=false) private LocalDateTime atualizadoEm;
     @Column(name="legado_id",unique=true) private Long legadoId;
-    @PrePersist void aoCriar(){LocalDateTime a=LocalDateTime.now();criadoEm=criadoEm==null?a:criadoEm;atualizadoEm=a;}
+    @PrePersist void aoCriar(){LocalDateTime a=LocalDateTime.now();criadoEm=criadoEm==null?a:criadoEm;atualizadoEm=atualizadoEm==null?a:atualizadoEm;}
     @PreUpdate void aoAtualizar(){atualizadoEm=LocalDateTime.now();}
     public Long getId(){return id;} public void setId(Long id){this.id=id;}
     public FornecedorLicitacao getFornecedor(){return fornecedor;} public void setFornecedor(FornecedorLicitacao fornecedor){this.fornecedor=fornecedor;}

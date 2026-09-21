@@ -46,7 +46,7 @@ public class Licitacao {
     @OrderBy("enviadoEm DESC")
     private List<LicitacaoAnexo> anexos = new ArrayList<>();
 
-    @PrePersist void aoCriar() { LocalDateTime agora = LocalDateTime.now(); criadoEm = criadoEm == null ? agora : criadoEm; atualizadoEm = agora; }
+    @PrePersist void aoCriar() { LocalDateTime agora = LocalDateTime.now(); criadoEm = criadoEm == null ? agora : criadoEm; atualizadoEm = atualizadoEm == null ? agora : atualizadoEm; }
     @PreUpdate void aoAtualizar() { atualizadoEm = LocalDateTime.now(); }
 
     public Long getId() { return id; }

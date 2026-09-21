@@ -13,7 +13,7 @@
 | `lic_fornecedor_itens` | `FornecedorItem` | Itens ofertados pelo fornecedor |
 | `lic_portfolio_estoque` | `PortfolioEstoque` | Estoque do portfólio |
 
-Todos os valores monetários usam `DECIMAL`; datas de auditoria usam `DATETIME(6)`. Em `lic_itens`, `selecionado_cotacao` registra se o item participa do fluxo a partir da Cotação, sem apagar os itens não escolhidos. `legado_id` é único e reservado à idempotência da futura importação do SQLite. As auditorias apontam para `usuario`, sem criar outro cadastro.
+Todos os valores monetários usam `DECIMAL`; datas de auditoria usam `DATETIME(6)`. Em `lic_itens`, `selecionado_cotacao` registra se o item participa do fluxo a partir da Cotação, sem apagar os itens não escolhidos. `legado_id` é único e garante a idempotência da importação dos CSVs do sistema anterior. As auditorias apontam para `usuario`, sem criar outro cadastro; quando o identificador antigo não existe no banco atual, a interface apresenta a autoria como Sistema.
 
 ```mermaid
 erDiagram

@@ -21,7 +21,7 @@ public class FornecedorLicitacao {
     @Column(name="legado_id",unique=true) private Long legadoId;
     @OneToMany(mappedBy="fornecedor",cascade=CascadeType.ALL,orphanRemoval=true) @OrderBy("nome ASC")
     private List<FornecedorItem> itens=new ArrayList<>();
-    @PrePersist void aoCriar(){LocalDateTime a=LocalDateTime.now();criadoEm=criadoEm==null?a:criadoEm;atualizadoEm=a;}
+    @PrePersist void aoCriar(){LocalDateTime a=LocalDateTime.now();criadoEm=criadoEm==null?a:criadoEm;atualizadoEm=atualizadoEm==null?a:atualizadoEm;}
     @PreUpdate void aoAtualizar(){atualizadoEm=LocalDateTime.now();}
     public Long getId(){return id;} public void setId(Long id){this.id=id;}
     public String getCnpj(){return cnpj;} public void setCnpj(String cnpj){this.cnpj=cnpj;}
