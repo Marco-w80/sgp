@@ -22,7 +22,7 @@ import java.util.*;
 public class LicitacaoService {
     public enum Urgencia { ATRASADO, CRITICO, ATENCAO, NO_PRAZO }
     public record KanbanCard(Licitacao licitacao,Urgencia urgencia,long dias){}
-    public record Dashboard(Map<String,List<KanbanCard>> colunas,long total,long emAndamento,long urgentes){}
+    public record Dashboard(Map<String,List<KanbanCard>> colunas,long total,long emAndamento,long urgentes,long disputasHoje,long exigemAmostra,long semItens){}
     private final LicitacaoRepository licitacoes; private final LicitacaoItemRepository itens; private final CotacaoLicitacaoRepository cotacoes;
     private final LicitacaoHistoricoRepository historicos; private final ObjectMapper json; private final UsuarioAtualService usuarioAtual; private final LicitacaoAnexoService anexos; private final JdbcTemplate jdbc;
     public LicitacaoService(LicitacaoRepository licitacoes,LicitacaoItemRepository itens,CotacaoLicitacaoRepository cotacoes,LicitacaoHistoricoRepository historicos,ObjectMapper json,UsuarioAtualService usuarioAtual,LicitacaoAnexoService anexos,JdbcTemplate jdbc){this.licitacoes=licitacoes;this.itens=itens;this.cotacoes=cotacoes;this.historicos=historicos;this.json=json;this.usuarioAtual=usuarioAtual;this.anexos=anexos;this.jdbc=jdbc;}
@@ -52,6 +52,27 @@ public class LicitacaoService {
     @Transactional public CotacaoLicitacao salvarCotacao(Long licitacaoId,Long itemId,Long cotacaoId,FornecedorLicitacao fornecedor,String fornecedorNome,BigDecimal valor,LocalDate data,String obs){LicitacaoItem item=itemSelecionadoDaLicitacao(licitacaoId,itemId);if(valor==null||valor.signum()<0)throw new IllegalArgumentException("Valor da cotação é obrigatório.");CotacaoLicitacao c=cotacaoId==null?new CotacaoLicitacao():cotacoes.findById(cotacaoId).orElseThrow();if(cotacaoId!=null&&!c.getItem().getId().equals(itemId))throw new IllegalArgumentException("Cotação não pertence ao item.");c.setItem(item);c.setFornecedor(fornecedor);c.setFornecedorNome(fornecedor!=null?fornecedor.getNome():fornecedorNome);if(c.getFornecedorNome()==null||c.getFornecedorNome().isBlank())throw new IllegalArgumentException("Fornecedor é obrigatório.");c.setValorUnitario(valor);c.setDataCotacao(data);c.setObservacoes(obs);if(cotacaoId==null)c.setRegistradoPor(usuarioAtual.obter());CotacaoLicitacao salva=cotacoes.save(c);if(cotacaoId==null)item.getCotacoes().add(salva);return salva;}
     @Transactional public void excluirCotacao(Long licitacaoId,Long itemId,Long cotacaoId){CotacaoLicitacao c=cotacoes.findById(cotacaoId).orElseThrow();if(!c.getItem().getId().equals(itemId)||!c.getItem().getLicitacao().getId().equals(licitacaoId))throw new IllegalArgumentException("Cotação inválida.");c.getItem().getCotacoes().remove(c);cotacoes.delete(c);}
 
-    @Transactional(readOnly=true) public Dashboard dashboard(String busca,boolean arquivadas){List<Licitacao> lista=licitacoes.pesquisar(busca==null?"":busca.trim(),arquivadas);Map<String,List<KanbanCard>> col=new LinkedHashMap<>();for(EtapaLicitacao e:EtapaLicitacao.values())col.put(e.name(),new ArrayList<>());col.put("EM_ANDAMENTO",new ArrayList<>());long andamento=0,urgentes=0;for(Licitacao l:lista){long dias=ChronoUnit.DAYS.between(LocalDate.now(),l.getDataDisputa().toLocalDate());Urgencia u=urgencia(dias);if(dias>=0&&dias<=7)urgentes++;String chave=l.getDataDisputa().isBefore(LocalDateTime.now())||l.getDataDisputa().isEqual(LocalDateTime.now())?"EM_ANDAMENTO":l.getEtapaAtual().name();if(chave.equals("EM_ANDAMENTO"))andamento++;col.get(chave).add(new KanbanCard(l,u,dias));}return new Dashboard(col,lista.size(),andamento,urgentes);}
+    @Transactional(readOnly=true) public Dashboard dashboard(String busca,boolean arquivadas){
+        List<Licitacao> lista=licitacoes.pesquisar(busca==null?"":busca.trim(),arquivadas);
+        Map<String,List<KanbanCard>> col=new LinkedHashMap<>();
+        for(EtapaLicitacao e:EtapaLicitacao.values())col.put(e.name(),new ArrayList<>());
+        col.put("EM_ANDAMENTO",new ArrayList<>());
+        LocalDateTime agora=LocalDateTime.now();
+        LocalDate hoje=agora.toLocalDate();
+        long andamento=0,urgentes=0,disputasHoje=0,exigemAmostra=0,semItens=0;
+        for(Licitacao l:lista){
+            LocalDate diaDisputa=l.getDataDisputa().toLocalDate();
+            long dias=ChronoUnit.DAYS.between(hoje,diaDisputa);
+            Urgencia u=urgencia(dias);
+            if(dias>=0&&dias<=7)urgentes++;
+            if(diaDisputa.equals(hoje))disputasHoje++;
+            if(l.isPrecisaAmostra())exigemAmostra++;
+            if(l.getItens().isEmpty())semItens++;
+            String chave=!l.getDataDisputa().isAfter(agora)?"EM_ANDAMENTO":l.getEtapaAtual().name();
+            if(chave.equals("EM_ANDAMENTO"))andamento++;
+            col.get(chave).add(new KanbanCard(l,u,dias));
+        }
+        return new Dashboard(col,lista.size(),andamento,urgentes,disputasHoje,exigemAmostra,semItens);
+    }
     public Urgencia urgencia(long dias){if(dias<0)return Urgencia.ATRASADO;if(dias<=3)return Urgencia.CRITICO;if(dias<=7)return Urgencia.ATENCAO;return Urgencia.NO_PRAZO;}
 }

@@ -27,7 +27,7 @@
       <div class="lic-dashboard-overview">
         <div class="card border-left-primary lic-dashboard-stat lic-stat-active">
           <div class="card-body">
-            <div><span class="lic-dashboard-stat-label">Ativas</span><strong class="lic-dashboard-stat-value" th:text="${dashboard.total}">0</strong></div>
+            <div><span class="lic-dashboard-stat-label" th:text="${arquivadas ? 'Arquivadas' : 'Ativas'}">Ativas</span><strong class="lic-dashboard-stat-value" th:text="${dashboard.total}">0</strong></div>
             <i class="fas fa-list-alt lic-dashboard-stat-icon" aria-hidden="true"></i>
           </div>
         </div>
@@ -41,6 +41,24 @@
           <div class="card-body">
             <div><span class="lic-dashboard-stat-label">Próximos 7 dias</span><strong class="lic-dashboard-stat-value" th:text="${dashboard.urgentes}">0</strong></div>
             <i class="far fa-calendar-alt lic-dashboard-stat-icon" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="card border-left-info lic-dashboard-stat lic-stat-today">
+          <div class="card-body">
+            <div><span class="lic-dashboard-stat-label">Disputas hoje</span><strong class="lic-dashboard-stat-value" th:text="${dashboard.disputasHoje}">0</strong></div>
+            <i class="fas fa-calendar-day lic-dashboard-stat-icon" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="card border-left-success lic-dashboard-stat lic-stat-samples">
+          <div class="card-body">
+            <div><span class="lic-dashboard-stat-label">Exigem amostra</span><strong class="lic-dashboard-stat-value" th:text="${dashboard.exigemAmostra}">0</strong></div>
+            <i class="fas fa-vial lic-dashboard-stat-icon" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="card border-left-secondary lic-dashboard-stat lic-stat-no-items">
+          <div class="card-body">
+            <div><span class="lic-dashboard-stat-label">Sem itens</span><strong class="lic-dashboard-stat-value" th:text="${dashboard.semItens}">0</strong></div>
+            <i class="fas fa-box-open lic-dashboard-stat-icon" aria-hidden="true"></i>
           </div>
         </div>
       </div>

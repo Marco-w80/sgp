@@ -338,13 +338,18 @@
 .licitacoes-dashboard .lic-stat-active { border-left-color: var(--lic-blue) !important; }
 .licitacoes-dashboard .lic-stat-progress { border-left-color: #e74a3b !important; }
 .licitacoes-dashboard .lic-stat-soon { border-left-color: #f6c23e !important; }
+.licitacoes-dashboard .lic-stat-today { border-left-color: #36b9cc !important; }
+.licitacoes-dashboard .lic-stat-samples { border-left-color: #1cc88a !important; }
+.licitacoes-dashboard .lic-stat-no-items { border-left-color: #858796 !important; }
 
 .licitacoes-dashboard .lic-dashboard-summary { padding: .75rem 1.25rem; }
 .licitacoes-dashboard .lic-dashboard-overview {
   display: grid;
-  grid-template-columns: repeat(3, minmax(150px, 175px));
+  grid-template-columns: repeat(6, minmax(150px, 1fr));
   gap: .75rem;
   align-items: stretch;
+  overflow-x: auto;
+  padding-bottom: .35rem;
 }
 .licitacoes-dashboard .lic-dashboard-stat .card-body {
   display: flex;
@@ -368,6 +373,9 @@
 .lic-stat-active .lic-dashboard-stat-icon { background: #e8f2fb; color: var(--lic-blue); }
 .lic-stat-progress .lic-dashboard-stat-icon { background: #fbe9e7; color: #c94035; }
 .lic-stat-soon .lic-dashboard-stat-icon { background: #fff4dd; color: #a76b00; }
+.lic-stat-today .lic-dashboard-stat-icon { background: #e5f7fa; color: #138295; }
+.lic-stat-samples .lic-dashboard-stat-icon { background: #e1f8ed; color: #13875d; }
+.lic-stat-no-items .lic-dashboard-stat-icon { background: #edf0f4; color: #5a5c69; }
 
 .licitacoes-dashboard .form-control:focus {
   border-color: var(--lic-blue);
@@ -436,12 +444,10 @@
 @media (max-width: 767.98px) {
   .licitacoes-dashboard .lic-dashboard-actions { width: 100%; }
   .licitacoes-dashboard .lic-dashboard-actions .btn { flex: 1 1 auto; }
-  .licitacoes-dashboard .lic-dashboard-overview { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .licitacoes-dashboard .lic-dashboard-board { padding: 1rem .5rem .25rem; }
 }
 
 @media (max-width: 575.98px) {
-  .licitacoes-dashboard .lic-dashboard-overview { grid-template-columns: minmax(0, 1fr); }
   .licitacoes-dashboard .lic-dashboard-board-search { flex-wrap: wrap; }
   .licitacoes-dashboard .lic-dashboard-board-search .form-control { flex-basis: 100%; }
 }
