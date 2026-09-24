@@ -118,7 +118,7 @@
           <p class="objeto-clamp" th:text="${card.licitacao.objeto}" th:title="${card.licitacao.objeto}">Objeto</p>
         </div>
         <div class="card-meta">
-          <span class="card-meta-item"><i class="fas fa-boxes" aria-hidden="true"></i><span><strong th:text="${#lists.size(card.licitacao.itens)}">0</strong> itens</span></span>
+          <span class="card-meta-item"><i class="fas fa-boxes" aria-hidden="true"></i><span><strong th:text="${card.itensSelecionados}">0</strong> de <strong th:text="${card.totalItens}">0</strong> itens</span></span>
           <span class="card-meta-item"><i class="far fa-calendar-alt" aria-hidden="true"></i><span>Disputa <strong th:text="${#temporals.format(card.licitacao.dataDisputa,'dd/MM HH:mm')}"></strong></span></span>
         </div>
         <div class="licitacao-card-actions">
@@ -147,7 +147,7 @@
         <p class="objeto-clamp" th:text="${card.licitacao.objeto}" th:title="${card.licitacao.objeto}">Objeto</p>
       </div>
       <div class="card-meta">
-        <span class="card-meta-item"><i class="fas fa-boxes" aria-hidden="true"></i><span><strong th:text="${#lists.size(card.licitacao.itens)}">0</strong> itens</span></span>
+        <span class="card-meta-item"><i class="fas fa-boxes" aria-hidden="true"></i><span><strong th:text="${card.itensSelecionados}">0</strong> de <strong th:text="${card.totalItens}">0</strong> itens</span></span>
         <span class="card-meta-item"><i class="far fa-calendar-alt" aria-hidden="true"></i><span>Disputa <strong th:text="${#temporals.format(card.licitacao.dataDisputa,'dd/MM HH:mm')}"></strong></span></span>
       </div>
       <div class="licitacao-card-actions">

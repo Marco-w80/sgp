@@ -21,7 +21,7 @@ import java.util.*;
 @Service
 public class LicitacaoService {
     public enum Urgencia { ATRASADO, CRITICO, ATENCAO, NO_PRAZO }
-    public record KanbanCard(Licitacao licitacao,Urgencia urgencia,long dias){}
+    public record KanbanCard(Licitacao licitacao,Urgencia urgencia,long dias,long itensSelecionados,long totalItens){}
     public record Dashboard(Map<String,List<KanbanCard>> colunas,long total,long emAndamento,long urgentes,long disputasHoje,long exigemAmostra,long semItens){}
     private final LicitacaoRepository licitacoes; private final LicitacaoItemRepository itens; private final CotacaoLicitacaoRepository cotacoes;
     private final LicitacaoHistoricoRepository historicos; private final ObjectMapper json; private final UsuarioAtualService usuarioAtual; private final LicitacaoAnexoService anexos; private final JdbcTemplate jdbc;
@@ -70,7 +70,8 @@ public class LicitacaoService {
             if(l.getItens().isEmpty())semItens++;
             String chave=!l.getDataDisputa().isAfter(agora)?"EM_ANDAMENTO":l.getEtapaAtual().name();
             if(chave.equals("EM_ANDAMENTO"))andamento++;
-            col.get(chave).add(new KanbanCard(l,u,dias));
+            long itensSelecionados=l.getItens().stream().filter(LicitacaoItem::isSelecionadoCotacao).count();
+            col.get(chave).add(new KanbanCard(l,u,dias,itensSelecionados,l.getItens().size()));
         }
         return new Dashboard(col,lista.size(),andamento,urgentes,disputasHoje,exigemAmostra,semItens);
     }
