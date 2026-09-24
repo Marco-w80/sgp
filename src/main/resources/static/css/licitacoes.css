@@ -256,6 +256,8 @@
 .approval-card { border-left: 4px solid #858796; }
 .approval-card.decisao-aprovado { border-left-color: #1cc88a; }
 .approval-card.decisao-reprovado { border-left-color: #e74a3b; }
+.approval-cotacoes td { vertical-align: middle; }
+.approval-cotacao-observacao { min-width: 15rem; white-space: pre-wrap; }
 
 .timeline { border-left: 3px solid #d9dce3; margin-left: .5rem; padding-left: 1.5rem; }
 .timeline-item { position: relative; padding-bottom: 1.5rem; }
