@@ -453,3 +453,182 @@
   .licitacoes-dashboard .lic-dashboard-board-search { flex-wrap: wrap; }
   .licitacoes-dashboard .lic-dashboard-board-search .form-control { flex-basis: 100%; }
 }
+
+/* Cadastro e edição de licitações */
+.licitacao-form-page {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding-bottom: 1.5rem;
+}
+
+.lic-form-page-header { margin-bottom: 1.25rem; }
+.lic-form-back {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  margin-bottom: .9rem;
+  color: #69788b;
+  font-size: .84rem;
+  font-weight: 600;
+}
+.lic-form-back:hover { color: var(--lic-blue); text-decoration: none; }
+.lic-form-page-heading { display: flex; align-items: center; gap: .85rem; }
+.lic-form-page-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 3rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: .65rem;
+  background: var(--lic-dark);
+  color: #fff;
+  font-size: 1.2rem;
+  box-shadow: 0 .25rem .65rem rgba(25, 47, 81, .18);
+}
+.lic-form-page-heading h1 { margin: 0; color: var(--lic-dark); font-size: 1.55rem; font-weight: 700; }
+.lic-form-page-heading p { margin: .2rem 0 0; color: #6d7c90; font-size: .9rem; }
+
+.licitacao-form { display: grid; gap: 1.25rem; }
+.lic-form-card {
+  overflow: hidden;
+  border: 1px solid #dfe5ed;
+  border-radius: .75rem;
+  box-shadow: 0 .35rem 1.15rem rgba(25, 47, 81, .07);
+}
+.lic-form-pncp { border-top: 3px solid var(--lic-blue); }
+.lic-form-section-header {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  min-height: 76px;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e4e9f0;
+  background: #f8f9fc;
+}
+.lic-form-section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 2.4rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: .55rem;
+  background: #e8f2fb;
+  color: var(--lic-blue);
+  font-size: 1rem;
+}
+.lic-form-section-title { min-width: 0; }
+.lic-form-section-title h2 { margin: 0; color: var(--lic-dark); font-size: 1rem; font-weight: 700; }
+.lic-form-section-title p { margin: .2rem 0 0; color: #77869a; font-size: .8rem; line-height: 1.35; }
+.lic-form-source-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  padding: .4rem .65rem;
+  border: 1px solid #c9deef;
+  border-radius: 10rem;
+  background: #fff;
+  color: var(--lic-blue);
+  font-size: .72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.lic-form-section-body { padding: 1.25rem; }
+.licitacao-form label { margin-bottom: .38rem; color: #3f4f63; font-size: .8rem; font-weight: 700; }
+.licitacao-form .form-control {
+  min-height: 42px;
+  border-color: #ced7e2;
+  border-radius: .4rem;
+  color: var(--lic-dark);
+  font-size: .88rem;
+}
+.licitacao-form textarea.form-control { min-height: auto; resize: vertical; }
+.licitacao-form .form-control::placeholder { color: #a0a9b5; }
+.licitacao-form .form-control:focus {
+  border-color: var(--lic-blue);
+  box-shadow: 0 0 0 .2rem rgba(22, 98, 152, .16);
+}
+.licitacao-form .form-text { margin-top: .4rem; font-size: .74rem; line-height: 1.4; }
+.lic-form-required { color: #c94035; }
+.lic-form-optional {
+  margin-left: .3rem;
+  padding: .15rem .4rem;
+  border-radius: 10rem;
+  background: #edf0f4;
+  color: #6b7888;
+  font-size: .65rem;
+  font-weight: 600;
+}
+.lic-form-input-icon { position: relative; }
+.lic-form-input-icon > i {
+  position: absolute;
+  top: 50%;
+  left: .85rem;
+  z-index: 1;
+  color: #8493a5;
+  transform: translateY(-50%);
+}
+.lic-form-input-icon .form-control { padding-left: 2.35rem; }
+.lic-form-pncp-button { min-height: 42px; background: var(--lic-blue); border-color: var(--lic-blue); font-weight: 700; }
+.lic-form-pncp-button:hover,
+.lic-form-pncp-button:focus { background: var(--lic-dark); border-color: var(--lic-dark); }
+.lic-form-pncp-preview {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #dce5ee;
+  border-radius: .55rem;
+  background: #f8fafc;
+}
+.lic-form-preview-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .75rem; }
+.lic-form-preview-header strong { display: block; color: var(--lic-dark); font-size: .88rem; }
+.lic-form-preview-header small { display: block; margin-top: .15rem; color: #77869a; font-size: .74rem; }
+.pncp-itens-preview { max-height: 320px; overflow: auto; border-radius: .35rem; }
+.lic-form-manual-sections { margin-right: -.625rem; margin-left: -.625rem; }
+.lic-form-manual-sections > [class*="col-"] { padding-right: .625rem; padding-left: .625rem; }
+.lic-form-money-input { position: relative; }
+.lic-form-money-input > span {
+  position: absolute;
+  top: 50%;
+  left: .85rem;
+  z-index: 1;
+  color: #65758a;
+  font-size: .82rem;
+  font-weight: 700;
+  transform: translateY(-50%);
+}
+.lic-form-money-input .form-control { padding-left: 2.55rem; }
+.lic-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #dfe5ed;
+  border-radius: .7rem;
+  background: #fff;
+  box-shadow: 0 .3rem 1rem rgba(25, 47, 81, .07);
+}
+.lic-form-actions .btn { min-width: 112px; font-weight: 600; }
+.lic-form-actions .btn-primary { background: var(--lic-blue); border-color: var(--lic-blue); }
+.lic-form-actions .btn-primary:hover,
+.lic-form-actions .btn-primary:focus { background: var(--lic-dark); border-color: var(--lic-dark); }
+.lic-form-required-note { color: #77869a; font-size: .76rem; }
+
+@media (max-width: 767.98px) {
+  .lic-form-page-heading { align-items: flex-start; }
+  .lic-form-page-heading h1 { font-size: 1.35rem; }
+  .lic-form-section-header { align-items: flex-start; padding: .9rem 1rem; }
+  .lic-form-source-badge { display: none; }
+  .lic-form-section-body { padding: 1rem; }
+  .lic-form-actions { align-items: stretch; flex-direction: column; }
+  .lic-form-actions > div { display: flex; }
+  .lic-form-actions .btn { flex: 1 1 0; min-width: 0; }
+}
+
+@media (max-width: 399.98px) {
+  .lic-form-page-icon { display: none; }
+  .lic-form-actions > div { flex-direction: column-reverse; gap: .5rem; }
+  .lic-form-actions .btn { width: 100%; margin-left: 0 !important; }
+}
