@@ -5,60 +5,70 @@
   <link rel="stylesheet" th:href="@{/css/licitacoes.css}">
 </head>
 <body>
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <div>
-    <a th:href="@{/licitacoes}" class="small"><i class="fas fa-arrow-left"></i> Licita&ccedil;&otilde;es</a>
-    <h1 class="h3 text-gray-800 mt-2">Importar dados legados</h1>
-  </div>
-</div>
-
-<div class="alert alert-info">
-  A importa&ccedil;&atilde;o preserva as rela&ccedil;&otilde;es entre licita&ccedil;&otilde;es, itens, cota&ccedil;&otilde;es, fornecedores e hist&oacute;rico.
-  Ela pode ser repetida com seguran&ccedil;a: registros j&aacute; importados n&atilde;o s&atilde;o duplicados.
-</div>
-<div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
-
-<div class="card shadow-sm mb-4">
-  <div class="card-header"><strong>Arquivos exportados do banco antigo</strong></div>
-  <div class="card-body">
-    <form method="post" enctype="multipart/form-data" th:action="@{/licitacoes/importacao-legado}">
-      <div class="form-row">
-        <div class="form-group col-md-6"><label>licitacoes.csv *</label><input required type="file" accept=".csv,text/csv" name="licitacoes" class="form-control-file"></div>
-        <div class="form-group col-md-6"><label>itens.csv *</label><input required type="file" accept=".csv,text/csv" name="itens" class="form-control-file"></div>
-        <div class="form-group col-md-6"><label>item_cotacoes.csv *</label><input required type="file" accept=".csv,text/csv" name="itemCotacoes" class="form-control-file"></div>
-        <div class="form-group col-md-6"><label>licitacao_stage_history.csv *</label><input required type="file" accept=".csv,text/csv" name="stageHistory" class="form-control-file"></div>
-        <div class="form-group col-md-6"><label>fornecedores.csv *</label><input required type="file" accept=".csv,text/csv" name="fornecedores" class="form-control-file"></div>
-        <div class="form-group col-md-6"><label>fornecedor_itens.csv *</label><input required type="file" accept=".csv,text/csv" name="fornecedorItens" class="form-control-file"></div>
-      </div>
-      <div class="text-right">
-        <button class="btn btn-primary"><i class="fas fa-file-import mr-1"></i> Validar e importar</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="card shadow-sm" th:if="${relatorio != null}" id="relatorio-importacao-legado">
-  <div class="card-header"><strong>Importa&ccedil;&atilde;o conclu&iacute;da</strong></div>
-  <div class="card-body">
-    <p><b th:text="${relatorio.totalImportado}">0</b> registros novos e <b th:text="${relatorio.totalReconciliado}">0</b> registros reconciliados com cadastros existentes.</p>
-    <div class="table-responsive">
-      <table class="table table-sm">
-        <thead><tr><th>Conjunto</th><th>Novos</th><th>J&aacute; importados</th><th>Reconciliados</th><th>Total processado</th></tr></thead>
-        <tbody>
-          <tr><td>Licita&ccedil;&otilde;es</td><td th:text="${relatorio.licitacoes.importados}"></td><td th:text="${relatorio.licitacoes.jaImportados}"></td><td th:text="${relatorio.licitacoes.reconciliados}"></td><td th:text="${relatorio.licitacoes.totalProcessado}"></td></tr>
-          <tr><td>Itens</td><td th:text="${relatorio.itens.importados}"></td><td th:text="${relatorio.itens.jaImportados}"></td><td th:text="${relatorio.itens.reconciliados}"></td><td th:text="${relatorio.itens.totalProcessado}"></td></tr>
-          <tr><td>Cota&ccedil;&otilde;es</td><td th:text="${relatorio.cotacoes.importados}"></td><td th:text="${relatorio.cotacoes.jaImportados}"></td><td th:text="${relatorio.cotacoes.reconciliados}"></td><td th:text="${relatorio.cotacoes.totalProcessado}"></td></tr>
-          <tr><td>Hist&oacute;ricos</td><td th:text="${relatorio.historicos.importados}"></td><td th:text="${relatorio.historicos.jaImportados}"></td><td th:text="${relatorio.historicos.reconciliados}"></td><td th:text="${relatorio.historicos.totalProcessado}"></td></tr>
-          <tr><td>Fornecedores</td><td th:text="${relatorio.fornecedores.importados}"></td><td th:text="${relatorio.fornecedores.jaImportados}"></td><td th:text="${relatorio.fornecedores.reconciliados}"></td><td th:text="${relatorio.fornecedores.totalProcessado}"></td></tr>
-          <tr><td>Itens de fornecedores</td><td th:text="${relatorio.fornecedorItens.importados}"></td><td th:text="${relatorio.fornecedorItens.jaImportados}"></td><td th:text="${relatorio.fornecedorItens.reconciliados}"></td><td th:text="${relatorio.fornecedorItens.totalProcessado}"></td></tr>
-        </tbody>
-      </table>
+<main class="legacy-import-page">
+  <header class="legacy-page-header">
+    <a th:href="@{/licitacoes}" class="legacy-back"><i class="fas fa-arrow-left" aria-hidden="true"></i> Voltar para licita&ccedil;&otilde;es</a>
+    <div class="legacy-page-heading">
+      <span class="legacy-page-icon" aria-hidden="true"><i class="fas fa-database"></i></span>
+      <div><h1>Importar dados legados</h1><p>Migre os registros exportados do sistema anterior para o fluxo atual de licita&ccedil;&otilde;es.</p></div>
     </div>
-    <div class="alert alert-warning mb-2" th:each="aviso : ${relatorio.avisos}" th:text="${aviso}"></div>
-    <a class="btn btn-success" th:href="@{/licitacoes}"><i class="fas fa-columns mr-1"></i> Ver licita&ccedil;&otilde;es importadas</a>
-    <a class="btn btn-outline-primary ml-2" th:href="@{/licitacoes/portfolio(aba='fornecedores')}">Ver fornecedores</a>
+  </header>
+
+  <div class="legacy-info-panel">
+    <i class="fas fa-shield-alt" aria-hidden="true"></i>
+    <div><strong>Importa&ccedil;&atilde;o segura e conciliada</strong><span>As rela&ccedil;&otilde;es entre licita&ccedil;&otilde;es, itens, cota&ccedil;&otilde;es, fornecedores e hist&oacute;rico s&atilde;o preservadas. O processo pode ser repetido, pois registros j&aacute; importados n&atilde;o s&atilde;o duplicados.</span></div>
   </div>
-</div>
+  <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+
+  <section class="card legacy-card legacy-upload-card" aria-labelledby="titulo-arquivos-legado">
+    <header class="legacy-card-header">
+      <span class="legacy-card-icon" aria-hidden="true"><i class="fas fa-file-csv"></i></span>
+      <div><h2 id="titulo-arquivos-legado">Arquivos exportados do banco antigo</h2><p>Selecione os seis arquivos CSV correspondentes antes de iniciar.</p></div>
+      <span class="legacy-required-badge">6 arquivos obrigat&oacute;rios</span>
+    </header>
+    <div class="card-body legacy-card-body">
+      <form method="post" enctype="multipart/form-data" th:action="@{/licitacoes/importacao-legado}">
+        <div class="legacy-file-grid">
+          <label class="legacy-file-field" for="legado-licitacoes"><span class="legacy-file-icon"><i class="fas fa-gavel" aria-hidden="true"></i></span><span class="legacy-file-copy"><strong>Licita&ccedil;&otilde;es</strong><small>licitacoes.csv</small></span><input id="legado-licitacoes" required type="file" accept=".csv,text/csv" name="licitacoes"></label>
+          <label class="legacy-file-field" for="legado-itens"><span class="legacy-file-icon"><i class="fas fa-list" aria-hidden="true"></i></span><span class="legacy-file-copy"><strong>Itens</strong><small>itens.csv</small></span><input id="legado-itens" required type="file" accept=".csv,text/csv" name="itens"></label>
+          <label class="legacy-file-field" for="legado-cotacoes"><span class="legacy-file-icon"><i class="fas fa-tags" aria-hidden="true"></i></span><span class="legacy-file-copy"><strong>Cota&ccedil;&otilde;es</strong><small>item_cotacoes.csv</small></span><input id="legado-cotacoes" required type="file" accept=".csv,text/csv" name="itemCotacoes"></label>
+          <label class="legacy-file-field" for="legado-historico"><span class="legacy-file-icon"><i class="fas fa-history" aria-hidden="true"></i></span><span class="legacy-file-copy"><strong>Hist&oacute;rico de etapas</strong><small>licitacao_stage_history.csv</small></span><input id="legado-historico" required type="file" accept=".csv,text/csv" name="stageHistory"></label>
+          <label class="legacy-file-field" for="legado-fornecedores"><span class="legacy-file-icon"><i class="fas fa-building" aria-hidden="true"></i></span><span class="legacy-file-copy"><strong>Fornecedores</strong><small>fornecedores.csv</small></span><input id="legado-fornecedores" required type="file" accept=".csv,text/csv" name="fornecedores"></label>
+          <label class="legacy-file-field" for="legado-fornecedor-itens"><span class="legacy-file-icon"><i class="fas fa-boxes" aria-hidden="true"></i></span><span class="legacy-file-copy"><strong>Itens dos fornecedores</strong><small>fornecedor_itens.csv</small></span><input id="legado-fornecedor-itens" required type="file" accept=".csv,text/csv" name="fornecedorItens"></label>
+        </div>
+        <div class="legacy-actions"><span><i class="fas fa-info-circle mr-1" aria-hidden="true"></i> Somente arquivos CSV s&atilde;o aceitos.</span><button class="btn btn-primary"><i class="fas fa-file-import mr-1" aria-hidden="true"></i> Validar e importar</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card legacy-card legacy-report-card" th:if="${relatorio != null}" id="relatorio-importacao-legado">
+    <header class="legacy-card-header legacy-success-header">
+      <span class="legacy-card-icon" aria-hidden="true"><i class="fas fa-check"></i></span>
+      <div><h2>Importa&ccedil;&atilde;o conclu&iacute;da</h2><p>Os arquivos foram processados e conciliados com a base atual.</p></div>
+    </header>
+    <div class="card-body legacy-card-body">
+      <div class="legacy-report-summary">
+        <div><span>Registros novos</span><strong th:text="${relatorio.totalImportado}">0</strong></div>
+        <div><span>Registros reconciliados</span><strong th:text="${relatorio.totalReconciliado}">0</strong></div>
+      </div>
+      <div class="table-responsive legacy-report-table">
+        <table class="table mb-0">
+          <thead><tr><th>Conjunto</th><th class="text-right">Novos</th><th class="text-right">J&aacute; importados</th><th class="text-right">Reconciliados</th><th class="text-right">Total processado</th></tr></thead>
+          <tbody>
+            <tr><td><i class="fas fa-gavel" aria-hidden="true"></i> Licita&ccedil;&otilde;es</td><td th:text="${relatorio.licitacoes.importados}"></td><td th:text="${relatorio.licitacoes.jaImportados}"></td><td th:text="${relatorio.licitacoes.reconciliados}"></td><td th:text="${relatorio.licitacoes.totalProcessado}"></td></tr>
+            <tr><td><i class="fas fa-list" aria-hidden="true"></i> Itens</td><td th:text="${relatorio.itens.importados}"></td><td th:text="${relatorio.itens.jaImportados}"></td><td th:text="${relatorio.itens.reconciliados}"></td><td th:text="${relatorio.itens.totalProcessado}"></td></tr>
+            <tr><td><i class="fas fa-tags" aria-hidden="true"></i> Cota&ccedil;&otilde;es</td><td th:text="${relatorio.cotacoes.importados}"></td><td th:text="${relatorio.cotacoes.jaImportados}"></td><td th:text="${relatorio.cotacoes.reconciliados}"></td><td th:text="${relatorio.cotacoes.totalProcessado}"></td></tr>
+            <tr><td><i class="fas fa-history" aria-hidden="true"></i> Hist&oacute;ricos</td><td th:text="${relatorio.historicos.importados}"></td><td th:text="${relatorio.historicos.jaImportados}"></td><td th:text="${relatorio.historicos.reconciliados}"></td><td th:text="${relatorio.historicos.totalProcessado}"></td></tr>
+            <tr><td><i class="fas fa-building" aria-hidden="true"></i> Fornecedores</td><td th:text="${relatorio.fornecedores.importados}"></td><td th:text="${relatorio.fornecedores.jaImportados}"></td><td th:text="${relatorio.fornecedores.reconciliados}"></td><td th:text="${relatorio.fornecedores.totalProcessado}"></td></tr>
+            <tr><td><i class="fas fa-boxes" aria-hidden="true"></i> Itens de fornecedores</td><td th:text="${relatorio.fornecedorItens.importados}"></td><td th:text="${relatorio.fornecedorItens.jaImportados}"></td><td th:text="${relatorio.fornecedorItens.reconciliados}"></td><td th:text="${relatorio.fornecedorItens.totalProcessado}"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert alert-warning mb-2" th:each="aviso : ${relatorio.avisos}" th:text="${aviso}"></div>
+      <div class="legacy-report-actions"><a class="btn btn-success" th:href="@{/licitacoes}"><i class="fas fa-columns mr-1" aria-hidden="true"></i> Ver licita&ccedil;&otilde;es importadas</a><a class="btn btn-outline-primary" th:href="@{/licitacoes/portfolio(aba='fornecedores')}"><i class="fas fa-truck mr-1" aria-hidden="true"></i> Ver fornecedores</a></div>
+    </div>
+  </section>
+</main>
 
 <th:block th:replace="~{fragments/foot :: bot}"></th:block>
 </body>

@@ -1,10 +1,181 @@
-<!DOCTYPE html><html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head><th:block th:replace="~{fragments/head :: top}"></th:block><link rel="stylesheet" th:href="@{/css/licitacoes.css}"></head><body>
-<div class="d-flex justify-content-between align-items-center mb-3"><div><a th:href="@{/licitacoes}" class="small"><i class="fas fa-arrow-left"></i> Licita&ccedil;&otilde;es</a><h1 class="h3 text-gray-800 mt-2">Portf&oacute;lio</h1></div></div><div class="alert alert-success" th:if="${mensagem}" th:text="${mensagem}"></div><div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
-<form method="get" class="card shadow-sm mb-3"><div class="card-body py-3"><input type="hidden" name="aba" th:value="${abaAtiva}"><div class="input-group"><input class="form-control" name="busca" th:value="${busca}" placeholder="Pesquisar nome, marca, fabricante, fornecedor, resumo ou item"><div class="input-group-append"><button class="btn btn-outline-primary"><i class="fas fa-search"></i> Pesquisar</button></div></div></div></form>
-<ul class="nav nav-tabs mb-3"><li class="nav-item"><a class="nav-link" th:classappend="${abaAtiva=='estoque'?' active':''}" th:href="@{/licitacoes/portfolio(aba='estoque',busca=${busca})}">Estoque</a></li><li class="nav-item"><a class="nav-link" th:classappend="${abaAtiva=='fornecedores'?' active':''}" th:href="@{/licitacoes/portfolio(aba='fornecedores',busca=${busca})}">Diversos / Fornecedores</a></li></ul>
-<section th:if="${abaAtiva=='estoque'}"><div class="card shadow-sm mb-3"><div class="card-header"><strong>Novo item de estoque</strong></div><div class="card-body"><form method="post" th:action="@{/licitacoes/portfolio/estoque}" class="form-row align-items-end"><div class="form-group col-md-3"><label>Nome *</label><input required class="form-control" name="nome"></div><div class="form-group col-md-2"><label>Marca</label><input class="form-control" name="marca"></div><div class="form-group col-md-2"><label>Fabricante</label><input class="form-control" name="fabricante"></div><div class="form-group col-md-2"><label>Quantidade</label><input type="number" step="0.0001" class="form-control" name="quantidade" value="0"></div><div class="form-group col-md-2"><label>Pre&ccedil;o</label><input type="number" step="0.0001" class="form-control" name="preco"></div><div class="form-group col-md-1"><button class="btn btn-primary"><i class="fas fa-plus"></i></button></div></form></div></div><div class="card shadow-sm"><div class="table-responsive"><table class="table mb-0"><thead><tr><th>Nome</th><th>Marca</th><th>Fabricante</th><th>Quantidade</th><th>Pre&ccedil;o</th><th></th></tr></thead><tbody><tr th:if="${#lists.isEmpty(estoque)}"><td colspan="6" class="text-center text-muted">Nenhum item.</td></tr><tr th:each="p : ${estoque}"><td th:text="${p.nome}"></td><td th:text="${p.marca}"></td><td th:text="${p.fabricante}"></td><td th:text="${p.quantidade}"></td><td th:text="${p.preco != null ? 'R$ '+#numbers.formatDecimal(p.preco,1,'POINT',2,'COMMA') : '—'}"></td><td><button class="btn btn-sm btn-outline-secondary" data-toggle="collapse" th:data-target="${'#est-'+p.id}"><i class="fas fa-edit"></i></button><form class="d-inline" method="post" th:action="@{/licitacoes/portfolio/estoque/{id}/excluir(id=${p.id})}" onsubmit="return confirm('Excluir item?')"><button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button></form></td></tr><tr class="collapse" th:each="p : ${estoque}" th:id="${'est-'+p.id}"><td colspan="6"><form method="post" th:action="@{/licitacoes/portfolio/estoque}" class="form-row"><input type="hidden" name="id" th:value="${p.id}"><div class="col"><input class="form-control" name="nome" th:value="${p.nome}" required></div><div class="col"><input class="form-control" name="marca" th:value="${p.marca}"></div><div class="col"><input class="form-control" name="fabricante" th:value="${p.fabricante}"></div><div class="col"><input class="form-control" name="quantidade" th:value="${p.quantidade}"></div><div class="col"><input class="form-control" name="preco" th:value="${p.preco}"></div><div class="col-auto"><button class="btn btn-success"><i class="fas fa-save"></i></button></div></form></td></tr></tbody></table></div></div></section>
-<section th:if="${abaAtiva=='fornecedores'}"><div class="card shadow-sm mb-3"><div class="card-header"><strong>Novo fornecedor / fabricante</strong></div><div class="card-body"><div class="alert alert-light border"><i class="fas fa-info-circle mr-1"></i> Informe o CNPJ para preencher os dados automaticamente. Se a consulta não funcionar, continue preenchendo o cadastro manualmente.</div><form method="post" th:action="@{/licitacoes/portfolio/fornecedores}" class="form-row align-items-end" id="form-novo-fornecedor"><div class="form-group col-md-3"><label>CNPJ (opcional)</label><input class="form-control" name="cnpj" id="fornecedor-cnpj" maxlength="18" autocomplete="off" placeholder="00.000.000/0000-00"></div><div class="form-group col-md-2"><button type="button" class="btn btn-outline-primary btn-block" id="buscar-fornecedor-cnpj"><i class="fas fa-search mr-1"></i> Buscar CNPJ</button></div><div class="form-group col-md-4"><label>Nome *</label><input required class="form-control" name="nome" id="fornecedor-nome"></div><div class="form-group col-md-3"><label>Contato</label><input class="form-control" name="contato" id="fornecedor-contato"></div><div class="form-group col-md-5"><label>Resumo</label><input class="form-control" name="resumo" id="fornecedor-resumo"></div><div class="form-group col-md-6"><label>Observa&ccedil;&otilde;es</label><input class="form-control" name="observacoes" id="fornecedor-observacoes"></div><div class="form-group col-md-1"><button class="btn btn-primary btn-block" title="Cadastrar fornecedor"><i class="fas fa-plus"></i></button></div><div class="col-12"><div id="mensagem-consulta-cnpj" class="alert d-none mb-0" role="status"></div></div></form></div></div>
- <div class="card shadow-sm mb-3" th:each="f : ${fornecedores}"><div class="card-header d-flex justify-content-between align-items-center"><button class="btn btn-link text-left p-0" data-toggle="collapse" th:data-target="${'#forn-'+f.id}"><strong th:text="${f.nome}"></strong><span class="badge badge-light ml-2" th:if="${f.cnpj}" th:text="${f.cnpjFormatado}"></span><span class="text-muted ml-2" th:text="${f.resumo}"></span></button><div><button class="btn btn-sm btn-outline-primary" data-toggle="modal" th:data-target="${'#imp-f-'+f.id}"><i class="fas fa-file-import"></i> Importar itens</button><form class="d-inline" method="post" th:action="@{/licitacoes/portfolio/fornecedores/{id}/excluir(id=${f.id})}" onsubmit="return confirm('Excluir fornecedor e seus itens?')"><button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button></form></div></div><div class="collapse show" th:id="${'forn-'+f.id}"><div class="card-body"><p><b>Contato:</b> <span th:text="${f.contato ?: '—'}"></span> <span class="ml-3" th:text="${f.observacoes}"></span></p><details class="mb-3"><summary>Editar fornecedor</summary><form method="post" th:action="@{/licitacoes/portfolio/fornecedores}" class="form-row mt-2"><input type="hidden" name="id" th:value="${f.id}"><div class="col"><input class="form-control" name="cnpj" th:value="${f.cnpjFormatado}" placeholder="CNPJ"></div><div class="col"><input class="form-control" name="nome" th:value="${f.nome}" required></div><div class="col"><input class="form-control" name="contato" th:value="${f.contato}"></div><div class="col"><input class="form-control" name="resumo" th:value="${f.resumo}"></div><div class="col"><input class="form-control" name="observacoes" th:value="${f.observacoes}"></div><div class="col-auto"><button class="btn btn-success"><i class="fas fa-save"></i></button></div></form></details><form method="post" th:action="@{/licitacoes/portfolio/fornecedores/{id}/itens(id=${f.id})}" class="form-row align-items-end"><div class="form-group col-md-5"><label>Nome do item *</label><input required class="form-control" name="nome"></div><div class="form-group col-md-3"><label>Marca</label><input class="form-control" name="marca"></div><div class="form-group col-md-3"><label>Pre&ccedil;o</label><input type="number" step="0.0001" class="form-control" name="preco"></div><div class="form-group col-md-1"><button class="btn btn-primary"><i class="fas fa-plus"></i></button></div></form><table class="table table-sm"><thead><tr><th>Item</th><th>Marca</th><th>Pre&ccedil;o</th><th></th></tr></thead><tbody><tr th:each="i : ${f.itens}"><td th:text="${i.nome}"></td><td th:text="${i.marca}"></td><td th:text="${i.preco != null ? 'R$ '+#numbers.formatDecimal(i.preco,1,'POINT',2,'COMMA') : '—'}"></td><td class="text-right"><button class="btn btn-sm btn-link" data-toggle="collapse" th:data-target="${'#fi-'+i.id}">Editar</button><form class="d-inline" method="post" th:action="@{/licitacoes/portfolio/fornecedores/{id}/itens/{iid}/excluir(id=${f.id},iid=${i.id})}"><button class="btn btn-sm btn-link text-danger">Excluir</button></form></td></tr><tr class="collapse" th:each="i : ${f.itens}" th:id="${'fi-'+i.id}"><td colspan="4"><form method="post" th:action="@{/licitacoes/portfolio/fornecedores/{id}/itens(id=${f.id})}" class="form-row"><input type="hidden" name="itemId" th:value="${i.id}"><div class="col"><input class="form-control" name="nome" th:value="${i.nome}" required></div><div class="col"><input class="form-control" name="marca" th:value="${i.marca}"></div><div class="col"><input class="form-control" name="preco" th:value="${i.preco}"></div><div class="col-auto"><button class="btn btn-success"><i class="fas fa-save"></i></button></div></form></td></tr></tbody></table></div></div></div>
- <p th:if="${#lists.isEmpty(fornecedores)}" class="text-center text-muted">Nenhum fornecedor.</p>
- <div class="modal fade" th:each="f : ${fornecedores}" th:id="${'imp-f-'+f.id}" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><form method="post" th:action="@{/licitacoes/portfolio/fornecedores/{id}/itens/importar(id=${f.id})}"><div class="modal-header"><h5>Importar itens de <span th:text="${f.nome}"></span></h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body"><textarea name="dados" rows="7" required class="form-control" placeholder="Nome&#9;Marca&#9;Preço"></textarea><div class="form-row mt-2"><div class="col"><label>Delimitador</label><select name="delimitador" class="form-control"><option value="AUTOMATICO">Autom&aacute;tico</option><option value="TAB">TAB</option><option value="VIRGULA">V&iacute;rgula</option><option value="PONTO_VIRGULA">Ponto e v&iacute;rgula</option><option value="ESPACOS">M&uacute;ltiplos espa&ccedil;os</option></select></div><div class="col"><label><input type="checkbox" name="cabecalho" value="true"> Primeira linha &eacute; cabe&ccedil;alho</label></div><div class="col"><label>Coluna nome</label><input type="number" name="colNome" value="0" min="0" class="form-control"></div><div class="col"><label>Coluna marca</label><input type="number" name="colMarca" value="1" min="-1" class="form-control"></div><div class="col"><label>Coluna pre&ccedil;o</label><input type="number" name="colPreco" value="2" min="-1" class="form-control"></div></div></div><div class="modal-footer"><button class="btn btn-primary">Importar lote</button></div></form></div></div></div>
-</section><script th:src="@{/js/licitacoes.js}"></script><th:block th:replace="~{fragments/foot :: bot}"></th:block></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{fragments/head :: top}"></th:block>
+  <link rel="stylesheet" th:href="@{/css/licitacoes.css}">
+</head>
+<body>
+<main class="licitacao-portfolio-page">
+  <header class="portfolio-page-header">
+    <div class="portfolio-page-heading">
+      <span class="portfolio-page-icon" aria-hidden="true"><i class="fas fa-boxes"></i></span>
+      <div>
+        <h1>Portf&oacute;lio</h1>
+        <p>Consulte o estoque e mantenha fornecedores e itens organizados para as cota&ccedil;&otilde;es.</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="alert alert-success" th:if="${mensagem}" th:text="${mensagem}"></div>
+  <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+
+  <section class="card portfolio-toolbar" aria-label="Pesquisa e navega&ccedil;&atilde;o do portf&oacute;lio">
+    <form method="get" class="portfolio-search">
+      <input type="hidden" name="aba" th:value="${abaAtiva}">
+      <label for="portfolio-busca" class="sr-only">Pesquisar no portf&oacute;lio</label>
+      <div class="portfolio-search-field">
+        <i class="fas fa-search" aria-hidden="true"></i>
+        <input id="portfolio-busca" class="form-control" name="busca" th:value="${busca}" placeholder="Pesquisar nome, marca, fabricante, fornecedor, resumo ou item">
+      </div>
+      <a class="btn btn-light" th:if="${busca != null and !#strings.isEmpty(busca)}" th:href="@{/licitacoes/portfolio(aba=${abaAtiva})}" title="Limpar pesquisa"><i class="fas fa-times" aria-hidden="true"></i><span class="sr-only">Limpar pesquisa</span></a>
+      <button class="btn btn-primary"><i class="fas fa-search mr-1" aria-hidden="true"></i> Pesquisar</button>
+    </form>
+
+    <nav class="portfolio-tabs" aria-label="Se&ccedil;&otilde;es do portf&oacute;lio">
+      <a class="portfolio-tab" th:classappend="${abaAtiva=='estoque'?' active':''}" th:href="@{/licitacoes/portfolio(aba='estoque',busca=${busca})}">
+        <span><i class="fas fa-warehouse" aria-hidden="true"></i> Estoque</span>
+        <span class="badge" th:text="${#lists.size(estoque)}">0</span>
+      </a>
+      <a class="portfolio-tab" th:classappend="${abaAtiva=='fornecedores'?' active':''}" th:href="@{/licitacoes/portfolio(aba='fornecedores',busca=${busca})}">
+        <span><i class="fas fa-truck" aria-hidden="true"></i> Fornecedores</span>
+        <span class="badge" th:text="${#lists.size(fornecedores)}">0</span>
+      </a>
+    </nav>
+  </section>
+
+  <section class="portfolio-section" th:if="${abaAtiva=='estoque'}">
+    <div class="card portfolio-card portfolio-create-card">
+      <header class="portfolio-card-header">
+        <span class="portfolio-card-icon" aria-hidden="true"><i class="fas fa-plus"></i></span>
+        <div><h2>Novo item de estoque</h2><p>Cadastre um produto dispon&iacute;vel e seu valor de refer&ecirc;ncia.</p></div>
+      </header>
+      <div class="card-body portfolio-card-body">
+        <form method="post" th:action="@{/licitacoes/portfolio/estoque}" class="form-row align-items-end">
+          <div class="form-group col-md-6 col-lg-3"><label for="estoque-nome">Nome <span class="portfolio-required">*</span></label><input id="estoque-nome" required class="form-control" name="nome" placeholder="Nome do item"></div>
+          <div class="form-group col-md-6 col-lg-2"><label for="estoque-marca">Marca</label><input id="estoque-marca" class="form-control" name="marca" placeholder="Marca"></div>
+          <div class="form-group col-md-6 col-lg-2"><label for="estoque-fabricante">Fabricante</label><input id="estoque-fabricante" class="form-control" name="fabricante" placeholder="Fabricante"></div>
+          <div class="form-group col-md-3 col-lg-2"><label for="estoque-quantidade">Quantidade</label><input id="estoque-quantidade" type="number" step="0.0001" min="0" class="form-control" name="quantidade" value="0"></div>
+          <div class="form-group col-md-3 col-lg-2"><label for="estoque-preco">Pre&ccedil;o</label><div class="portfolio-money-input"><span>R$</span><input id="estoque-preco" type="number" step="0.0001" min="0" class="form-control" name="preco" placeholder="0,00"></div></div>
+          <div class="form-group col-lg-1"><button class="btn btn-primary btn-block portfolio-add-button" title="Cadastrar item"><i class="fas fa-plus" aria-hidden="true"></i><span class="d-lg-none ml-1">Cadastrar item</span></button></div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card portfolio-card portfolio-results-card">
+      <header class="portfolio-list-header">
+        <div><h2>Itens em estoque</h2><p th:if="${busca != null and !#strings.isEmpty(busca)}">Resultados para “<span th:text="${busca}"></span>”</p></div>
+        <span class="portfolio-result-count"><strong th:text="${#lists.size(estoque)}">0</strong> <span th:text="${#lists.size(estoque) == 1 ? 'item' : 'itens'}">itens</span></span>
+      </header>
+      <div class="table-responsive">
+        <table class="table portfolio-table mb-0">
+          <thead><tr><th>Nome</th><th>Marca</th><th>Fabricante</th><th class="text-right">Quantidade</th><th class="text-right">Pre&ccedil;o</th><th class="text-right">A&ccedil;&otilde;es</th></tr></thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(estoque)}"><td colspan="6"><div class="portfolio-empty"><i class="fas fa-box-open" aria-hidden="true"></i><strong>Nenhum item encontrado</strong><span>Cadastre um item ou altere os termos da pesquisa.</span></div></td></tr>
+            <th:block th:each="p : ${estoque}">
+              <tr>
+                <td><strong th:text="${p.nome}"></strong></td><td th:text="${p.marca ?: '—'}"></td><td th:text="${p.fabricante ?: '—'}"></td>
+                <td class="text-right text-nowrap" th:text="${p.quantidade}"></td>
+                <td class="text-right text-nowrap" th:text="${p.preco != null ? 'R$ '+#numbers.formatDecimal(p.preco,1,'POINT',2,'COMMA') : '—'}"></td>
+                <td class="text-right text-nowrap"><button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="collapse" th:data-target="${'#est-'+p.id}" title="Editar item"><i class="fas fa-edit" aria-hidden="true"></i></button><form class="d-inline" method="post" th:action="@{/licitacoes/portfolio/estoque/{id}/excluir(id=${p.id})}" data-confirmacao="Este item será removido do estoque." data-confirmacao-titulo="Excluir item?" data-confirmacao-botao="Excluir"><button class="btn btn-sm btn-outline-danger" title="Excluir item"><i class="fas fa-trash" aria-hidden="true"></i></button></form></td>
+              </tr>
+              <tr class="collapse portfolio-edit-row" th:id="${'est-'+p.id}"><td colspan="6">
+                <form method="post" th:action="@{/licitacoes/portfolio/estoque}" class="portfolio-inline-edit">
+                  <input type="hidden" name="id" th:value="${p.id}"><input class="form-control" name="nome" th:value="${p.nome}" required aria-label="Nome"><input class="form-control" name="marca" th:value="${p.marca}" aria-label="Marca"><input class="form-control" name="fabricante" th:value="${p.fabricante}" aria-label="Fabricante"><input type="number" step="0.0001" class="form-control" name="quantidade" th:value="${p.quantidade}" aria-label="Quantidade"><input type="number" step="0.0001" class="form-control" name="preco" th:value="${p.preco}" aria-label="Preço"><button class="btn btn-success"><i class="fas fa-save mr-1" aria-hidden="true"></i> Salvar</button>
+                </form>
+              </td></tr>
+            </th:block>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="portfolio-section" th:if="${abaAtiva=='fornecedores'}">
+    <div class="card portfolio-card portfolio-create-card">
+      <header class="portfolio-card-header">
+        <span class="portfolio-card-icon" aria-hidden="true"><i class="fas fa-building"></i></span>
+        <div><h2>Novo fornecedor ou fabricante</h2><p>Cadastre os dados principais e os produtos fornecidos.</p></div>
+      </header>
+      <div class="card-body portfolio-card-body">
+        <div class="portfolio-info"><i class="fas fa-info-circle" aria-hidden="true"></i><span>Informe o CNPJ para preencher os dados automaticamente. Se a consulta não funcionar, continue preenchendo o cadastro manualmente.</span></div>
+        <form method="post" th:action="@{/licitacoes/portfolio/fornecedores}" class="form-row align-items-end" id="form-novo-fornecedor">
+          <div class="form-group col-md-4 col-lg-3"><label for="fornecedor-cnpj">CNPJ <span class="portfolio-optional">Opcional</span></label><input class="form-control" name="cnpj" id="fornecedor-cnpj" maxlength="18" autocomplete="off" placeholder="00.000.000/0000-00"></div>
+          <div class="form-group col-md-3 col-lg-2"><button type="button" class="btn btn-outline-primary btn-block" id="buscar-fornecedor-cnpj"><i class="fas fa-search mr-1" aria-hidden="true"></i> Buscar CNPJ</button></div>
+          <div class="form-group col-md-5 col-lg-4"><label for="fornecedor-nome">Nome <span class="portfolio-required">*</span></label><input required class="form-control" name="nome" id="fornecedor-nome" placeholder="Raz&atilde;o social ou nome"></div>
+          <div class="form-group col-md-12 col-lg-3"><label for="fornecedor-contato">Contato</label><input class="form-control" name="contato" id="fornecedor-contato" placeholder="Telefone ou e-mail"></div>
+          <div class="form-group col-md-5"><label for="fornecedor-resumo">Resumo</label><input class="form-control" name="resumo" id="fornecedor-resumo" placeholder="Linha de produtos ou especialidade"></div>
+          <div class="form-group col-md-6"><label for="fornecedor-observacoes">Observa&ccedil;&otilde;es</label><input class="form-control" name="observacoes" id="fornecedor-observacoes" placeholder="Informa&ccedil;&otilde;es importantes"></div>
+          <div class="form-group col-md-1"><button class="btn btn-primary btn-block portfolio-add-button" title="Cadastrar fornecedor"><i class="fas fa-plus" aria-hidden="true"></i><span class="d-md-none ml-1">Cadastrar fornecedor</span></button></div>
+          <div class="col-12"><div id="mensagem-consulta-cnpj" class="alert d-none mb-0" role="status"></div></div>
+        </form>
+      </div>
+    </div>
+
+    <header class="portfolio-suppliers-heading">
+      <div><h2>Fornecedores cadastrados</h2><p th:if="${busca != null and !#strings.isEmpty(busca)}">Resultados para “<span th:text="${busca}"></span>”</p></div>
+      <span class="portfolio-result-count"><strong th:text="${#lists.size(fornecedores)}">0</strong> <span th:text="${#lists.size(fornecedores) == 1 ? 'fornecedor' : 'fornecedores'}">fornecedores</span></span>
+    </header>
+
+    <div class="portfolio-empty portfolio-empty-card" th:if="${#lists.isEmpty(fornecedores)}"><i class="fas fa-truck" aria-hidden="true"></i><strong>Nenhum fornecedor encontrado</strong><span>Cadastre um fornecedor ou altere os termos da pesquisa.</span></div>
+
+    <article class="card portfolio-card portfolio-supplier-card" th:each="f : ${fornecedores}">
+      <header class="portfolio-supplier-header">
+        <button type="button" class="portfolio-supplier-toggle" data-toggle="collapse" th:data-target="${'#forn-'+f.id}" aria-expanded="true">
+          <span class="portfolio-supplier-avatar" aria-hidden="true"><i class="fas fa-building"></i></span>
+          <span class="portfolio-supplier-identity"><strong th:text="${f.nome}"></strong><small><span th:if="${f.cnpj}" th:text="${f.cnpjFormatado}"></span><span th:if="${f.resumo}" th:text="${f.resumo}"></span></small></span>
+          <i class="fas fa-chevron-down portfolio-collapse-icon" aria-hidden="true"></i>
+        </button>
+        <div class="portfolio-supplier-actions"><button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" th:data-target="${'#imp-f-'+f.id}"><i class="fas fa-file-import mr-1" aria-hidden="true"></i> Importar itens</button><form method="post" th:action="@{/licitacoes/portfolio/fornecedores/{id}/excluir(id=${f.id})}" data-confirmacao="O fornecedor e todos os itens vinculados serão excluídos." data-confirmacao-titulo="Excluir fornecedor?" data-confirmacao-botao="Excluir"><button class="btn btn-sm btn-outline-danger" title="Excluir fornecedor"><i class="fas fa-trash" aria-hidden="true"></i></button></form></div>
+      </header>
+
+      <div class="collapse show" th:id="${'forn-'+f.id}">
+        <div class="card-body portfolio-supplier-body">
+          <div class="portfolio-supplier-meta">
+            <span><i class="fas fa-address-card" aria-hidden="true"></i><span><small>Contato</small><strong th:text="${f.contato ?: 'Não informado'}"></strong></span></span>
+            <span><i class="fas fa-sticky-note" aria-hidden="true"></i><span><small>Observa&ccedil;&otilde;es</small><strong th:text="${f.observacoes ?: 'Sem observações'}"></strong></span></span>
+          </div>
+
+          <details class="portfolio-details">
+            <summary><i class="fas fa-edit mr-1" aria-hidden="true"></i> Editar dados do fornecedor</summary>
+            <form method="post" th:action="@{/licitacoes/portfolio/fornecedores}" class="portfolio-supplier-edit">
+              <input type="hidden" name="id" th:value="${f.id}"><input class="form-control" name="cnpj" th:value="${f.cnpjFormatado}" placeholder="CNPJ" aria-label="CNPJ"><input class="form-control" name="nome" th:value="${f.nome}" required placeholder="Nome" aria-label="Nome"><input class="form-control" name="contato" th:value="${f.contato}" placeholder="Contato" aria-label="Contato"><input class="form-control" name="resumo" th:value="${f.resumo}" placeholder="Resumo" aria-label="Resumo"><input class="form-control" name="observacoes" th:value="${f.observacoes}" placeholder="Observações" aria-label="Observações"><button class="btn btn-success"><i class="fas fa-save mr-1" aria-hidden="true"></i> Salvar</button>
+            </form>
+          </details>
+
+          <div class="portfolio-items-header"><div><h3>Itens fornecidos</h3><span><strong th:text="${#lists.size(f.itens)}">0</strong> cadastrados</span></div></div>
+          <form method="post" th:action="@{/licitacoes/portfolio/fornecedores/{id}/itens(id=${f.id})}" class="form-row align-items-end portfolio-item-create">
+            <div class="form-group col-md-5"><label>Nome do item <span class="portfolio-required">*</span></label><input required class="form-control" name="nome" placeholder="Nome do produto"></div>
+            <div class="form-group col-md-3"><label>Marca</label><input class="form-control" name="marca" placeholder="Marca"></div>
+            <div class="form-group col-md-3"><label>Pre&ccedil;o</label><div class="portfolio-money-input"><span>R$</span><input type="number" step="0.0001" min="0" class="form-control" name="preco" placeholder="0,00"></div></div>
+            <div class="form-group col-md-1"><button class="btn btn-primary btn-block portfolio-add-button" title="Adicionar item"><i class="fas fa-plus" aria-hidden="true"></i><span class="d-md-none ml-1">Adicionar</span></button></div>
+          </form>
+
+          <div class="table-responsive portfolio-items-table"><table class="table table-sm mb-0"><thead><tr><th>Item</th><th>Marca</th><th class="text-right">Pre&ccedil;o</th><th class="text-right">A&ccedil;&otilde;es</th></tr></thead><tbody>
+            <tr th:if="${#lists.isEmpty(f.itens)}"><td colspan="4" class="text-center text-muted py-4">Nenhum item cadastrado para este fornecedor.</td></tr>
+            <th:block th:each="i : ${f.itens}">
+              <tr><td><strong th:text="${i.nome}"></strong></td><td th:text="${i.marca ?: '—'}"></td><td class="text-right text-nowrap" th:text="${i.preco != null ? 'R$ '+#numbers.formatDecimal(i.preco,1,'POINT',2,'COMMA') : '—'}"></td><td class="text-right text-nowrap"><button type="button" class="btn btn-sm btn-link" data-toggle="collapse" th:data-target="${'#fi-'+i.id}"><i class="fas fa-edit mr-1" aria-hidden="true"></i> Editar</button><form class="d-inline" method="post" th:action="@{/licitacoes/portfolio/fornecedores/{id}/itens/{iid}/excluir(id=${f.id},iid=${i.id})}" data-confirmacao="Este item será removido do fornecedor." data-confirmacao-titulo="Excluir item?" data-confirmacao-botao="Excluir"><button class="btn btn-sm btn-link text-danger"><i class="fas fa-trash-alt mr-1" aria-hidden="true"></i> Excluir</button></form></td></tr>
+              <tr class="collapse portfolio-edit-row" th:id="${'fi-'+i.id}"><td colspan="4"><form method="post" th:action="@{/licitacoes/portfolio/fornecedores/{id}/itens(id=${f.id})}" class="portfolio-item-edit"><input type="hidden" name="itemId" th:value="${i.id}"><input class="form-control" name="nome" th:value="${i.nome}" required aria-label="Nome"><input class="form-control" name="marca" th:value="${i.marca}" aria-label="Marca"><input type="number" step="0.0001" class="form-control" name="preco" th:value="${i.preco}" aria-label="Preço"><button class="btn btn-success"><i class="fas fa-save mr-1" aria-hidden="true"></i> Salvar</button></form></td></tr>
+            </th:block>
+          </tbody></table></div>
+        </div>
+      </div>
+    </article>
+
+    <div class="modal fade portfolio-import-modal" th:each="f : ${fornecedores}" th:id="${'imp-f-'+f.id}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg"><div class="modal-content"><form method="post" th:action="@{/licitacoes/portfolio/fornecedores/{id}/itens/importar(id=${f.id})}">
+        <div class="modal-header"><div><h5>Importar itens</h5><small>Fornecedor: <strong th:text="${f.nome}"></strong></small></div><button type="button" class="close" data-dismiss="modal" aria-label="Fechar">&times;</button></div>
+        <div class="modal-body">
+          <label>Dados dos itens</label><textarea name="dados" rows="7" required class="form-control" placeholder="Nome&#9;Marca&#9;Preço"></textarea>
+          <div class="form-row mt-3"><div class="form-group col-md-4"><label>Delimitador</label><select name="delimitador" class="form-control"><option value="AUTOMATICO">Autom&aacute;tico</option><option value="TAB">TAB</option><option value="VIRGULA">V&iacute;rgula</option><option value="PONTO_VIRGULA">Ponto e v&iacute;rgula</option><option value="ESPACOS">M&uacute;ltiplos espa&ccedil;os</option></select></div><div class="form-group col-md-4"><label>Coluna nome</label><input type="number" name="colNome" value="0" min="0" class="form-control"></div><div class="form-group col-md-2"><label>Coluna marca</label><input type="number" name="colMarca" value="1" min="-1" class="form-control"></div><div class="form-group col-md-2"><label>Coluna pre&ccedil;o</label><input type="number" name="colPreco" value="2" min="-1" class="form-control"></div></div>
+          <div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" th:id="${'cabecalho-importacao-'+f.id}" name="cabecalho" value="true"><label class="custom-control-label" th:for="${'cabecalho-importacao-'+f.id}">A primeira linha &eacute; o cabe&ccedil;alho</label></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-light" data-dismiss="modal">Cancelar</button><button class="btn btn-primary"><i class="fas fa-file-import mr-1" aria-hidden="true"></i> Importar lote</button></div>
+      </form></div></div>
+    </div>
+  </section>
+</main>
+
+<script th:src="@{/js/licitacoes.js}"></script>
+<th:block th:replace="~{fragments/foot :: bot}"></th:block>
+</body>
+</html>
