@@ -57,7 +57,9 @@ public class HomeController {
         LocalDate ate = periodo[1];
 
         var pendencias = processoService.listarProcessosComDocumentacaoPendenteComMinDias(diasMinimos, de, ate);
-        var processosSemVisita = processoService.listarProcessosComFiltroAcompanhamento(diasSemVisita, null, null);
+        // Esta lista usa apenas o filtro de dias sem visita. O período geral do
+        // dashboard não deve ocultar processos que ainda precisam de acompanhamento.
+        var processosSemVisita = processoService.listarProcessosSemVisita(diasSemVisita);
 
         LocalDateTime agora = LocalDateTime.now();
         Map<Long, Long> diasSemVisitaMap = new LinkedHashMap<>();

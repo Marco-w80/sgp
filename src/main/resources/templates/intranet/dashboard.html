@@ -461,6 +461,11 @@
       transition: all 0.3s;
     }
 
+    body.tv-mode .dashboard-page[data-presentation-exclude="true"],
+    body.tv-mode .pagination-dot.presentation-excluded {
+      display: none !important;
+    }
+
     .pagination-dot.active {
       background-color: white;
       transform: scale(1.3);
@@ -1010,7 +1015,7 @@
               </div>
             </div>
 
-            <div class="dashboard-page" data-title="Sem Acompanhamento">
+            <div class="dashboard-page" data-title="Sem Acompanhamento" data-presentation-exclude="true">
               <div class="row">
                 <div class="col-xl-4 col-md-6 mb-4">
                   <div class="card kpi-card card-theme-danger h-100 shadow-sm">
@@ -1179,13 +1184,15 @@
         navContainer.appendChild(navBtn);
 
         const dot = document.createElement('div');
-        dot.className = 'pagination-dot';
+        dot.className = 'pagination-dot' + (page.dataset.presentationExclude === 'true' ? ' presentation-excluded' : '');
         dot.dataset.index = index;
         paginationDotsContainer.appendChild(dot);
       });
 
       const navButtons = document.querySelectorAll('.dashboard-nav-btn');
       const dots = document.querySelectorAll('.pagination-dot');
+      const allPageIndexes = Array.from(pages, (_, index) => index);
+      const presentationPageIndexes = allPageIndexes.filter(index => pages[index].dataset.presentationExclude !== 'true');
 
       // 2. Função principal para mostrar uma página (COM ATUALIZAÇÃO DO TÍTULO)
       function showPage(index) {
@@ -1218,8 +1225,16 @@
       };
 
       // 4. Funções de navegação
-      const nextPage = () => showPage((currentPageIndex + 1) % pages.length);
-      const prevPage = () => showPage((currentPageIndex - 1 + pages.length) % pages.length);
+      const navigatePage = direction => {
+        const availableIndexes = document.body.classList.contains('tv-mode') ? presentationPageIndexes : allPageIndexes;
+        if (!availableIndexes.length) return;
+        const currentPosition = availableIndexes.indexOf(currentPageIndex);
+        const basePosition = currentPosition >= 0 ? currentPosition : (direction > 0 ? -1 : 0);
+        const nextPosition = (basePosition + direction + availableIndexes.length) % availableIndexes.length;
+        showPage(availableIndexes[nextPosition]);
+      };
+      const nextPage = () => navigatePage(1);
+      const prevPage = () => navigatePage(-1);
 
       // 5. Event Listeners
       navContainer.addEventListener('click', (e) => {
@@ -1230,8 +1245,10 @@
 
       tvModeBtn.addEventListener('click', () => {
         document.body.classList.add('tv-mode');
-        // Garante que o título da página atual seja exibido ao entrar no modo TV
-        presentationTitle.textContent = pages[currentPageIndex].dataset.title;
+        const initialPresentationPage = presentationPageIndexes.includes(currentPageIndex)
+          ? currentPageIndex
+          : presentationPageIndexes[0];
+        if (initialPresentationPage !== undefined) showPage(initialPresentationPage);
 
         // NOVO: Recolhe o filtro automaticamente para limpar a tela para a apresentação
         $('#dashboardFilterBar').collapse('hide');

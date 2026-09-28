@@ -142,10 +142,25 @@ public class ProcessoService {
                                                                  Integer diasSemEdicao,
                                                                  StatusProcesso status) {
         LocalDateTime agora = LocalDateTime.now();
-        LocalDateTime limiteAcesso = diasSemAcesso != null ? agora.minusDays(diasSemAcesso) : null;
-        LocalDateTime limiteEdicao = diasSemEdicao != null ? agora.minusDays(diasSemEdicao) : null;
+        Integer diasAcessoValidos = diasSemAcesso != null ? Math.max(diasSemAcesso, 0) : null;
+        Integer diasEdicaoValidos = diasSemEdicao != null ? Math.max(diasSemEdicao, 0) : null;
+        LocalDateTime limiteAcesso = diasAcessoValidos != null ? agora.minusDays(diasAcessoValidos) : null;
+        LocalDateTime limiteEdicao = diasEdicaoValidos != null ? agora.minusDays(diasEdicaoValidos) : null;
 
-        return processoRepository.buscarParaListagemComAcompanhamento(limiteAcesso, limiteEdicao, status);
+        return processoRepository.buscarParaListagemComAcompanhamento(
+                limiteAcesso,
+                limiteAcesso != null ? limiteAcesso.toLocalDate() : null,
+                limiteEdicao,
+                limiteEdicao != null ? limiteEdicao.toLocalDate() : null,
+                status);
+    }
+
+    public List<Processo> listarProcessosSemVisita(Integer diasSemVisita) {
+        return listarProcessosComFiltroAcompanhamento(diasSemVisita, null, null)
+                .stream()
+                .filter(processo -> processo.getStatus() != StatusProcesso.OBITO
+                        && processo.getStatus() != StatusProcesso.CONCLUIDO)
+                .toList();
     }
 
     /**

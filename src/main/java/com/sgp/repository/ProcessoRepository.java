@@ -22,14 +22,20 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
 
     @Query("""
            select p from Processo p
-           where (:limiteAcesso is null or p.ultimoAcessoEm is null or p.ultimoAcessoEm <= :limiteAcesso)
-             and (:limiteEdicao is null or p.ultimaEdicaoEm is null or p.ultimaEdicaoEm <= :limiteEdicao)
+           where (:limiteAcesso is null
+                  or p.ultimoAcessoEm <= :limiteAcesso
+                  or (p.ultimoAcessoEm is null and p.dataInicio <= :limiteAcessoData))
+             and (:limiteEdicao is null
+                  or p.ultimaEdicaoEm <= :limiteEdicao
+                  or (p.ultimaEdicaoEm is null and p.dataInicio <= :limiteEdicaoData))
              and (:status is null or p.status = :status)
-           order by p.id desc
+           order by p.ultimoAcessoEm asc, p.dataInicio asc, p.id desc
            """)
     List<Processo> buscarParaListagemComAcompanhamento(@Param("limiteAcesso") LocalDateTime limiteAcesso,
-                                                       @Param("limiteEdicao") LocalDateTime limiteEdicao,
-                                                       @Param("status") StatusProcesso status);
+                                                        @Param("limiteAcessoData") LocalDate limiteAcessoData,
+                                                        @Param("limiteEdicao") LocalDateTime limiteEdicao,
+                                                        @Param("limiteEdicaoData") LocalDate limiteEdicaoData,
+                                                        @Param("status") StatusProcesso status);
 
     @Query(value = """
             select p.id,
