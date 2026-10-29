@@ -3,15 +3,18 @@ package com.sgp.controller;
 import com.sgp.dto.PessoaForm;
 import com.sgp.model.*;
 import com.sgp.repository.PessoaRepository;
+import com.sgp.repository.ProcessoRepository;
+import com.sgp.projections.Projections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/pessoas")
@@ -19,6 +22,9 @@ public class PessoaController {
 
     @Autowired
     private PessoaRepository pessoaRepository;
+
+    @Autowired
+    private ProcessoRepository processoRepository;
 
     @GetMapping("/cadastrar")
     public String showForm(Model model) {
@@ -68,8 +74,48 @@ public class PessoaController {
     @GetMapping("/listar")
     public String list(Model model) {
         List<Pessoa> pessoas = pessoaRepository.findAll();
+        Map<Long, Long> vinculosProcessos = new HashMap<>();
+        somarVinculos(vinculosProcessos, processoRepository.contarVinculosPorPaciente());
+        somarVinculos(vinculosProcessos, processoRepository.contarVinculosPorAdvogado());
+        somarVinculos(vinculosProcessos, processoRepository.contarVinculosPorMedico());
         model.addAttribute("pessoas", pessoas);
+        model.addAttribute("vinculosProcessos", vinculosProcessos);
         return "pessoas/listar-pessoas";
+    }
+
+    @PostMapping("/excluir/{id}")
+    public String excluir(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        Pessoa pessoa = pessoaRepository.findById(id).orElse(null);
+        if (pessoa == null) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Pessoa não encontrada.");
+            return "redirect:/pessoas/listar";
+        }
+
+        long vinculos = processoRepository.contarVinculosPessoa(id);
+        if (vinculos > 0) {
+            redirectAttributes.addFlashAttribute("mensagemErro",
+                    mensagemVinculo("A pessoa " + pessoa.getNome(), vinculos));
+            return "redirect:/pessoas/listar";
+        }
+
+        try {
+            pessoaRepository.delete(pessoa);
+            pessoaRepository.flush();
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Pessoa excluída com sucesso.");
+        } catch (DataIntegrityViolationException ex) {
+            redirectAttributes.addFlashAttribute("mensagemErro",
+                    "Não foi possível excluir a pessoa porque ela possui vínculos no sistema.");
+        }
+        return "redirect:/pessoas/listar";
+    }
+
+    private void somarVinculos(Map<Long, Long> destino, List<Projections.IdTotalProjection> vinculos) {
+        vinculos.forEach(item -> destino.merge(item.getId(), item.getTotal(), Long::sum));
+    }
+
+    private String mensagemVinculo(String cadastro, long quantidade) {
+        return cadastro + " está vinculada a " + quantidade + " processo" + (quantidade == 1 ? "" : "s")
+                + " e não pode ser excluída.";
     }
 
     @GetMapping("/editar/{id}")

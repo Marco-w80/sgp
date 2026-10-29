@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
 
 <head>
-    <title>Todos os Tumores por Localização</title>
+    <title>Doenças cadastradas</title>
     <th:block th:replace="~{fragments/head :: top}"></th:block>
 
     <style>
@@ -128,22 +128,22 @@
                 <div class="card shadow mb-4 rounded">
                     <div class="card-header py-3 d-sm-flex align-items-center justify-content-between main-header">
                         <h6 class="m-0 font-weight-bold text-primary">
-                            <i class="fas fa-microscope mr-2"></i> Todos os Tumores Cadastrados por Localização
+                            <i class="fas fa-notes-medical mr-2"></i> Doenças cadastradas por categoria
                         </h6>
                         <a th:href="@{/doencas/cadastrar}" class="btn btn-gerenciar btn-sm shadow-sm">
-                            <i class="fas fa-cogs mr-1"></i> Gerenciar Tumores
+                            <i class="fas fa-cogs mr-1"></i> Gerenciar doenças
                         </a>
                     </div>
 
                     <div class="card-body">
                         <div class="search-container mb-4">
                             <i class="fas fa-search form-control-icon"></i>
-                            <input type="text" id="filterInput" class="form-control" placeholder="Filtrar por nome do tumor ou localização..."
-                                   aria-label="Filtrar Tumores">
+                            <input type="text" id="filterInput" class="form-control" placeholder="Filtrar por doença ou categoria..."
+                                   aria-label="Filtrar doenças">
                         </div>
 
                         <div th:if="${grupos == null or grupos.isEmpty()}" class="text-center">
-                            <p class="text-muted">Nenhuma localização com tumores cadastrados encontrada.</p>
+                            <p class="text-muted">Nenhuma categoria com doenças cadastradas foi encontrada.</p>
                         </div>
 
                         <div id="noResultsMessage" class="alert alert-warning text-center" style="display: none;">
@@ -155,16 +155,16 @@
                                 <div class="card border-left-primary shadow h-100 py-2 rounded">
                                     <div class="card-header py-2">
                                         <h6 class="m-0 font-weight-bold group-name">
-                                            <i class="fas fa-map-marker-alt mr-2"></i> <span th:text="${grupo.nome}">Localização</span>
+                                            <i class="fas fa-folder-open mr-2"></i> <span th:text="${grupo.nome}">Categoria</span>
                                         </h6>
                                     </div>
                                     <div class="card-body">
                                         <ul class="list-group list-group-flush">
                                             <li class="list-group-item tumor-item" th:each="d : ${grupo.doencas}">
-                                                <span class="tumor-name" th:text="${d.nome}">Tipo de Tumor</span>
+                                                <span class="tumor-name" th:text="${d.nome}">Doença</span>
                                             </li>
                                             <li class="list-group-item text-muted text-center no-tumors-message" th:if="${grupo.doencas == null or grupo.doencas.isEmpty()}">
-                                                Nenhum tipo de tumor cadastrado nesta localização.
+                                                Nenhuma doença cadastrada nesta categoria.
                                             </li>
                                         </ul>
                                     </div>

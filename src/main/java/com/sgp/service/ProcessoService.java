@@ -155,12 +155,32 @@ public class ProcessoService {
                 status);
     }
 
+    public List<Processo> listarProcessosComFiltroAcompanhamentoPorStatus(Integer diasSemAcesso,
+                                                                          Integer diasSemEdicao,
+                                                                          List<StatusProcesso> statuses) {
+        if (statuses == null || statuses.isEmpty()) {
+            return listarProcessosComFiltroAcompanhamento(diasSemAcesso, diasSemEdicao, (StatusProcesso) null);
+        }
+
+        LocalDateTime agora = LocalDateTime.now();
+        Integer diasAcessoValidos = diasSemAcesso != null ? Math.max(diasSemAcesso, 0) : null;
+        Integer diasEdicaoValidos = diasSemEdicao != null ? Math.max(diasSemEdicao, 0) : null;
+        LocalDateTime limiteAcesso = diasAcessoValidos != null ? agora.minusDays(diasAcessoValidos) : null;
+        LocalDateTime limiteEdicao = diasEdicaoValidos != null ? agora.minusDays(diasEdicaoValidos) : null;
+
+        return processoRepository.buscarParaListagemComAcompanhamentoPorStatus(
+                limiteAcesso,
+                limiteAcesso != null ? limiteAcesso.toLocalDate() : null,
+                limiteEdicao,
+                limiteEdicao != null ? limiteEdicao.toLocalDate() : null,
+                statuses);
+    }
+
     public List<Processo> listarProcessosSemVisita(Integer diasSemVisita) {
-        return listarProcessosComFiltroAcompanhamento(diasSemVisita, null, null)
-                .stream()
-                .filter(processo -> processo.getStatus() != StatusProcesso.OBITO
-                        && processo.getStatus() != StatusProcesso.CONCLUIDO)
-                .toList();
+        return listarProcessosComFiltroAcompanhamentoPorStatus(
+                diasSemVisita,
+                null,
+                List.of(StatusProcesso.ABERTO, StatusProcesso.EM_ANDAMENTO));
     }
 
     /**

@@ -6,6 +6,11 @@ package com.sgp.projections;
  */
 public class Projections {
 
+    public interface IdTotalProjection {
+        Long getId();
+        Long getTotal();
+    }
+
     public interface StatusCountProjection {
         String getStatus(); // nome do enum como string
         Long getTotal();

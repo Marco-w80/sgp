@@ -262,6 +262,19 @@
                   <a th:href="@{|/produtos/editar/${prod.id}|}" class="btn btn-circle btn-sm btn-outline-primary shadow-sm" title="Editar">
                     <i class="fas fa-edit"></i>
                   </a>
+                  <form th:if="${vinculosProcessos.get(prod.id) == null or vinculosProcessos.get(prod.id) == 0}"
+                    method="post" th:action="@{/produtos/excluir/{id}(id=${prod.id})}"
+                    class="d-inline ml-1 formulario-exclusao-cadastro" th:data-nome="${prod.nomeItem}">
+                    <button type="submit" class="btn btn-circle btn-sm btn-outline-danger shadow-sm" title="Excluir">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                  <button th:if="${vinculosProcessos.get(prod.id) != null and vinculosProcessos.get(prod.id) > 0}"
+                    type="button" class="btn btn-circle btn-sm btn-outline-secondary ml-1 shadow-sm btn-cadastro-vinculado"
+                    th:data-nome="${prod.nomeItem}" th:data-vinculos="${vinculosProcessos.get(prod.id)}"
+                    th:title="${'Vinculado a ' + vinculosProcessos.get(prod.id) + ' processo(s)'}">
+                    <i class="fas fa-lock"></i>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -278,6 +291,9 @@
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <div id="cadastro-feedback" class="d-none" th:data-sucesso="${mensagemSucesso}"
+    th:data-erro="${mensagemErro}"></div>
+  <script th:src="@{/js/exclusao-cadastros.js}"></script>
 
   <script>
     $(document).ready(function () {

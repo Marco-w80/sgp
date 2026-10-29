@@ -336,7 +336,7 @@
           <legend class="w-auto px-2">Detalhes da Doença</legend>
           <div class="form-row">
             <div class="form-group col-md-6">
-              <label>Localização da Doença<span class="text-danger">*</span></label>
+              <label>Categoria da doença<span class="text-danger">*</span></label>
               <select class="form-control" id="grupoDoenca" name="grupoDoencaId" required>
                 <option value="">Selecione</option>
                 <option th:each="g : ${gruposDoenca}" th:value="${g.id}" th:text="${g.nome}"
@@ -344,7 +344,7 @@
               </select>
             </div>
             <div class="form-group col-md-6">
-              <label>Tipo de Tumor<span class="text-danger">*</span></label>
+              <label>Doença<span class="text-danger">*</span></label>
               <select class="form-control" id="doenca" name="doencaId" required
                 th:attr="data-selected-id=${processo.doenca != null ? processo.doenca.id : ''}">
                 <option value="">Selecione</option>
@@ -600,7 +600,7 @@
       // Atualiza o Select2 para mostrar o placeholder de desabilitado
       doencaSelect.select2({
         theme: 'bootstrap4',
-        placeholder: 'Selecione uma localização primeiro'
+        placeholder: 'Selecione uma categoria primeiro'
       });
       return;
     }

@@ -21,6 +21,33 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
       boolean existsByNumeroInterno(String numeroInterno);
 
     @Query("""
+           select count(p) from Processo p
+           where p.paciente.id = :pessoaId
+              or p.advogado.id = :pessoaId
+              or p.medico.id = :pessoaId
+           """)
+    long contarVinculosPessoa(@Param("pessoaId") Long pessoaId);
+
+    long countByHospitalId(Long hospitalId);
+
+    long countByLocalId(Long localId);
+
+    @Query("select p.paciente.id as id, count(p) as total from Processo p group by p.paciente.id")
+    List<Projections.IdTotalProjection> contarVinculosPorPaciente();
+
+    @Query("select p.advogado.id as id, count(p) as total from Processo p where p.advogado is not null group by p.advogado.id")
+    List<Projections.IdTotalProjection> contarVinculosPorAdvogado();
+
+    @Query("select p.medico.id as id, count(p) as total from Processo p where p.medico is not null group by p.medico.id")
+    List<Projections.IdTotalProjection> contarVinculosPorMedico();
+
+    @Query("select p.hospital.id as id, count(p) as total from Processo p where p.hospital is not null group by p.hospital.id")
+    List<Projections.IdTotalProjection> contarVinculosPorHospital();
+
+    @Query("select p.local.id as id, count(p) as total from Processo p where p.local is not null group by p.local.id")
+    List<Projections.IdTotalProjection> contarVinculosPorLocal();
+
+    @Query("""
            select p from Processo p
            where (:limiteAcesso is null
                   or p.ultimoAcessoEm <= :limiteAcesso
@@ -36,6 +63,24 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
                                                         @Param("limiteEdicao") LocalDateTime limiteEdicao,
                                                         @Param("limiteEdicaoData") LocalDate limiteEdicaoData,
                                                         @Param("status") StatusProcesso status);
+
+    @Query("""
+           select p from Processo p
+           where (:limiteAcesso is null
+                  or p.ultimoAcessoEm <= :limiteAcesso
+                  or (p.ultimoAcessoEm is null and p.dataInicio <= :limiteAcessoData))
+             and (:limiteEdicao is null
+                  or p.ultimaEdicaoEm <= :limiteEdicao
+                  or (p.ultimaEdicaoEm is null and p.dataInicio <= :limiteEdicaoData))
+             and p.status in :statuses
+           order by p.ultimoAcessoEm asc, p.dataInicio asc, p.id desc
+           """)
+    List<Processo> buscarParaListagemComAcompanhamentoPorStatus(
+            @Param("limiteAcesso") LocalDateTime limiteAcesso,
+            @Param("limiteAcessoData") LocalDate limiteAcessoData,
+            @Param("limiteEdicao") LocalDateTime limiteEdicao,
+            @Param("limiteEdicaoData") LocalDate limiteEdicaoData,
+            @Param("statuses") List<StatusProcesso> statuses);
 
     @Query(value = """
             select p.id,

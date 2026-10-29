@@ -342,6 +342,19 @@
                     title="Editar">
                     <i class="fas fa-edit"></i>
                   </a>
+                  <form th:if="${vinculosProcessos.get(p.id) == null or vinculosProcessos.get(p.id) == 0}"
+                    method="post" th:action="@{/pessoas/excluir/{id}(id=${p.id})}"
+                    class="d-inline ml-1 formulario-exclusao-cadastro" th:data-nome="${p.nome}">
+                    <button type="submit" class="btn btn-circle btn-sm btn-outline-danger" title="Excluir">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                  <button th:if="${vinculosProcessos.get(p.id) != null and vinculosProcessos.get(p.id) > 0}"
+                    type="button" class="btn btn-circle btn-sm btn-outline-secondary ml-1 btn-cadastro-vinculado"
+                    th:data-nome="${p.nome}" th:data-vinculos="${vinculosProcessos.get(p.id)}"
+                    th:title="${'Vinculada a ' + vinculosProcessos.get(p.id) + ' processo(s)'}">
+                    <i class="fas fa-lock"></i>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -358,6 +371,9 @@
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <div id="cadastro-feedback" class="d-none" th:data-sucesso="${mensagemSucesso}"
+    th:data-erro="${mensagemErro}"></div>
+  <script th:src="@{/js/exclusao-cadastros.js}"></script>
 
   <script>
     let dadosPessoas = [];

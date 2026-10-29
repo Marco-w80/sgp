@@ -37,7 +37,7 @@ class ProcessoServiceAcompanhamentoTest {
     private DoencaRepository doencaRepository;
 
     @Test
-    void listaSomenteProcessosSemVisitaHaMaisDiasQueOFiltroEExcluiObitos() {
+    void listaSomenteProcessosAtivosSemVisitaHaMaisDiasQueOFiltro() {
         Paciente paciente = pacienteRepository.save(new Paciente(
                 "Paciente acompanhamento",
                 Sexo.OUTRO,
@@ -69,6 +69,9 @@ class ProcessoServiceAcompanhamentoTest {
         Processo obitoLegadoSemAcesso = salvarProcesso(
                 "ACOMP-OBITO-LEGADO", paciente, doenca,
                 LocalDate.now().minusDays(30), StatusProcesso.CONCLUIDO, null);
+        Processo suspensoSemAcesso = salvarProcesso(
+                "ACOMP-SUSPENSO", paciente, doenca,
+                LocalDate.now().minusDays(30), StatusProcesso.SUSPENSO, null);
 
         List<Long> idsEncontrados = processoService.listarProcessosSemVisita(7).stream()
                 .map(Processo::getId)
@@ -80,7 +83,48 @@ class ProcessoServiceAcompanhamentoTest {
                         recenteSemAcesso.getId(),
                         antigoComVisitaRecente.getId(),
                         obitoSemAcesso.getId(),
-                        obitoLegadoSemAcesso.getId());
+                        obitoLegadoSemAcesso.getId(),
+                        suspensoSemAcesso.getId());
+    }
+
+    @Test
+    void separaProcessosAtivosSuspensosEObitosPelosStatus() {
+        Paciente paciente = pacienteRepository.save(new Paciente(
+                "Paciente listagens por status",
+                Sexo.OUTRO,
+                LocalDate.of(1985, 5, 10),
+                "10987654321",
+                "TESTE-LISTAGENS-STATUS"));
+
+        Doenca doenca = new Doenca();
+        doenca.setNome("Doença para listagens");
+        doenca = doencaRepository.save(doenca);
+
+        Processo aberto = salvarProcesso("LISTA-ABERTO", paciente, doenca,
+                LocalDate.now(), StatusProcesso.ABERTO, null);
+        Processo andamento = salvarProcesso("LISTA-ANDAMENTO", paciente, doenca,
+                LocalDate.now(), StatusProcesso.EM_ANDAMENTO, null);
+        Processo suspenso = salvarProcesso("LISTA-SUSPENSO", paciente, doenca,
+                LocalDate.now(), StatusProcesso.SUSPENSO, null);
+        Processo obito = salvarProcesso("LISTA-OBITO", paciente, doenca,
+                LocalDate.now(), StatusProcesso.OBITO, null);
+        Processo obitoLegado = salvarProcesso("LISTA-CONCLUIDO", paciente, doenca,
+                LocalDate.now(), StatusProcesso.CONCLUIDO, null);
+
+        List<Long> ativos = ids(processoService.listarProcessosComFiltroAcompanhamentoPorStatus(
+                null, null, List.of(StatusProcesso.ABERTO, StatusProcesso.EM_ANDAMENTO)));
+        List<Long> suspensos = ids(processoService.listarProcessosComFiltroAcompanhamentoPorStatus(
+                null, null, List.of(StatusProcesso.SUSPENSO)));
+        List<Long> obitos = ids(processoService.listarProcessosComFiltroAcompanhamentoPorStatus(
+                null, null, List.of(StatusProcesso.OBITO, StatusProcesso.CONCLUIDO)));
+
+        assertThat(ativos).containsExactlyInAnyOrder(aberto.getId(), andamento.getId());
+        assertThat(suspensos).containsExactly(suspenso.getId());
+        assertThat(obitos).containsExactlyInAnyOrder(obito.getId(), obitoLegado.getId());
+    }
+
+    private List<Long> ids(List<Processo> processos) {
+        return processos.stream().map(Processo::getId).toList();
     }
 
     private Processo salvarProcesso(String numeroInterno,

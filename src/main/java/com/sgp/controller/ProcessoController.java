@@ -32,6 +32,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/processos")
 public class ProcessoController {
 
+    private static final List<StatusProcesso> STATUS_ATIVOS = List.of(
+            StatusProcesso.ABERTO, StatusProcesso.EM_ANDAMENTO);
+    private static final List<StatusProcesso> STATUS_SUSPENSOS = List.of(StatusProcesso.SUSPENSO);
+    private static final List<StatusProcesso> STATUS_OBITOS = List.of(
+            StatusProcesso.OBITO, StatusProcesso.CONCLUIDO);
+
     @Autowired
     private ProcessoRepository processoRepository;
     @Autowired
@@ -176,15 +182,63 @@ public class ProcessoController {
         proc.setObs(obs);
 
         processoRepository.save(proc);
-        return "redirect:/processos/listar";
+        return redirecionarParaListagem(proc.getStatus());
     }
 
-    @GetMapping("/listar")
-    public String list(@RequestParam(required = false) Integer diasSemAcesso,
-                       @RequestParam(required = false) Integer diasSemEdicao,
-                       @RequestParam(required = false) StatusProcesso status,
-                       Model model) {
-        List<Processo> processos = processoService.listarProcessosComFiltroAcompanhamento(diasSemAcesso, diasSemEdicao, status);
+    @GetMapping({"/listar", "/ativos"})
+    public String listarAtivos(@RequestParam(required = false) Integer diasSemAcesso,
+                               @RequestParam(required = false) Integer diasSemEdicao,
+                               Model model) {
+        return prepararListagem(diasSemAcesso, diasSemEdicao, STATUS_ATIVOS,
+                "Processos ativos",
+                "Processos abertos e em andamento.",
+                "fas fa-play-circle",
+                "/processos/ativos",
+                "ativos",
+                "Nenhum processo aberto ou em andamento foi encontrado.",
+                model);
+    }
+
+    @GetMapping("/suspensos")
+    public String listarSuspensos(@RequestParam(required = false) Integer diasSemAcesso,
+                                  @RequestParam(required = false) Integer diasSemEdicao,
+                                  Model model) {
+        return prepararListagem(diasSemAcesso, diasSemEdicao, STATUS_SUSPENSOS,
+                "Processos suspensos",
+                "Processos que estão temporariamente suspensos.",
+                "fas fa-pause-circle",
+                "/processos/suspensos",
+                "suspensos",
+                "Nenhum processo suspenso foi encontrado.",
+                model);
+    }
+
+    @GetMapping("/obitos")
+    public String listarObitos(@RequestParam(required = false) Integer diasSemAcesso,
+                               @RequestParam(required = false) Integer diasSemEdicao,
+                               Model model) {
+        return prepararListagem(diasSemAcesso, diasSemEdicao, STATUS_OBITOS,
+                "Processos de óbito",
+                "Processos encerrados em razão de óbito.",
+                "fas fa-ribbon",
+                "/processos/obitos",
+                "obitos",
+                "Nenhum processo de óbito foi encontrado.",
+                model);
+    }
+
+    private String prepararListagem(Integer diasSemAcesso,
+                                    Integer diasSemEdicao,
+                                    List<StatusProcesso> statuses,
+                                    String titulo,
+                                    String descricao,
+                                    String icone,
+                                    String rota,
+                                    String tipo,
+                                    String mensagemVazia,
+                                    Model model) {
+        List<Processo> processos = processoService.listarProcessosComFiltroAcompanhamentoPorStatus(
+                diasSemAcesso, diasSemEdicao, statuses);
 
         LocalDateTime agora = LocalDateTime.now();
         Map<Long, Long> diasSemAcessoMap = new HashMap<>();
@@ -197,9 +251,13 @@ public class ProcessoController {
         model.addAttribute("processos", processos);
         model.addAttribute("diasSemAcesso", diasSemAcesso);
         model.addAttribute("diasSemEdicao", diasSemEdicao);
-        model.addAttribute("statusSelecionado", status);
-        model.addAttribute("statusValues", statusValuesForForm());
         model.addAttribute("diasSemAcessoMap", diasSemAcessoMap);
+        model.addAttribute("tituloListagem", titulo);
+        model.addAttribute("descricaoListagem", descricao);
+        model.addAttribute("iconeListagem", icone);
+        model.addAttribute("rotaListagem", rota);
+        model.addAttribute("tipoListagem", tipo);
+        model.addAttribute("mensagemVazia", mensagemVazia);
         return "processos/listar-processos";
     }
 
@@ -231,17 +289,34 @@ public class ProcessoController {
     public ResponseEntity<byte[]> exportarExcel(
             @RequestParam(required = false) Integer diasSemAcesso,
             @RequestParam(required = false) Integer diasSemEdicao,
-            @RequestParam(required = false) StatusProcesso status) {
+            @RequestParam(required = false) StatusProcesso status,
+            @RequestParam(required = false) String tipo) {
 
-        List<Processo> processos = processoService.listarProcessosComFiltroAcompanhamento(diasSemAcesso, diasSemEdicao, status);
-        byte[] arquivo = processoExcelService.gerarRelatorioCompleto(processos, "Relatorio de Processos");
+        List<StatusProcesso> statuses = statusesDaListagem(tipo);
+        List<Processo> processos = statuses == null
+                ? processoService.listarProcessosComFiltroAcompanhamento(diasSemAcesso, diasSemEdicao, status)
+                : processoService.listarProcessosComFiltroAcompanhamentoPorStatus(diasSemAcesso, diasSemEdicao, statuses);
+        String identificador = tipo == null || tipo.isBlank() ? "processos" : tipo;
+        byte[] arquivo = processoExcelService.gerarRelatorioCompleto(processos, "Relatório de Processos");
         String data = LocalDate.now().toString();
-        String nomeArquivo = "relatorio-processos-" + data + ".xlsx";
+        String nomeArquivo = "relatorio-processos-" + identificador + "-" + data + ".xlsx";
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + nomeArquivo + "\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(arquivo);
+    }
+
+    private List<StatusProcesso> statusesDaListagem(String tipo) {
+        if (tipo == null) {
+            return null;
+        }
+        return switch (tipo.toLowerCase()) {
+            case "ativos" -> STATUS_ATIVOS;
+            case "suspensos" -> STATUS_SUSPENSOS;
+            case "obitos" -> STATUS_OBITOS;
+            default -> null;
+        };
     }
 
     @GetMapping("/editar/{id}")
@@ -421,7 +496,17 @@ public class ProcessoController {
 
         Processo processoSalvo = processoRepository.save(proc);
         processoLogService.registrarEdicao(processoSalvo);
-        return "redirect:/processos/listar";
+        return redirecionarParaListagem(processoSalvo.getStatus());
+    }
+
+    private String redirecionarParaListagem(StatusProcesso status) {
+        if (status == StatusProcesso.SUSPENSO) {
+            return "redirect:/processos/suspensos";
+        }
+        if (status == StatusProcesso.OBITO || status == StatusProcesso.CONCLUIDO) {
+            return "redirect:/processos/obitos";
+        }
+        return "redirect:/processos/ativos";
     }
 
     private List<StatusProcesso> statusValuesForForm() {

@@ -9,6 +9,6 @@ import com.sgp.model.Doenca;
 public interface DoencaRepository extends JpaRepository<Doenca, Long> {
 
     List<Doenca> findByGrupoId(Long grupoId);
-
-
+    boolean existsByNomeIgnoreCaseAndGrupoId(String nome, Long grupoId);
+    boolean existsByNomeIgnoreCaseAndGrupoIdAndIdNot(String nome, Long grupoId, Long id);
 }

@@ -563,9 +563,13 @@ border-radius: 10px !important;
     <div class="card shadow mb-5">
 
       <div class="card-header py-3 d-sm-flex align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">
-          <i class="fas fa-clipboard-list mr-2"></i> Listar Processos
-        </h6>
+        <div>
+          <h6 class="m-0 font-weight-bold text-primary">
+            <i class="mr-2" th:classappend="${' ' + iconeListagem}" aria-hidden="true"></i>
+            <span th:text="${tituloListagem}">Processos</span>
+          </h6>
+          <small class="text-muted" th:text="${descricaoListagem}">Processos filtrados por situação.</small>
+        </div>
         <a th:href="@{/processos/cadastrar}" class="btn btn-primary shadow-sm">
           <i class="fas fa-plus mr-1"></i> Novo Processo
         </a>
@@ -574,7 +578,7 @@ border-radius: 10px !important;
       <div class="card-body card-body-table">
 
         <div class="p-4 border-bottom bg-white">
-          <form method="get" th:action="@{/processos/listar}" class="mb-0">
+          <form method="get" th:action="${rotaListagem}" class="mb-0">
             <div class="form-row align-items-end">
               <div class="form-group col-xl-2 col-lg-3 col-md-4 mb-3 mb-md-0">
                 <label for="diasSemAcesso" class="small font-weight-bold text-muted text-uppercase mb-1">Dias sem
@@ -588,24 +592,15 @@ border-radius: 10px !important;
                 <input type="number" min="0" class="form-control" id="diasSemEdicao" name="diasSemEdicao"
                   th:value="${diasSemEdicao}">
               </div>
-              <div class="form-group col-xl-2 col-lg-3 col-md-4 mb-3 mb-md-0">
-                <label for="status" class="small font-weight-bold text-muted text-uppercase mb-1">Status</label>
-                <select class="form-control" id="status" name="status">
-                  <option value="">Todos</option>
-                  <option th:each="s : ${statusValues}" th:value="${s.name()}"
-                    th:text="${s.name() == 'OBITO' ? 'Óbito' : #strings.replace(s.name(), '_', ' ')}"
-                    th:selected="${statusSelecionado != null and statusSelecionado == s}"></option>
-                </select>
-              </div>
-              <div class="form-group col-xl-6 col-lg-12 col-md-12 text-xl-right text-lg-left mb-0 mt-3 mt-xl-0">
+              <div class="form-group col-xl-8 col-lg-6 col-md-4 text-xl-right text-lg-left mb-0 mt-3 mt-md-0">
                 <button type="submit" class="btn btn-primary shadow-sm mr-2">
                   <i class="fas fa-filter mr-1"></i> Filtrar
                 </button>
-                <a th:href="@{/processos/exportar-excel(diasSemAcesso=${diasSemAcesso},diasSemEdicao=${diasSemEdicao},status=${statusSelecionado})}"
+                <a th:href="@{/processos/exportar-excel(diasSemAcesso=${diasSemAcesso},diasSemEdicao=${diasSemEdicao},tipo=${tipoListagem})}"
                   class="btn btn-success shadow-sm mr-2">
                   <i class="fas fa-file-excel mr-1"></i> Excel
                 </a>
-                <a th:href="@{/processos/listar}" class="btn btn-outline-secondary">Limpar</a>
+                <a th:href="${rotaListagem}" class="btn btn-outline-secondary">Limpar</a>
               </div>
             </div>
           </form>
@@ -633,7 +628,7 @@ border-radius: 10px !important;
             </thead>
             <tbody>
               <tr th:if="${processos == null or #lists.isEmpty(processos)}">
-                <td colspan="14" class="text-center py-4 text-muted">Nenhum processo encontrado.</td>
+                <td colspan="14" class="text-center py-4 text-muted" th:text="${mensagemVazia}">Nenhum processo encontrado.</td>
               </tr>
               <tr th:each="proc : ${processos}">
                 <td class="truncate font-weight-bold" style="color: var(--cor-secundaria);" th:text="${proc.numeroProcesso}"></td>

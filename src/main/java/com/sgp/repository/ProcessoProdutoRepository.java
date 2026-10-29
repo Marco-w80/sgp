@@ -12,6 +12,17 @@ import java.util.List;
 @Repository
 public interface ProcessoProdutoRepository extends JpaRepository<ProcessoProduto, Long> {
 
+       @Query("select count(distinct pp.processo.id) from ProcessoProduto pp where pp.produto.id = :produtoId")
+       long contarProcessosPorProduto(@Param("produtoId") Long produtoId);
+
+       @Query("""
+                     select prod.id as id, count(distinct pp.processo.id) as total
+                     from ProcessoProduto pp
+                     join pp.produto prod
+                     group by prod.id
+                     """)
+       List<Projections.IdTotalProjection> contarProcessosPorProduto();
+
        // Consumo total por produto (agrupa por ID do produto)
        @Query("""
                      select cast(prod.id as string) as produto,
