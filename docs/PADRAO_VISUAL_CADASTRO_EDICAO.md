@@ -2,6 +2,8 @@
 
 Levantamento do código das telas acessadas pelos menus **Cadastrar** e **Editar** em `fragments/head.html`. O menu Editar leva às listagens, e cada listagem abre o respectivo formulário de edição. Este documento descreve o padrão existente e orienta a criação de novas telas; ele não substitui uma conferência visual no navegador.
 
+O padrão completo do módulo de Licitações, incluindo dashboard, cards, Kanban, busca e navegação fixa, está em `docs/PADRAO_VISUAL_LICITACOES.md`.
+
 ## Base compartilhada
 
 - Interface: Thymeleaf, SB Admin 2, Bootstrap 4, Nunito e Font Awesome. O fragmento `fragments/head.html` fornece menu lateral, barra superior e abertura de `.container-fluid`; `fragments/foot.html` fecha a estrutura e carrega os scripts base.
